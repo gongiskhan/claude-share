@@ -1,0 +1,98 @@
+{
+  "version": 2,
+  "plugins": {
+    "frontend-design@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/frontend-design/e30768372b41",
+        "version": "e30768372b41",
+        "installedAt": "2026-01-07T06:58:17.907Z",
+        "lastUpdated": "2026-01-21T07:16:33.739Z"
+      }
+    ],
+    "agent-sdk-dev@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/agent-sdk-dev/e30768372b41",
+        "version": "e30768372b41",
+        "installedAt": "2026-01-07T06:58:17.936Z",
+        "lastUpdated": "2026-01-21T07:16:33.753Z"
+      }
+    ],
+    "ralph-loop@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/ralph-loop/e30768372b41",
+        "version": "e30768372b41",
+        "installedAt": "2026-01-07T06:58:17.967Z",
+        "lastUpdated": "2026-01-21T07:16:33.762Z"
+      }
+    ],
+    "swift-lsp@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/swift-lsp/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-01-08T12:57:18.099Z",
+        "lastUpdated": "2026-01-08T12:57:18.099Z"
+      }
+    ],
+    "plugin-dev@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/plugin-dev/e30768372b41",
+        "version": "e30768372b41",
+        "installedAt": "2026-01-08T14:20:41.276Z",
+        "lastUpdated": "2026-01-21T07:16:33.786Z"
+      }
+    ],
+    "context7@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/context7/e30768372b41",
+        "version": "e30768372b41",
+        "installedAt": "2026-01-09T18:13:37.938Z",
+        "lastUpdated": "2026-01-21T07:16:33.746Z"
+      }
+    ],
+    "code-simplifier@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/code-simplifier/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-01-09T18:13:37.965Z",
+        "lastUpdated": "2026-01-09T18:13:37.965Z"
+      }
+    ],
+    "dev-browser@dev-browser-marketplace": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/dev-browser-marketplace/dev-browser/66682fb0513a",
+        "version": "66682fb0513a",
+        "installedAt": "2026-01-21T21:19:42.927Z",
+        "lastUpdated": "2026-01-21T21:19:42.927Z",
+        "gitCommitSha": "66682fb0513aec308e68d71740e2b0394a29d884"
+      }
+    ],
+    "document-skills@anthropic-agent-skills": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/anthropic-agent-skills/document-skills/69c0b1a06741",
+        "version": "69c0b1a06741",
+        "installedAt": "2026-01-21T21:24:28.571Z",
+        "lastUpdated": "2026-01-21T21:24:28.571Z",
+        "gitCommitSha": "69c0b1a0674149f27b61b2635f935524b6add202"
+      }
+    ],
+    "example-skills@anthropic-agent-skills": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/anthropic-agent-skills/example-skills/69c0b1a06741",
+        "version": "69c0b1a06741",
+        "installedAt": "2026-01-21T21:24:28.671Z",
+        "lastUpdated": "2026-01-21T21:24:28.671Z",
+        "gitCommitSha": "69c0b1a0674149f27b61b2635f935524b6add202"
+      }
+    ]
+  }
+}

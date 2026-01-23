@@ -1,0 +1,1631 @@
+{
+  "version": "2.0",
+  "skillType": "integration",
+  "integrationKey": "stripe",
+  "displayName": "Stripe",
+  "description": "Payment processing, subscriptions, invoices, and billing management with Stripe",
+  "authType": "api_key",
+  "provider": "Stripe",
+  "category": "payments",
+  "configSchema": [
+    {
+      "key": "secret_api_key",
+      "label": "Secret API Key",
+      "type": "string",
+      "required": true,
+      "secret": true,
+      "helpText": "Your Stripe secret key (starts with sk_live_ or sk_test_). Found in Stripe Dashboard → Developers → API keys."
+    }
+  ],
+  "actions": [
+    {
+      "actionName": "list_customers",
+      "description": "Retrieve a list of customers from Stripe",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of customers (1-100)",
+            "default": 10
+          },
+          "email": {
+            "type": "string",
+            "description": "Filter by exact email match"
+          },
+          "starting_after": {
+            "type": "string",
+            "description": "Cursor for pagination (customer ID)"
+          }
+        },
+        "required": []
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "List of customer objects"
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether more results exist"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/customers",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        },
+        "queryParams": {
+          "limit": "{{limit}}",
+          "email": "{{email}}",
+          "starting_after": "{{starting_after}}"
+        }
+      }
+    },
+    {
+      "actionName": "get_customer",
+      "description": "Retrieve a specific customer by ID",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string",
+            "description": "The Stripe customer ID"
+          }
+        },
+        "required": [
+          "customer_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/customers/{{customer_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        }
+      }
+    },
+    {
+      "actionName": "create_customer",
+      "description": "Create a new customer in Stripe",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Customer email address"
+          },
+          "name": {
+            "type": "string",
+            "description": "Customer full name"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Customer phone number"
+          },
+          "description": {
+            "type": "string",
+            "description": "Internal description"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Custom key-value pairs"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Created customer ID"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/customers",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "email": "{{email}}",
+          "name": "{{name}}",
+          "phone": "{{phone}}",
+          "description": "{{description}}",
+          "metadata": "{{metadata}}"
+        }
+      }
+    },
+    {
+      "actionName": "update_customer",
+      "description": "Update an existing customer",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string",
+            "description": "The Stripe customer ID"
+          },
+          "email": {
+            "type": "string",
+            "description": "New email address"
+          },
+          "name": {
+            "type": "string",
+            "description": "New name"
+          },
+          "phone": {
+            "type": "string",
+            "description": "New phone number"
+          },
+          "description": {
+            "type": "string",
+            "description": "New description"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "New metadata"
+          }
+        },
+        "required": [
+          "customer_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/customers/{{customer_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "email": "{{email}}",
+          "name": "{{name}}",
+          "phone": "{{phone}}",
+          "description": "{{description}}",
+          "metadata": "{{metadata}}"
+        }
+      }
+    },
+    {
+      "actionName": "list_payments",
+      "description": "List payment intents",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum results (1-100)",
+            "default": 10
+          },
+          "customer": {
+            "type": "string",
+            "description": "Filter by customer ID"
+          },
+          "starting_after": {
+            "type": "string",
+            "description": "Cursor for pagination"
+          }
+        },
+        "required": []
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "List of payment intents"
+          },
+          "has_more": {
+            "type": "boolean"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/payment_intents",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        },
+        "queryParams": {
+          "limit": "{{limit}}",
+          "customer": "{{customer}}",
+          "starting_after": "{{starting_after}}"
+        }
+      }
+    },
+    {
+      "actionName": "get_payment",
+      "description": "Retrieve a specific payment intent",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "payment_intent_id": {
+            "type": "string",
+            "description": "The payment intent ID"
+          }
+        },
+        "required": [
+          "payment_intent_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "customer": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/payment_intents/{{payment_intent_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        }
+      }
+    },
+    {
+      "actionName": "create_payment_intent",
+      "description": "Create a new payment intent",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "description": "Amount in cents"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Three-letter currency code"
+          },
+          "customer": {
+            "type": "string",
+            "description": "Customer ID"
+          },
+          "description": {
+            "type": "string",
+            "description": "Payment description"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Custom metadata"
+          }
+        },
+        "required": [
+          "amount",
+          "currency"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/payment_intents",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "amount": "{{amount}}",
+          "currency": "{{currency}}",
+          "customer": "{{customer}}",
+          "description": "{{description}}",
+          "metadata": "{{metadata}}"
+        }
+      }
+    },
+    {
+      "actionName": "list_subscriptions",
+      "description": "List subscriptions with optional filters",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum results (1-100)",
+            "default": 10
+          },
+          "customer": {
+            "type": "string",
+            "description": "Filter by customer ID"
+          },
+          "status": {
+            "type": "string",
+            "description": "Filter by status: active, canceled, past_due, trialing, all"
+          },
+          "price": {
+            "type": "string",
+            "description": "Filter by price ID"
+          },
+          "starting_after": {
+            "type": "string",
+            "description": "Cursor for pagination"
+          }
+        },
+        "required": []
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "List of subscriptions"
+          },
+          "has_more": {
+            "type": "boolean"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/subscriptions",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        },
+        "queryParams": {
+          "limit": "{{limit}}",
+          "customer": "{{customer}}",
+          "status": "{{status}}",
+          "price": "{{price}}",
+          "starting_after": "{{starting_after}}"
+        }
+      }
+    },
+    {
+      "actionName": "get_subscription",
+      "description": "Retrieve a specific subscription",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "description": "The subscription ID"
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "customer": {
+            "type": "string"
+          },
+          "current_period_end": {
+            "type": "integer"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/subscriptions/{{subscription_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        }
+      }
+    },
+    {
+      "actionName": "create_subscription",
+      "description": "Create a new subscription for a customer",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "customer": {
+            "type": "string",
+            "description": "Customer ID"
+          },
+          "price": {
+            "type": "string",
+            "description": "Price ID to subscribe to"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Number of units",
+            "default": 1
+          },
+          "trial_period_days": {
+            "type": "integer",
+            "description": "Days of free trial"
+          },
+          "cancel_at_period_end": {
+            "type": "boolean",
+            "description": "Cancel at end of period"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Custom metadata"
+          }
+        },
+        "required": [
+          "customer",
+          "price"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "current_period_end": {
+            "type": "integer"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/subscriptions",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "customer": "{{customer}}",
+          "items[0][price]": "{{price}}",
+          "items[0][quantity]": "{{quantity}}",
+          "trial_period_days": "{{trial_period_days}}",
+          "cancel_at_period_end": "{{cancel_at_period_end}}",
+          "metadata": "{{metadata}}"
+        }
+      }
+    },
+    {
+      "actionName": "update_subscription",
+      "description": "Update an existing subscription",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "description": "The subscription ID"
+          },
+          "price": {
+            "type": "string",
+            "description": "New price ID"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "New quantity"
+          },
+          "cancel_at_period_end": {
+            "type": "boolean",
+            "description": "Cancel at period end"
+          },
+          "proration_behavior": {
+            "type": "string",
+            "description": "create_prorations, none, or always_invoice"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "New metadata"
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/subscriptions/{{subscription_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "items[0][price]": "{{price}}",
+          "items[0][quantity]": "{{quantity}}",
+          "cancel_at_period_end": "{{cancel_at_period_end}}",
+          "proration_behavior": "{{proration_behavior}}",
+          "metadata": "{{metadata}}"
+        }
+      }
+    },
+    {
+      "actionName": "cancel_subscription",
+      "description": "Cancel a subscription",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "description": "The subscription ID"
+          },
+          "cancel_at_period_end": {
+            "type": "boolean",
+            "description": "If true, cancel at end of current period"
+          },
+          "cancellation_details": {
+            "type": "object",
+            "description": "Reason details with comment and feedback"
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "canceled_at": {
+            "type": "integer"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "DELETE",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/subscriptions/{{subscription_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "queryParams": {
+          "cancel_at_period_end": "{{cancel_at_period_end}}"
+        }
+      }
+    },
+    {
+      "actionName": "list_invoices",
+      "description": "List invoices with optional filters",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum results (1-100)",
+            "default": 10
+          },
+          "customer": {
+            "type": "string",
+            "description": "Filter by customer ID"
+          },
+          "subscription": {
+            "type": "string",
+            "description": "Filter by subscription ID"
+          },
+          "status": {
+            "type": "string",
+            "description": "Filter by status: draft, open, paid, void, uncollectible"
+          },
+          "starting_after": {
+            "type": "string",
+            "description": "Cursor for pagination"
+          }
+        },
+        "required": []
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "List of invoices"
+          },
+          "has_more": {
+            "type": "boolean"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/invoices",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        },
+        "queryParams": {
+          "limit": "{{limit}}",
+          "customer": "{{customer}}",
+          "subscription": "{{subscription}}",
+          "status": "{{status}}",
+          "starting_after": "{{starting_after}}"
+        }
+      }
+    },
+    {
+      "actionName": "get_invoice",
+      "description": "Retrieve a specific invoice",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "invoice_id": {
+            "type": "string",
+            "description": "The invoice ID"
+          }
+        },
+        "required": [
+          "invoice_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "amount_due": {
+            "type": "integer"
+          },
+          "customer": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/invoices/{{invoice_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        }
+      }
+    },
+    {
+      "actionName": "create_invoice",
+      "description": "Create a new invoice for a customer",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "customer": {
+            "type": "string",
+            "description": "Customer ID"
+          },
+          "auto_advance": {
+            "type": "boolean",
+            "description": "Automatically finalize",
+            "default": true
+          },
+          "collection_method": {
+            "type": "string",
+            "description": "charge_automatically or send_invoice"
+          },
+          "days_until_due": {
+            "type": "integer",
+            "description": "Days until payment is due"
+          },
+          "description": {
+            "type": "string",
+            "description": "Invoice description"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Custom metadata"
+          }
+        },
+        "required": [
+          "customer"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/invoices",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "customer": "{{customer}}",
+          "auto_advance": "{{auto_advance}}",
+          "collection_method": "{{collection_method}}",
+          "days_until_due": "{{days_until_due}}",
+          "description": "{{description}}",
+          "metadata": "{{metadata}}"
+        }
+      }
+    },
+    {
+      "actionName": "send_invoice",
+      "description": "Finalize and send an invoice",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "invoice_id": {
+            "type": "string",
+            "description": "The invoice ID"
+          }
+        },
+        "required": [
+          "invoice_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/invoices/{{invoice_id}}/send",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        }
+      }
+    },
+    {
+      "actionName": "pay_invoice",
+      "description": "Mark an invoice as paid",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "invoice_id": {
+            "type": "string",
+            "description": "The invoice ID"
+          },
+          "paid_out_of_band": {
+            "type": "boolean",
+            "description": "Mark as paid outside Stripe"
+          }
+        },
+        "required": [
+          "invoice_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/invoices/{{invoice_id}}/pay",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "paid_out_of_band": "{{paid_out_of_band}}"
+        }
+      }
+    },
+    {
+      "actionName": "void_invoice",
+      "description": "Void an open invoice",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "invoice_id": {
+            "type": "string",
+            "description": "The invoice ID"
+          }
+        },
+        "required": [
+          "invoice_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/invoices/{{invoice_id}}/void",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        }
+      }
+    },
+    {
+      "actionName": "list_refunds",
+      "description": "List refunds with optional filters",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum results (1-100)",
+            "default": 10
+          },
+          "payment_intent": {
+            "type": "string",
+            "description": "Filter by payment intent ID"
+          },
+          "charge": {
+            "type": "string",
+            "description": "Filter by charge ID"
+          },
+          "starting_after": {
+            "type": "string",
+            "description": "Cursor for pagination"
+          }
+        },
+        "required": []
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "List of refunds"
+          },
+          "has_more": {
+            "type": "boolean"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/refunds",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        },
+        "queryParams": {
+          "limit": "{{limit}}",
+          "payment_intent": "{{payment_intent}}",
+          "charge": "{{charge}}",
+          "starting_after": "{{starting_after}}"
+        }
+      }
+    },
+    {
+      "actionName": "get_refund",
+      "description": "Retrieve a specific refund",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "refund_id": {
+            "type": "string",
+            "description": "The refund ID"
+          }
+        },
+        "required": [
+          "refund_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/refunds/{{refund_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        }
+      }
+    },
+    {
+      "actionName": "create_refund",
+      "description": "Create a refund for a payment",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "payment_intent": {
+            "type": "string",
+            "description": "Payment intent ID to refund"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Amount to refund in cents (full refund if omitted)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "duplicate, fraudulent, or requested_by_customer"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Custom metadata"
+          }
+        },
+        "required": [
+          "payment_intent"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/refunds",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "payment_intent": "{{payment_intent}}",
+          "amount": "{{amount}}",
+          "reason": "{{reason}}",
+          "metadata": "{{metadata}}"
+        }
+      }
+    },
+    {
+      "actionName": "list_products",
+      "description": "List products in your catalog",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum results (1-100)",
+            "default": 10
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Filter by active status"
+          },
+          "starting_after": {
+            "type": "string",
+            "description": "Cursor for pagination"
+          }
+        },
+        "required": []
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "List of products"
+          },
+          "has_more": {
+            "type": "boolean"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/products",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        },
+        "queryParams": {
+          "limit": "{{limit}}",
+          "active": "{{active}}",
+          "starting_after": "{{starting_after}}"
+        }
+      }
+    },
+    {
+      "actionName": "get_product",
+      "description": "Retrieve a specific product",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "description": "The product ID"
+          }
+        },
+        "required": [
+          "product_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/products/{{product_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        }
+      }
+    },
+    {
+      "actionName": "create_product",
+      "description": "Create a new product",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Product name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Product description"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether product is available",
+            "default": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Custom metadata"
+          },
+          "images": {
+            "type": "array",
+            "description": "Array of image URLs"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/products",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "name": "{{name}}",
+          "description": "{{description}}",
+          "active": "{{active}}",
+          "metadata": "{{metadata}}",
+          "images": "{{images}}"
+        }
+      }
+    },
+    {
+      "actionName": "update_product",
+      "description": "Update an existing product",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "description": "The product ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "New name"
+          },
+          "description": {
+            "type": "string",
+            "description": "New description"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "New active status"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "New metadata"
+          }
+        },
+        "required": [
+          "product_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/products/{{product_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "name": "{{name}}",
+          "description": "{{description}}",
+          "active": "{{active}}",
+          "metadata": "{{metadata}}"
+        }
+      }
+    },
+    {
+      "actionName": "list_prices",
+      "description": "List prices with optional filters",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum results (1-100)",
+            "default": 10
+          },
+          "product": {
+            "type": "string",
+            "description": "Filter by product ID"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Filter by active status"
+          },
+          "type": {
+            "type": "string",
+            "description": "one_time or recurring"
+          },
+          "starting_after": {
+            "type": "string",
+            "description": "Cursor for pagination"
+          }
+        },
+        "required": []
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "List of prices"
+          },
+          "has_more": {
+            "type": "boolean"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/prices",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        },
+        "queryParams": {
+          "limit": "{{limit}}",
+          "product": "{{product}}",
+          "active": "{{active}}",
+          "type": "{{type}}",
+          "starting_after": "{{starting_after}}"
+        }
+      }
+    },
+    {
+      "actionName": "get_price",
+      "description": "Retrieve a specific price",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "price_id": {
+            "type": "string",
+            "description": "The price ID"
+          }
+        },
+        "required": [
+          "price_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "unit_amount": {
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "product": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/prices/{{price_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        }
+      }
+    },
+    {
+      "actionName": "create_price",
+      "description": "Create a new price for a product",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "product": {
+            "type": "string",
+            "description": "Product ID"
+          },
+          "unit_amount": {
+            "type": "integer",
+            "description": "Price in cents"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Three-letter currency code"
+          },
+          "recurring_interval": {
+            "type": "string",
+            "description": "month, year, week, or day (for subscriptions)"
+          },
+          "recurring_interval_count": {
+            "type": "integer",
+            "description": "Number of intervals",
+            "default": 1
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether price is active",
+            "default": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Custom metadata"
+          }
+        },
+        "required": [
+          "product",
+          "unit_amount",
+          "currency"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "unit_amount": {
+            "type": "integer"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/prices",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "product": "{{product}}",
+          "unit_amount": "{{unit_amount}}",
+          "currency": "{{currency}}",
+          "recurring[interval]": "{{recurring_interval}}",
+          "recurring[interval_count]": "{{recurring_interval_count}}",
+          "active": "{{active}}",
+          "metadata": "{{metadata}}"
+        }
+      }
+    },
+    {
+      "actionName": "create_checkout_session",
+      "description": "Create a Stripe Checkout session",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "description": "payment, subscription, or setup"
+          },
+          "success_url": {
+            "type": "string",
+            "description": "URL after successful payment"
+          },
+          "cancel_url": {
+            "type": "string",
+            "description": "URL if canceled"
+          },
+          "line_items": {
+            "type": "array",
+            "description": "Array of {price, quantity} objects"
+          },
+          "customer": {
+            "type": "string",
+            "description": "Existing customer ID"
+          },
+          "customer_email": {
+            "type": "string",
+            "description": "Pre-fill email"
+          },
+          "allow_promotion_codes": {
+            "type": "boolean",
+            "description": "Allow promo codes"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Custom metadata"
+          }
+        },
+        "required": [
+          "mode",
+          "success_url",
+          "cancel_url",
+          "line_items"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "description": "Checkout URL to redirect to"
+          }
+        }
+      },
+      "mutates": true,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/checkout/sessions",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "bodyTemplate": {
+          "mode": "{{mode}}",
+          "success_url": "{{success_url}}",
+          "cancel_url": "{{cancel_url}}",
+          "line_items": "{{line_items}}",
+          "customer": "{{customer}}",
+          "customer_email": "{{customer_email}}",
+          "allow_promotion_codes": "{{allow_promotion_codes}}",
+          "metadata": "{{metadata}}"
+        }
+      }
+    },
+    {
+      "actionName": "get_checkout_session",
+      "description": "Retrieve a checkout session",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "description": "The checkout session ID"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "payment_status": {
+            "type": "string"
+          },
+          "customer": {
+            "type": "string"
+          },
+          "subscription": {
+            "type": "string"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://api.stripe.com/v1",
+        "path": "/checkout/sessions/{{session_id}}",
+        "headers": {
+          "Authorization": "Bearer {{secret_api_key}}"
+        }
+      }
+    }
+  ],
+  "proxyContract": {
+    "executeEndpoint": "/api/agent/integrations/execute",
+    "requiredInputs": [
+      "integrationKey",
+      "actionName",
+      "args"
+    ]
+  },
+  "createdAt": "2026-01-15T21:17:48.178Z",
+  "updatedAt": "2026-01-15T21:17:48.178Z"
+}
