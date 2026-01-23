@@ -1,0 +1,24 @@
+# Sensitive files
+.credentials.json
+history.jsonl
+stats-cache.json
+
+# Cache and temporary files
+.DS_Store
+cache/
+chrome/
+debug/
+file-history/
+ide/
+paste-cache/
+plans/
+projects/
+prompts-manager-docs/
+scripts/
+session-env/
+shell-snapshots/
+skills_archive/
+statsig/
+tasks/
+telemetry/
+todos/
