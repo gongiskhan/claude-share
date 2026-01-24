@@ -1,0 +1,173 @@
+{
+  "version": "2.0",
+  "skillType": "integration",
+  "integrationKey": "google-analytics-4",
+  "displayName": "Google Analytics 4",
+  "description": "Query Google Analytics 4 data including sessions, users, pageviews, and custom reports using the GA4 Data API.",
+  "authType": "service_account",
+  "provider": "Google",
+  "category": "analytics",
+  "configSchema": [
+    {
+      "key": "service_account_json",
+      "label": "Service Account JSON",
+      "type": "textarea",
+      "required": true,
+      "secret": true,
+      "helpText": "Paste the full content of your Google Cloud service account JSON key file. The service account needs the Analytics Viewer role."
+    },
+    {
+      "key": "property_id",
+      "label": "Property ID",
+      "type": "string",
+      "required": true,
+      "secret": false,
+      "helpText": "Your GA4 property ID (numeric). Found in Google Analytics Admin > Property Settings."
+    }
+  ],
+  "actions": [
+    {
+      "actionName": "run_report",
+      "description": "Run a standard GA4 report with specified metrics, dimensions, and date range",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "property_id": {
+            "type": "string",
+            "description": "GA4 property ID (e.g., '394264564')"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "Start date (YYYY-MM-DD or relative like '7daysAgo', '30daysAgo')"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "End date (YYYY-MM-DD or relative like 'today', 'yesterday')"
+          },
+          "metrics": {
+            "type": "array",
+            "description": "Metrics to retrieve (e.g., sessions, totalUsers, screenPageViews)"
+          },
+          "dimensions": {
+            "type": "array",
+            "description": "Dimensions to group by (e.g., date, country, pagePath)"
+          },
+          "limit": {
+            "type": "number",
+            "description": "Maximum rows to return (default: 100)"
+          }
+        },
+        "required": ["property_id", "start_date", "end_date", "metrics"]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "rows": {
+            "type": "array",
+            "description": "Report data rows with dimension and metric values"
+          },
+          "rowCount": {
+            "type": "number",
+            "description": "Total number of rows returned"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://analyticsdata.googleapis.com",
+        "path": "/v1beta/properties/{{property_id}}:runReport",
+        "headers": {
+          "Authorization": "Bearer {{access_token}}",
+          "Content-Type": "application/json"
+        },
+        "bodyTemplate": {
+          "dateRanges": [
+            {
+              "startDate": "{{start_date}}",
+              "endDate": "{{end_date}}"
+            }
+          ],
+          "metrics": "{{metrics_array}}",
+          "dimensions": "{{dimensions_array}}",
+          "limit": "{{limit}}"
+        },
+        "authHelpers": [
+          {
+            "type": "google_service_account",
+            "outputVariable": "access_token",
+            "config": {
+              "serviceAccountJsonVar": "service_account_json",
+              "scopes": ["https://www.googleapis.com/auth/analytics.readonly"]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "actionName": "run_realtime_report",
+      "description": "Get real-time active users and activity from GA4",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "property_id": {
+            "type": "string",
+            "description": "GA4 property ID (e.g., '394264564')"
+          },
+          "metrics": {
+            "type": "array",
+            "description": "Realtime metrics (e.g., activeUsers)"
+          },
+          "dimensions": {
+            "type": "array",
+            "description": "Realtime dimensions (e.g., country, deviceCategory)"
+          }
+        },
+        "required": ["property_id", "metrics"]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "rows": {
+            "type": "array",
+            "description": "Realtime data rows"
+          },
+          "rowCount": {
+            "type": "number",
+            "description": "Number of rows"
+          }
+        }
+      },
+      "mutates": false,
+      "httpConfig": {
+        "method": "POST",
+        "baseUrl": "https://analyticsdata.googleapis.com",
+        "path": "/v1beta/properties/{{property_id}}:runRealtimeReport",
+        "headers": {
+          "Authorization": "Bearer {{access_token}}",
+          "Content-Type": "application/json"
+        },
+        "bodyTemplate": {
+          "metrics": "{{metrics_array}}",
+          "dimensions": "{{dimensions_array}}"
+        },
+        "authHelpers": [
+          {
+            "type": "google_service_account",
+            "outputVariable": "access_token",
+            "config": {
+              "serviceAccountJsonVar": "service_account_json",
+              "scopes": ["https://www.googleapis.com/auth/analytics.readonly"]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "proxyContract": {
+    "executeEndpoint": "/api/agent/integrations/execute",
+    "requiredInputs": ["integrationKey", "actionName", "args"]
+  },
+  "createdAt": "2026-01-24T07:00:00.000Z",
+  "updatedAt": "2026-01-24T07:00:00.000Z"
+}
