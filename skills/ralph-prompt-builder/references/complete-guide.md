@@ -1,13 +1,13 @@
-# Ralph Loop Prompting System - Complete Guide v3.2
+# Ralph Loop Prompting System - Complete Guide v4.0
 
-Detailed explanations for creating effective Claude Code prompts using the Ralph Loop plugin with e2e-testing skill integration.
+Detailed explanations for creating effective Claude Code prompts using the Ralph Loop plugin with Claude for Chrome MCP tools for browser verification.
 
 ## Table of Contents
 
 1. [Why These Rules Exist](#why-these-rules-exist)
 2. [Command Format Rules](#command-format-rules)
 3. [Planning and Auto-Acceptance](#planning-and-auto-acceptance)
-4. [E2E Testing Skill Integration](#e2e-testing-skill-integration)
+4. [Browser Verification with MCP Tools](#browser-verification-with-mcp-tools)
 5. [Describing Images for Claude Code](#describing-images-for-claude-code)
 6. [Max Iterations Guidelines](#max-iterations-guidelines)
 7. [Completion Promise System](#completion-promise-system)
@@ -23,23 +23,23 @@ Detailed explanations for creating effective Claude Code prompts using the Ralph
 
 Without auto-acceptance, Claude Code pauses after creating a plan and waits for human confirmation. In a ralph-loop automated flow, this causes the loop to stall on every iteration waiting for approval that never comes. By instructing Claude to auto-accept its own plan, the loop runs continuously until completion or max iterations.
 
-### Why Use the E2E Testing Skill?
+### Why Use Claude for Chrome MCP Tools?
 
-The e2e-testing skill at `~/.claude/skills/e2e-testing` provides:
-- **Automatic browser strategy selection** - tries Claude for Chrome, dev-browser, Chrome debug mode, Chromium, and Agent Browser in sequence
-- **Persistent sessions** - reuses login sessions across tests
-- **Visible browser** - runs non-headless so you can observe
-- **Graceful fallback** - automatically moves to next strategy if one fails
+Claude has direct access to browser automation through the `mcp__claude-in-chrome__*` MCP tools. These tools allow:
+- **Direct browser control** - navigate, click, type, screenshot without writing code
+- **Real browser testing** - uses actual Chrome with all sessions intact
+- **Visual verification** - take screenshots to prove features work
+- **No Playwright scripts** - interact with tools directly, not by writing test files
 
-This eliminates the need to manually specify browser setup in every prompt.
+**CRITICAL:** Always instruct Claude to use MCP tools directly. NEVER tell Claude to write Playwright test scripts or test files.
 
 ### Why Check Ports First?
 
-When working with multiple worktrees, each runs on different ports. The e2e-testing skill needs to know which port to test. Always check .env for UI_PORT to ensure tests run against the correct instance.
+When working with multiple worktrees, each runs on different ports. The MCP tools need to navigate to the correct URL. Always check .env for UI_PORT to ensure browser verification runs against the correct instance.
 
 ### Why Validate Before Stopping?
 
-Claude Code might assume code works based on static analysis, but runtime behavior often differs. The completion promise should ONLY be output after the e2e-testing skill confirms the feature works through actual browser testing. This prevents loops from ending prematurely with broken code.
+Claude Code might assume code works based on static analysis, but runtime behavior often differs. The completion promise should ONLY be output after browser verification with screenshots confirms the feature works. This prevents loops from ending prematurely with broken code.
 
 ### Why Describe Images as Text?
 
@@ -93,62 +93,71 @@ PLAN FIRST then AUTO-ACCEPT and implement without waiting for confirmation.
 2. Creates a structured implementation plan
 3. Automatically accepts the plan (no pause)
 4. Executes the plan step by step
-5. Uses e2e-testing skill for verification
-6. Outputs promise only after e2e tests pass
+5. Uses Claude for Chrome MCP tools for browser verification
+6. Outputs promise only after screenshot confirms success
 
 ---
 
-## E2E Testing Skill Integration
+## Browser Verification with MCP Tools
 
-### The Skill Location
+### Available MCP Tools
 
-```
-~/.claude/skills/e2e-testing/SKILL.md
-```
+Claude has direct access to these browser automation tools:
 
-### What It Does
-
-The e2e-testing skill handles all browser automation with an intelligent fallback chain:
-
-```
-Strategy 1: Claude for Chrome (MCP)
-    ↓ (if unavailable or timeout)
-Strategy 2: dev-browser skill (Chrome Extension)
-    ↓ (if unavailable)
-Strategy 3: Chrome Debug Mode
-    ↓ (if fails)
-Strategy 4: Chromium Persistent Context (Playwright)
-    ↓ (if fails)
-Strategy 5: Agent Browser (Final Fallback)
-```
+| Tool | Purpose |
+|------|---------|
+| `mcp__claude-in-chrome__tabs_context_mcp` | Get/create browser tab context |
+| `mcp__claude-in-chrome__tabs_create_mcp` | Create new tab for testing |
+| `mcp__claude-in-chrome__resize_window` | Set viewport size (default: 1440x900) |
+| `mcp__claude-in-chrome__navigate` | Navigate to URL |
+| `mcp__claude-in-chrome__read_page` | Get page accessibility tree |
+| `mcp__claude-in-chrome__find` | Find specific elements |
+| `mcp__claude-in-chrome__form_input` | Fill form fields |
+| `mcp__claude-in-chrome__computer` | Click, type, screenshot, scroll |
+| `mcp__claude-in-chrome__get_page_text` | Extract page text content |
 
 ### How to Include in Prompts
 
-**Always use this pattern:**
+**Always use this pattern - explicitly naming the MCP tools:**
 
 ```
-VERIFICATION: FIRST check .env for UI_PORT. After implementation, use the e2e-testing skill from ~/.claude/skills/e2e-testing to verify on the correct port: 1) [Navigate action], 2) [Test action], 3) [Verify expected result], 4) Take screenshot to confirm.
+BROWSER VERIFICATION: FIRST check .env for UI_PORT. After implementation, use Claude for Chrome MCP tools to verify - NEVER write Playwright scripts. Steps: 1) Call mcp__claude-in-chrome__tabs_context_mcp with createIfEmpty=true, 2) Call mcp__claude-in-chrome__tabs_create_mcp, 3) Call mcp__claude-in-chrome__resize_window with width=1440 height=900, 4) Call mcp__claude-in-chrome__navigate to app URL, 5) [Test actions using MCP tools], 6) Call mcp__claude-in-chrome__computer with action=screenshot to capture proof. If MCP tools unavailable, use agent-browser CLI.
 ```
 
 ### Verification Steps Format
 
-Be specific about what the e2e-testing skill should verify:
+Be specific about what MCP tools to use:
 
 ```
-Verification steps for e2e-testing:
-1) Navigate to [specific page/route]
-2) [Specific action - resize viewport, click button, fill form, scroll]
-3) Verify [specific expected result - element visible, text appears, behavior works]
-4) Take screenshot to confirm the result
+Browser verification steps:
+1) Get tab context with mcp__claude-in-chrome__tabs_context_mcp
+2) Navigate to [specific page/route] with mcp__claude-in-chrome__navigate
+3) Find elements with mcp__claude-in-chrome__read_page or mcp__claude-in-chrome__find
+4) [Specific action - click, type, scroll using mcp__claude-in-chrome__computer]
+5) Take screenshot with mcp__claude-in-chrome__computer action=screenshot
 ```
 
-### What NOT to Include
+### CRITICAL: What NOT to Do
 
-Do NOT manually specify browser setup. These are handled automatically by the e2e-testing skill:
-- ~~Claude for Chrome setup~~
-- ~~Chrome debug mode commands~~
-- ~~Playwright MCP fallback~~
-- ~~Browser strategy selection~~
+**NEVER tell Claude to write test scripts.** These instructions cause Claude to create Playwright files instead of using MCP tools:
+- ~~"write Playwright tests"~~
+- ~~"create e2e tests"~~
+- ~~"write .spec.ts files"~~
+- ~~"use test() blocks"~~
+
+Instead, always be explicit: **"use Claude for Chrome MCP tools directly"**
+
+### Fallback: agent-browser CLI
+
+If Claude for Chrome MCP tools are unavailable (permission denied, extension not installed), fall back to agent-browser:
+
+```bash
+agent-browser open http://localhost:PORT
+agent-browser set viewport 1440 900
+agent-browser snapshot -i
+agent-browser [interaction commands]
+agent-browser screenshot result.png
+```
 
 ---
 
@@ -240,18 +249,18 @@ The promise system tells the ralph-loop when to stop. Without it, the loop eithe
 1. **Flag:** `--completion-promise "TAG"` tells the stop hook what pattern to look for
 2. **Instruction in prompt:** Tell Claude to output `<promise>TAG</promise>` when done
 
-### Critical Rule: E2E Tests Before Promise
+### Critical Rule: Screenshot Before Promise
 
 ```
-Output <promise>TAG</promise> ONLY after e2e tests confirm the feature works - never output the promise based on assumptions or code analysis alone.
+Output <promise>TAG</promise> ONLY after browser verification with screenshot confirms the feature works - never output the promise based on assumptions or code analysis alone.
 ```
 
-**Why:** Claude Code might believe code works based on reading it, but runtime behavior often differs. The promise must only appear after the e2e-testing skill confirms success through actual browser testing.
+**Why:** Claude Code might believe code works based on reading it, but runtime behavior often differs. The promise must only appear after Claude for Chrome MCP tools confirm success through actual browser testing with screenshots.
 
 ### Example
 
 ```
-... Output <promise>BUG_FIXED</promise> ONLY after e2e tests confirm the fix works." --max-iterations 5 --completion-promise "BUG_FIXED"
+... Output <promise>BUG_FIXED</promise> ONLY after browser verification with screenshot confirms the fix works." --max-iterations 5 --completion-promise "BUG_FIXED"
 ```
 
 ### Tag Naming Convention
@@ -270,20 +279,20 @@ Use descriptive, uppercase tags with underscores:
 
 ### Special Considerations
 
-Mobile bugs require specific testing approaches. Include viewport resizing in the e2e-testing verification steps.
+Mobile bugs require specific testing approaches. Include viewport resizing using `mcp__claude-in-chrome__resize_window` in the browser verification steps.
 
 ### Mobile-Specific Verification Steps
 
 ```
-Verification steps for e2e-testing:
-1) Navigate to page on correct port
-2) Resize viewport to mobile size (375x667 for iPhone, 360x640 for Android)
-3) Verify [mobile-specific behavior]
-4) Test with both portrait and landscape orientations
-5) Verify touch targets are at least 44px
-6) Resize back to desktop (1280x720)
+Browser verification for mobile:
+1) Call mcp__claude-in-chrome__tabs_context_mcp with createIfEmpty=true
+2) Call mcp__claude-in-chrome__navigate to page on correct port
+3) Call mcp__claude-in-chrome__resize_window with width=375 height=667 (iPhone)
+4) Verify [mobile-specific behavior]
+5) Call mcp__claude-in-chrome__computer action=screenshot for mobile proof
+6) Call mcp__claude-in-chrome__resize_window with width=1440 height=900 (desktop)
 7) Verify desktop layout still works
-8) Take screenshots at both sizes
+8) Call mcp__claude-in-chrome__computer action=screenshot for desktop proof
 ```
 
 ---
@@ -295,7 +304,7 @@ Verification steps for e2e-testing:
 - Check that `--completion-promise` flag is on same line as prompt
 - Ensure prompt includes instruction to output `<promise>TAG</promise>`
 - Verify TAG matches exactly between prompt and flag
-- Check if e2e-testing skill is failing silently
+- Check if Claude for Chrome MCP tools are returning errors
 
 ### Shell parsing errors
 
@@ -310,24 +319,31 @@ Verification steps for e2e-testing:
 
 ### Claude outputs promise too early
 
-- Make prompt more explicit: "ONLY after e2e tests confirm"
+- Make prompt more explicit: "ONLY after browser verification with screenshot confirms"
 - Add "never output the promise based on assumptions or code analysis alone"
-- Include more specific verification steps
+- Include more specific MCP tool usage steps
 
-### E2E testing skill not working
+### Claude for Chrome MCP tools not working
 
-The skill has automatic fallback. If all strategies fail:
-1. Check if Chrome is installed
-2. Run `npx playwright install chromium`
-3. Check if any browser instance is blocking (close other Chromes)
-4. Check `~/.e2e-testing/` for corrupted profiles, delete if needed
+1. Check if Claude for Chrome extension is installed and active
+2. Ensure Chrome is open
+3. Try accepting permissions when prompted
+4. Fall back to agent-browser CLI commands
 
-### E2E tests failing repeatedly
+### Claude writes Playwright scripts instead of using MCP tools
 
-- Check if the e2e-testing skill is properly installed at `~/.claude/skills/e2e-testing`
-- Ensure app is built and running before tests
-- Increase max iterations to allow for test/fix cycles
-- Make verification steps more specific
+This is the most common issue. Fix by being MORE EXPLICIT in your prompt:
+- Add "NEVER write Playwright test scripts or test files"
+- Add "use Claude for Chrome MCP tools directly"
+- Name the specific MCP tools: `mcp__claude-in-chrome__tabs_context_mcp`, `mcp__claude-in-chrome__navigate`, etc.
+- Add "call the MCP tools, do not write code that calls them"
+
+### Browser verification failing repeatedly
+
+- Ensure app is built and running before verification
+- Increase max iterations to allow for fix cycles
+- Make MCP tool steps more specific
+- Check if the app URL and port are correct
 
 ---
 
@@ -342,11 +358,13 @@ The skill has automatic fallback. If all strategies fail:
 - [ ] Error messages copied with exact text
 - [ ] File paths included where known
 - [ ] Port check included (check .env for UI_PORT first)
-- [ ] E2E testing skill referenced (`~/.claude/skills/e2e-testing`)
-- [ ] Verification steps are specific and numbered
+- [ ] Explicit MCP tool names included (`mcp__claude-in-chrome__*`)
+- [ ] "NEVER write Playwright scripts" is explicitly stated
+- [ ] Browser verification steps use specific MCP tool names
+- [ ] Screenshot step included (`mcp__claude-in-chrome__computer action=screenshot`)
 - [ ] Completion promise uses `<promise>TAG</promise>` format
-- [ ] Promise explicitly tied to e2e tests passing (not assumptions)
-- [ ] `--max-iterations` set based on complexity (+2-3 for e2e cycles)
+- [ ] Promise explicitly tied to screenshot confirmation (not assumptions)
+- [ ] `--max-iterations` set based on complexity (+2-3 for verification cycles)
 - [ ] `--completion-promise` flag matches tag in prompt
 
 ---

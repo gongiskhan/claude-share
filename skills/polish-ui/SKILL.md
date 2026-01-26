@@ -244,6 +244,141 @@ transition: all 0.2s ease-in-out;
 }
 ```
 
+## Framer Motion Animation Patterns (for React/Next.js projects)
+
+If the project uses Framer Motion, apply these animation patterns for professional polish:
+
+### Check for Framer Motion
+First, check if `framer-motion` is in `package.json` dependencies. If present, use these patterns:
+
+### Page Transitions
+Add entrance animations to page components:
+```tsx
+import { motion } from 'framer-motion';
+
+// Wrap page content
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.4, ease: 'easeOut' }}
+>
+  {/* page content */}
+</motion.div>
+```
+
+### Staggered List Animations
+For lists of items (cards, menu items, table rows):
+```tsx
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0 }
+};
+
+<motion.ul variants={container} initial="hidden" animate="show">
+  {items.map((i) => (
+    <motion.li key={i.id} variants={item}>{i.name}</motion.li>
+  ))}
+</motion.ul>
+```
+
+### Interactive Hover Effects
+For buttons, cards, and clickable elements:
+```tsx
+<motion.button
+  whileHover={{ scale: 1.02 }}
+  whileTap={{ scale: 0.98 }}
+  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+>
+  Click me
+</motion.button>
+```
+
+### Card Hover Lift
+```tsx
+<motion.div
+  whileHover={{ y: -4, boxShadow: '0 10px 30px rgba(0,0,0,0.12)' }}
+  transition={{ duration: 0.2 }}
+  className="card"
+>
+  {/* card content */}
+</motion.div>
+```
+
+### Loading Skeleton Pulse
+```tsx
+<motion.div
+  animate={{ opacity: [0.5, 1, 0.5] }}
+  transition={{ duration: 1.5, repeat: Infinity }}
+  className="skeleton"
+/>
+```
+
+### Exit Animations
+For elements leaving the DOM:
+```tsx
+import { AnimatePresence, motion } from 'framer-motion';
+
+<AnimatePresence>
+  {showItem && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, y: -10 }}
+    >
+      Content
+    </motion.div>
+  )}
+</AnimatePresence>
+```
+
+### Animation Best Practices
+
+| Principle | Guideline |
+|-----------|-----------|
+| **Subtlety** | Keep animations under 400ms for UI interactions |
+| **Spring physics** | Use `type: 'spring'` for natural feel |
+| **Purposeful** | Only animate meaningful state changes |
+| **Performance** | Stick to `transform` and `opacity` |
+| **Accessibility** | Respect `prefers-reduced-motion` |
+
+### Animation Polish Checklist
+
+When evaluating animations in an artifact:
+
+- [ ] Page transitions feel smooth (not jarring)
+- [ ] Lists have staggered entrance animation
+- [ ] Buttons have hover/tap feedback
+- [ ] Cards lift slightly on hover
+- [ ] Loading states are animated
+- [ ] Modals/dialogs animate in/out
+- [ ] Animations are not excessive or distracting
+- [ ] Exit animations are present where needed
+
+### When to Add Animations
+
+**DO add animations for:**
+- Page load content appearance
+- List item entrances
+- Button hover/tap feedback
+- Card hover states
+- Modal/dialog transitions
+- Toast/notification entrances
+- Loading state indicators
+
+**DON'T add animations for:**
+- Every single element (too distracting)
+- Critical error states (should be immediate)
+- Frequent repeated actions (becomes annoying)
+- Very short content changes
+
 ## Important Notes
 
 - **Never break functionality** - Polish should only improve appearance
