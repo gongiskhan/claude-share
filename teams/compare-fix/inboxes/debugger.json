@@ -1,0 +1,37 @@
+[
+  {
+    "from": "team-lead",
+    "text": "You are a Next.js/React debugging specialist on the compare-fix team. Your job is to fix bugs in the Compare feature of the Harmonika Git app at /Users/ggomes/dev/harmonika-all.\n\n## Your Workflow\n1. Check TaskList to find tasks assigned to you (or unassigned tasks 1, 2, 3)\n2. Claim a task, read the relevant source code deeply, fix the bug, and mark it complete\n3. Move to the next task\n4. Report findings and fixes to the team lead\n\n## Key Context\nThis is a Next.js 14 App Router project with:\n- shadcn/ui + Tailwind CSS\n- Zustand for state management\n- Server Actions for git operations\n- The Compare tab is at /repo/[repoId]/compare\n\n## Key Files to Read\n- components/compare/SideBySideDiff.tsx - Core side-by-side diff viewer\n- components/compare/CompareStatusBar.tsx - Status bar with navigation buttons\n- hooks/useCompareStore.ts - Zustand store for compare state\n- app/repo/[repoId]/compare/page.tsx - Compare page\n- lib/git/compare.ts - Server actions for comparison\n\n## Known Bugs\n1. **Navigation buttons do nothing**: The prev/next file and prev/next hunk buttons in the status bar don't work. Check the event handlers and store actions.\n2. **Hunk apply scroll**: After applying a hunk, the view scrolls to the middle of the file. It should stay near the current position or scroll to the next hunk.\n3. **Hunk apply button too big**: The apply arrow button in the gutter should be sized to match the change block height, with a max of 5 lines from the start of the change.\n\n## Important Rules\n- Read the full source code before making changes\n- Make minimal, focused fixes\n- Don't refactor unrelated code\n- Test by reading the code carefully - the tester agent will handle browser testing\n- Never use emoji characters in UI code",
+    "timestamp": "2026-02-10T03:55:16.187Z",
+    "read": true
+  },
+  {
+    "from": "debugger",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Debug and fix navigation buttons (prev/next file, prev/next hunk)\",\"description\":\"The navigation buttons in CompareStatusBar.tsx do nothing when clicked. Investigate the event handlers, the store actions they call, and the scroll/selection logic. Fix so that:\\n- Prev/Next File buttons correctly change the selected file in the CompareFileTree\\n- Prev/Next Hunk buttons scroll to the previous/next change hunk within the current file's SideBySideDiff\\n- Keyboard shortcuts (Ctrl+Up/Down for files, Alt+Up/Down for hunks) should also work\\n\\nKey files: components/compare/CompareStatusBar.tsx, components/compare/SideBySideDiff.tsx, hooks/useCompareStore.ts\",\"assignedBy\":\"debugger\",\"timestamp\":\"2026-02-10T03:55:27.344Z\"}",
+    "timestamp": "2026-02-10T03:55:27.344Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "team-lead-2",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"Fix hunk apply scroll behavior - should not scroll to middle of file\",\"description\":\"When applying a hunk (clicking the arrow button in the gutter), the view scrolls to the middle of the file instead of staying near the applied hunk or scrolling to the next change. Fix so that after applying a hunk:\\n- The view stays at the current position or smoothly scrolls to the next hunk\\n- Does NOT jump to the middle of the file\\n\\nKey files: components/compare/SideBySideDiff.tsx, hooks/useCompareStore.ts, lib/git/compare.ts\",\"assignedBy\":\"team-lead-2\",\"timestamp\":\"2026-02-10T03:56:50.054Z\"}",
+    "timestamp": "2026-02-10T03:56:50.054Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "team-lead-2",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"Fix hunk apply button sizing - should match change size (max 5 lines)\",\"description\":\"The hunk apply button (arrow in the gutter between left and right columns) is currently too large. It should be:\\n- Sized to match the height of the change block it applies to\\n- Maximum 5 lines tall from the start of the change (to indicate it will copy all)\\n- Positioned at the start of the change, not centered on the entire hunk\\n\\nThis is the arrow button in the gutter of SideBySideDiff that applies individual hunks from one side to the other.\\n\\nKey files: components/compare/SideBySideDiff.tsx\",\"assignedBy\":\"team-lead-2\",\"timestamp\":\"2026-02-10T03:56:56.072Z\"}",
+    "timestamp": "2026-02-10T03:56:56.072Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "team-lead-2",
+    "text": "Hey debugger, I've analyzed all 3 bugs and assigned tasks #1, #2, #3 to you with detailed analysis and fix approaches. Please check TaskList and start working through them.\n\n**Priority order: #2 first (simplest fix), then #3, then #1 (most complex).**\n\nKey files to edit:\n- `components/compare/SideBySideDiff.tsx` - Tasks #1, #2, #3 all touch this file\n- `components/compare/CompareStatusBar.tsx` - Task #1 nav fix\n- `app/repo/[repoId]/compare/page.tsx` - Task #1 keyboard shortcuts\n\n**Quick summary:**\n- **Task #2** (scroll after apply): Change the auto-scroll useEffect at line 152 to only fire on file change, not diff refresh. Use a ref to track previous selectedFile.\n- **Task #3** (button sizing): Modify the gutter hunk buttons to be positioned at top of hunk and height capped at min(lineCount, 5) * 20px.\n- **Task #1** (navigation): The nav buttons use `document.querySelector('[data-hunk=\"N\"]')` but data-hunk appears on both left and right columns. Use scoped queries. The StatusBar needs a way to scroll the diff containers - consider using a callback in the store or a custom event.\n\nRead the full task descriptions with TaskGet for detailed code references. Start with #2 since it's the smallest change.",
+    "summary": "Assigned bugs #1,#2,#3 with analysis",
+    "timestamp": "2026-02-10T03:57:08.576Z",
+    "color": "blue",
+    "read": true
+  }
+]

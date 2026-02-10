@@ -4,28 +4,28 @@
     "frontend-design@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/frontend-design/76f0544f5696",
-        "version": "76f0544f5696",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/frontend-design/e95321ce3f0b",
+        "version": "e95321ce3f0b",
         "installedAt": "2026-01-07T06:58:17.907Z",
-        "lastUpdated": "2026-01-24T16:16:31.268Z"
+        "lastUpdated": "2026-02-06T07:13:31.839Z"
       }
     ],
     "agent-sdk-dev@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/agent-sdk-dev/76f0544f5696",
-        "version": "76f0544f5696",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/agent-sdk-dev/e95321ce3f0b",
+        "version": "e95321ce3f0b",
         "installedAt": "2026-01-07T06:58:17.936Z",
-        "lastUpdated": "2026-01-24T16:16:31.266Z"
+        "lastUpdated": "2026-02-06T07:13:31.840Z"
       }
     ],
     "ralph-loop@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/ralph-loop/76f0544f5696",
-        "version": "76f0544f5696",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/ralph-loop/e95321ce3f0b",
+        "version": "e95321ce3f0b",
         "installedAt": "2026-01-07T06:58:17.967Z",
-        "lastUpdated": "2026-01-24T16:16:18.623Z"
+        "lastUpdated": "2026-02-06T07:13:31.842Z"
       }
     ],
     "swift-lsp@claude-plugins-official": [
@@ -40,19 +40,19 @@
     "plugin-dev@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/plugin-dev/76f0544f5696",
-        "version": "76f0544f5696",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/plugin-dev/e95321ce3f0b",
+        "version": "e95321ce3f0b",
         "installedAt": "2026-01-08T14:20:41.276Z",
-        "lastUpdated": "2026-01-24T16:16:31.268Z"
+        "lastUpdated": "2026-02-06T07:13:31.841Z"
       }
     ],
     "context7@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/context7/76f0544f5696",
-        "version": "76f0544f5696",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/context7/e95321ce3f0b",
+        "version": "e95321ce3f0b",
         "installedAt": "2026-01-09T18:13:37.938Z",
-        "lastUpdated": "2026-01-24T16:16:31.267Z"
+        "lastUpdated": "2026-02-06T07:13:31.842Z"
       }
     ],
     "code-simplifier@claude-plugins-official": [
