@@ -1,0 +1,79 @@
+{
+  "name": "countapp-flows",
+  "description": "Configure CountApp flows, extend MCP tools, and set up agent instructions for all CountApp workflows",
+  "createdAt": 1770782776084,
+  "leadAgentId": "team-lead@countapp-flows",
+  "leadSessionId": "ea4270fe-204a-4f8a-9a5c-69a210770bd7",
+  "members": [
+    {
+      "agentId": "team-lead@countapp-flows",
+      "name": "team-lead",
+      "agentType": "team-lead",
+      "model": "claude-opus-4-6",
+      "joinedAt": 1770782776084,
+      "tmuxPaneId": "",
+      "cwd": "/Users/ggomes/dev/probable-palm-tree",
+      "subscriptions": []
+    },
+    {
+      "agentId": "api-explorer@countapp-flows",
+      "name": "api-explorer",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "prompt": "Fetch and thoroughly analyze the CountApp API documentation at http://localhost:8081/accounting-api/api-docs. I need you to:\n\n1. Fetch the OpenAPI/Swagger JSON from http://localhost:8081/accounting-api/api-docs (or try http://localhost:8081/accounting-api/api-docs-json, or the base URL)\n2. Map out ALL available endpoints with their HTTP methods, paths, request bodies, and response schemas\n3. Focus specifically on:\n   - How to get current user profile/name (for greeting)\n   - How to upload/send invoices (faturas)\n   - How to upload/send bank statements (extratos)\n   - How to upload/send SAF-T files\n   - How to add documents to user registration/profile (cadastro)\n   - How to create support/assistance requests (pedidos de assistencia)\n   - How to list document types\n   - Any file upload endpoints and their expected formats\n   - Authentication mechanism (how auth tokens are used)\n\nWrite ALL your findings to /Users/ggomes/dev/probable-palm-tree/.claude/api-exploration.md with complete endpoint details including paths, methods, request/response schemas, and notes on file upload formats. Be as thorough as possible - this will be the reference for implementing MCP tools.",
+      "color": "blue",
+      "planModeRequired": false,
+      "joinedAt": 1770782785593,
+      "tmuxPaneId": "%40",
+      "cwd": "/Users/ggomes/dev/probable-palm-tree",
+      "subscriptions": [],
+      "backendType": "tmux",
+      "isActive": false
+    },
+    {
+      "agentId": "codebase-explorer@countapp-flows",
+      "name": "codebase-explorer",
+      "agentType": "Explore",
+      "model": "claude-opus-4-6",
+      "prompt": "Thoroughly explore the Palmtree codebase to understand the current state of:\n\n1. packages/countapp-mcp/ - Read ALL source files. Understand the existing tools, how BaseMcpServer is used, how ctx.fetch/ctx.getFile/ctx.authToken work\n2. packages/base-mcp/ - Read ALL source files. Understand the base class API\n3. packages/flow-engine/ - Read key files to understand how flows are loaded, how MCP servers are spawned, how instructions are loaded\n4. ~/.palmtree/ - Read ALL config files (config.yaml, auth.yaml, mcp.yaml), check flows/ directory, check instructions/ directory\n5. packages/main-api/ - Understand auth delegation and file upload endpoints\n6. .env and .env.example - Check current environment variables\n\nWrite a comprehensive summary to /Users/ggomes/dev/probable-palm-tree/.claude/codebase-state.md including:\n- Current countapp-mcp tools and their implementations\n- How base-mcp provides ctx object\n- How flow-engine loads flows and instructions\n- Current config file contents\n- Current flow definitions\n- Current instruction files\n- Environment variables\n- File upload mechanism (how files go from user upload to MCP tool access)",
+      "color": "green",
+      "planModeRequired": false,
+      "joinedAt": 1770782792574,
+      "tmuxPaneId": "%41",
+      "cwd": "/Users/ggomes/dev/probable-palm-tree",
+      "subscriptions": [],
+      "backendType": "tmux",
+      "isActive": false
+    },
+    {
+      "agentId": "docs-agent@countapp-flows",
+      "name": "docs-agent",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "prompt": "Update the documentation for the Palmtree project at /Users/ggomes/dev/probable-palm-tree. The countapp-mcp has been extended with new tools and new flows have been configured. You must update docs/countapp-integration.md.\n\nHere's what was done:\n\n## countapp-mcp Tools (packages/countapp-mcp/src/tools/)\n\n### Existing tools updated:\n- **get_user_profile** - Gets user profile (name, email). Path: GET /api/users/base/{publicId}\n- **get_user_data** - Gets user company/personal data. Path: GET /api/users-data/obtain-user-data\n- **list_invoices** - Lists invoices with pagination. Path: POST /api/users-invoice/base/list\n- **get_invoice** - Gets invoice details. Path: GET /api/users-invoice/base/{publicId}\n- **upload_saft** - Uploads SAF-T file. Path: POST /api/import-saft/upload (multipart)\n- **list_saft_imports** - Lists SAF-T imports. Path: POST /api/import-saft/base/list\n- **list_tasks** - Lists accounting tasks. Path: POST /api/user-task/base/list\n- **list_items** - Lists items/products. Path: POST /api/user-item/base/list\n\n### New tools added:\n- **upload_invoice** (invoices.js) - Uploads an invoice file. Path: POST /api/third-party-invoices/upload-invoice (multipart). Params: fileId, invoiceDate, invoiceValue, invoiceNif\n- **upload_bank_statement** (statements.js) - Uploads bank/credit card statement. First creates/gets movement via POST /api/unified-movement/get-or-create, then uploads to POST /api/unified-movement/{id}/upload-statement. Params: fileId, month, year, origin (BANK/CREDIT_CARD), bank\n- **list_bank_statements** (statements.js) - Lists bank statement periods. Path: POST /api/unified-movement/base/list\n- **create_support_ticket** (tickets.js) - Creates support request. Path: POST /api/ticket/new-ticket. Params: subject, description, fileIds (optional)\n- **list_support_tickets** (tickets.js) - Lists support tickets. Path: POST /api/ticket/base/list\n- **get_support_ticket** (tickets.js) - Gets ticket details. Path: GET /api/ticket/base/{publicId}\n- **upload_user_document** (documents.js) - Uploads document to user registration. Params: fileId, documentType (IDENTIFICACAO, NIF, CONTRATO_QUOTAS, RCBE, OUTROS)\n- **list_document_types** (documents.js) - Returns available document types for cadastro\n\n## Flows\n- **accounting-assistant** (main flow): 2 steps - user_request and follow_up. Uses countapp MCP server.\n- **sequence.yaml**: Only flows: [accounting-assistant]\n- Greeting flow removed from sequence (user is already authenticated)\n\n## Instructions\n- **general-instructions.md**: Full Portuguese (pt-PT) version of the general instructions\n- **accounting-assistant.md**: Portuguese instructions for the accounting assistant flow, describing all 5 workflows, available tools, error handling, and conversation guidelines\n\n## Config\n- config.yaml: welcome_message updated in Portuguese, locale changed to pt-PT\n- mcp.yaml: unchanged (already configured)\n\n## 5 Supported Workflows:\n1. Enviar Fatura (Send Invoice) - upload_invoice\n2. Enviar Extrato Bancario (Send Bank Statement) - upload_bank_statement\n3. Enviar SAF-T (Send SAF-T) - upload_saft\n4. Adicionar Documento ao Cadastro (Add Registration Document) - upload_user_document\n5. Abrir Pedido de Assistencia (Open Support Request) - create_support_ticket\n\n## End-to-end document upload flow:\n1. User uploads file in assistant-app chat (file goes to main-api, stored, returns fileId)\n2. User tells the assistant what kind of document it is\n3. Assistant calls appropriate MCP tool (e.g., upload_invoice) with fileId\n4. MCP tool calls ctx.getFile(fileId) to fetch the file buffer from main-api\n5. MCP tool constructs FormData and POSTs to CountApp API endpoint\n6. CountApp processes the file and returns result\n7. Assistant confirms success to user\n\nRead the existing docs/countapp-integration.md first, then update it comprehensively. Also check if any other docs need updates (docs/flow-engine.md, docs/setup.md, etc.).",
+      "color": "yellow",
+      "planModeRequired": false,
+      "joinedAt": 1770783216827,
+      "tmuxPaneId": "%42",
+      "cwd": "/Users/ggomes/dev/probable-palm-tree",
+      "subscriptions": [],
+      "backendType": "tmux",
+      "isActive": false
+    },
+    {
+      "agentId": "tester@countapp-flows",
+      "name": "tester",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "prompt": "Test the countapp-mcp server and configuration for the Palmtree project at /Users/ggomes/dev/probable-palm-tree.\n\nTasks:\n1. First install all dependencies: cd to project root and run `npm install`\n2. Start MongoDB if not running: `docker-compose up -d`\n3. Try to start the countapp-mcp server directly to verify it registers all tools:\n   `cd /Users/ggomes/dev/probable-palm-tree && node packages/countapp-mcp/src/index.js`\n   (This should output tool registration info to stderr. It will hang waiting for stdio input - that's expected. Just verify from stderr output that it starts and registers tools. Kill it after a few seconds.)\n\n4. Verify the following files exist and are valid:\n   - ~/.palmtree/flows/accounting-assistant.yaml (has mcp_servers: [countapp] and steps)\n   - ~/.palmtree/flows/sequence.yaml (has flows: [accounting-assistant])\n   - ~/.palmtree/instructions/general-instructions.md (in Portuguese)\n   - ~/.palmtree/instructions/accounting-assistant.md (in Portuguese, references all tools)\n   - ~/.palmtree/config.yaml (welcome_message in Portuguese, locale pt-PT)\n   - ~/.palmtree/mcp.yaml (countapp server configured)\n\n5. Check that countapp-mcp source files import correctly:\n   - packages/countapp-mcp/src/index.js imports all tool modules\n   - packages/countapp-mcp/src/tools/statements.js exists\n   - packages/countapp-mcp/src/tools/tickets.js exists  \n   - packages/countapp-mcp/src/tools/documents.js exists\n\n6. Check each tool file has proper descriptions with Portuguese terms in parentheses.\n\n7. Try starting all services: `npm run dev` (run for 15-20 seconds, check for startup errors, then stop)\n\n8. If CountApp API is running at localhost:8081, test:\n   a) GET http://localhost:8081/accounting-api/api/users/base/test-id (expect 401 without auth)\n   b) Verify the API is reachable\n\nReport all findings - what works, what fails, what needs fixing.",
+      "color": "purple",
+      "planModeRequired": false,
+      "joinedAt": 1770783228432,
+      "tmuxPaneId": "%43",
+      "cwd": "/Users/ggomes/dev/probable-palm-tree",
+      "subscriptions": [],
+      "backendType": "tmux",
+      "isActive": false
+    }
+  ]
+}

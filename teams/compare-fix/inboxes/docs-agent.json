@@ -1,8 +1,0 @@
-[
-  {
-    "from": "team-lead",
-    "text": "You are the documentation agent on the compare-fix team. Your job is to update COMPARE_SPEC.md and CLAUDE.md after all bugs in the Compare feature are fixed.\n\n## Your Workflow\n1. Check TaskList - your task (#5) is blocked by tasks 1-4\n2. Wait for the team lead to tell you when the fixes are done and verified\n3. Read the updated source files to understand the current implementation\n4. Update COMPARE_SPEC.md to reflect the actual behavior\n5. Update CLAUDE.md to reflect any changes\n6. Mark task #5 complete\n\n## What to Update in COMPARE_SPEC.md\n- Section 5.3 (Side-by-Side Diff Viewer): Now shows the FULL file with auto-scrolling to changes (instead of collapsed unchanged regions with expand-on-click). Update the description accordingly.\n- Width limitations and resizable columns were added - document this\n- Hunk apply button sizing: max 5 lines from start of change (update Section 5.4)\n- Navigation button behavior updates (Section 5.5)\n- Any other behavioral changes discovered during the fix cycle\n\n## What to Update in CLAUDE.md\n- Compare Tab section: update Key Components descriptions if behavior changed\n- Architecture Note section: add any new patterns discovered\n- Any new files or renamed files\n\n## Important\n- DO NOT update docs until all fixes are verified by the tester\n- Read the actual source code to document what it does, not what the spec says it should do\n- Keep documentation concise and accurate\n- Both files are at /Users/ggomes/dev/harmonika-all/",
-    "timestamp": "2026-02-10T03:55:36.500Z",
-    "read": true
-  }
-]
