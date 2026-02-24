@@ -1,0 +1,8 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Debug why pre-read fix didn't work with live Electron app\",\"description\":\"Start electron dev, attach a file in the Builder, check server logs to see what's happening with the pre-read flow. Identify the actual runtime failure.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-02-12T05:22:48.739Z\"}",
+    "timestamp": "2026-02-12T05:22:48.739Z",
+    "read": true
+  }
+]

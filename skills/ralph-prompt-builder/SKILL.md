@@ -14,7 +14,7 @@ These are non-negotiable. Everything else is guidance.
 1. **Every ralph-loop prompt MUST create an agent team.** Single-agent execution is not allowed.
 2. **The main agent (you) MUST NOT do any implementation, testing, or other task work directly.** Your only job is to: create the team, spawn the team lead and teammates, and clean up the team when done. ALL actual work - coding, testing, reviewing, documenting - is done by agents in the team. This keeps the main agent context window clean and avoids bloating it with implementation details.
 3. **The team lead MUST NOT do any work either.** The team lead is a coordinator: it holds knowledge of what needs to be done, breaks down tasks, assigns them to teammates, tracks progress, resolves blockers, and synthesizes results. It never writes code, never runs tests, never edits files. It delegates everything to specialized teammates who talk to each other directly.
-4. **A tester agent is ALWAYS required.** It uses the `/e2e-testing` skill (mcp__claude-in-chrome__* tools). It iterates with other agents until ALL tests pass - task features AND related area regressions. Screenshots are required as proof. The tester is the critical gate for completion.
+4. **A tester agent is ALWAYS required.** It uses the `/e2e-testing` skill. For web apps it uses `mcp__claude-in-chrome__*` tools, for Electron apps it uses `mcp__electron__*` tools. It iterates with other agents until ALL tests pass - task features AND related area regressions. Screenshots are required as proof. The tester is the critical gate for completion.
 5. **The promise MUST NOT be output until the tester confirms full test passage.** No exceptions. No assumptions. No "it should work" - only confirmed with screenshots.
 6. **For Capacitor apps, do NOT use Chrome MCP tools.** Use simulator screenshots instead.
 
@@ -25,7 +25,7 @@ These describe how we like to work. Include them in the prompt as context for Cl
 - **We care a lot about frontend quality.** When a task touches UI, we prefer having a dedicated agent that uses the `/polish-ui` and `/frontend-design` skills to ensure the result looks professional, is responsive, and avoids generic AI aesthetics.
 - **Planning before implementation is valuable.** For non-trivial tasks, having an agent analyze the codebase and design the approach before anyone writes code tends to produce better results.
 - **Documentation matters for significant changes.** We prefer a docs agent that keeps CLAUDE.md minimal (just an index with links) and puts detailed documentation in a `docs/` folder covering architecture, functional details, and API changes.
-- **We mostly work on Next.js apps, Node.js backends, and Capacitor mobile apps.** Agents should be aware of these ecosystems.
+- **We mostly work on Next.js apps, Node.js backends, Electron apps, and Capacitor mobile apps.** Agents should be aware of these ecosystems.
 - **Multiple implementers should have distinct file ownership** to avoid conflicts.
 
 ## What Claude Code Decides
@@ -44,7 +44,7 @@ Do not micromanage the team structure. Describe the task, state our preferences,
 
 1. Get task description from user
 2. If user provides screenshot/image, ask them to describe it in text (Claude Code cannot see images)
-3. Identify project type (Next.js / Node.js / Capacitor)
+3. Identify project type (Next.js / Node.js / Electron / Capacitor)
 4. Generate the prompt incorporating hard rules, preferences as context, and task details
 5. **Present TWO versions** (see Output Format below)
 
@@ -145,6 +145,22 @@ Simple ~5-7 | Medium ~8-12 | Complex ~12-18 | Major ~18-25
 /ralph-loop:ralph-loop "Implement real-time notifications system with in-app bell icon, notification panel, and mark-as-read functionality. PLAN FIRST then AUTO-ACCEPT and implement without waiting for confirmation. DELEGATION RULE: You (the main agent) MUST NOT do any implementation or testing directly. Create the agent team and let it handle everything. Your only job is team setup and cleanup. AGENT TEAM SETUP: Create an agent team for this task. Spawn a team lead in delegate mode - it coordinates only, never writes code. This is a complex full-stack feature. Our preferences: a planning phase would be valuable before implementation starts, we care about frontend quality (consider /polish-ui and /frontend-design skills), this is significant enough to warrant documentation updates (keep CLAUDE.md minimal with links, put details in docs/ folder). This is a Next.js 14 App Router project with Prisma ORM and PostgreSQL. If using multiple implementers, assign distinct file ownership to avoid conflicts. Decide the right teammates to spawn. Teammates talk to each other directly. CONTEXT: No notification system exists yet. Auth via NextAuth. REQUIREMENTS: 1) Database schema for notifications, 2) API routes for fetching, creating, marking as read, 3) Bell icon in header with unread count badge, 4) Notification dropdown panel, 5) Mark individual or all as read, 6) Real-time updates via polling or SSE. TESTER INSTRUCTIONS: A tester agent MUST be spawned that invokes the /e2e-testing skill. FIRST check .env for UI_PORT. Test all requirements including empty state. Regression test header nav and other pages. Report failures with screenshots. Iterate until ALL pass. COMPLETION: The team lead outputs <promise>NOTIFICATIONS_DONE</promise> ONLY when tester confirms ALL tests pass with screenshots and all agents confirm done. Then clean up the team." --max-iterations 18 --completion-promise "NOTIFICATIONS_DONE"
 ```
 
+## Electron Apps
+
+For Electron apps, the tester uses `mcp__electron__*` MCP tools instead of Chrome MCP tools. Include this context:
+
+- This is an Electron app - use `mcp__electron__*` tools for testing, NOT Chrome MCP tools
+- Use `mcp__electron__take_screenshot` for screenshots
+- Use `mcp__electron__send_command_to_electron` for interactions (click_by_text, fill_input, get_page_structure, etc.)
+- Use `mcp__electron__read_electron_logs` to check for console errors
+- The app must be running with remote debugging enabled (port 9222) for the MCP tools to connect
+
+### Electron Example
+
+```
+/ralph-loop:ralph-loop "Add keyboard shortcut preferences panel to the settings view. PLAN FIRST then AUTO-ACCEPT and implement without waiting for confirmation. DELEGATION RULE: You (the main agent) MUST NOT do any implementation or testing directly. Create the agent team and let it handle everything. Your only job is team setup and cleanup. AGENT TEAM SETUP: Create an agent team for this task. Spawn a team lead in delegate mode - it coordinates only, never writes code. This is an Electron app - the tester MUST use mcp__electron__* tools (NOT Chrome MCP tools) for all testing. We care about frontend quality so consider a UI polish pass. Decide the right teammates. Teammates talk to each other directly. CONTEXT: Electron app with React frontend. Settings view exists at hash route #settings. No keyboard shortcut customization exists yet. REQUIREMENTS: 1) Add shortcuts preferences section to settings, 2) Allow rebinding common actions, 3) Persist changes to config, 4) Show current bindings with edit controls. TESTER INSTRUCTIONS: A tester agent MUST be spawned that invokes the /e2e-testing skill. This is an Electron app so use mcp__electron__* tools: use mcp__electron__take_screenshot for screenshots, mcp__electron__send_command_to_electron for interactions and page inspection, mcp__electron__read_electron_logs to check for errors. Test: 1) Navigate to settings, 2) Verify shortcuts section renders, 3) Test rebinding a shortcut, 4) Verify persistence after reload, 5) Take screenshots. Report failures to implementer. Iterate until ALL pass. COMPLETION: The team lead outputs <promise>SHORTCUTS_PANEL_DONE</promise> ONLY when tester confirms ALL tests pass with screenshots and all agents confirm done. Then clean up the team." --max-iterations 12 --completion-promise "SHORTCUTS_PANEL_DONE"
+```
+
 ## Capacitor Apps
 
 For Capacitor shell apps, the testing approach is different. Include this context:
@@ -188,7 +204,7 @@ PREFERENCES (context for Claude Code, not rules):
   - Frontend quality matters: /polish-ui + /frontend-design
   - Non-trivial tasks: planning before implementation
   - Significant changes: docs agent (CLAUDE.md index + docs/ detail)
-  - Stacks: Next.js, Node.js, Capacitor
+  - Stacks: Next.js, Node.js, Electron, Capacitor
   - Multiple implementers: distinct file ownership
 
 LET CLAUDE CODE DECIDE:
