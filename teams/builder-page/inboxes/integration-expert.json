@@ -1,0 +1,33 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Build API client functions for builder page\",\"description\":\"Add all needed API client functions to /Users/ggomes/dev/ekoa-dev/ekoa/lib/api/client.ts:\\n- executeAgent(request) - POST /api/v1/execute\\n- getJob(jobId) - GET /api/v1/jobs/:id\\n- cancelJob(jobId) - DELETE /api/v1/jobs/:id\\n- listArtifactTypes() - GET /api/v1/artifacts\\n- getArtifactInstance(id) - GET /api/v1/artifacts/:id\\n- createArtifactInstance(artifactTypeId, name) - POST /api/v1/artifacts\\n- startPreview(artifactInstanceId, sessionId?) - POST /api/v1/preview/start\\n- stopPreview(previewId) - DELETE /api/v1/preview/:previewId\\n- getPreview(previewId) - GET /api/v1/preview/:previewId\\n- getPreviewProxyUrl(previewId) - returns /api/v1/preview/proxy/:previewId/\\n- createSession() - POST /api/v1/sessions\\n- updateSession(sessionId, data) - PUT /api/v1/sessions/:sessionId\\n- getSession(sessionId) - GET /api/v1/sessions/:sessionId\\n- inferIntegrations(prompt) - POST /api/v1/artifacts/infer (or similar)\\n- sendChatMessage(message, history, attachments) - POST /api/v1/chat\\n- getAgentConfig() - GET /api/v1/agent-config\\nAll functions should use the existing apiFetch helper and follow existing patterns.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-02-27T21:16:58.830Z\"}",
+    "timestamp": "2026-02-27T21:16:58.830Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"Build Zustand stores for builder page\",\"description\":\"Create Zustand stores at /Users/ggomes/dev/ekoa-dev/ekoa/stores/:\\n1. orchestration.ts - Main builder state store with:\\n   - Sessions management (list, active, create, delete, rename)\\n   - Messages per session\\n   - Per-session job state (jobId, status, output, progress, phase)\\n   - Per-session preview state (previewId, url, status)\\n   - Execution options (selectedArtifactTypeId, selectedIntegrations, fieldValues)\\n   - Quality refinements config (testing off by default)\\n   - Config wizard state (simplified - single page)\\n   - Side panel tab (files, output, preview)\\n   - File tree data\\n   - Pending attachments\\n   - Process output (terminal text)\\n2. artifacts.ts - Artifact types store:\\n   - Artifact types list\\n   - Loading state\\n   - Fetch action\\nFollow Zustand patterns with persist middleware, use zustand/immer for cleaner state updates if desired.\\nReference the original store at /Users/ggomes/dev/ekoa-dev/app/src/stores/orchestration.ts for types and patterns.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-02-27T21:16:59.412Z\"}",
+    "timestamp": "2026-02-27T21:16:59.412Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"Build SSE streaming hook and agent execution hook\",\"description\":\"Create hooks at /Users/ggomes/dev/ekoa-dev/ekoa/hooks/:\\n1. useJobStream.ts - SSE streaming hook:\\n   - Connect to /api/v1/jobs/:jobId/stream\\n   - Parse all event types (status, output, progress, result, error, complete, usage, deployment, terminal, preview)\\n   - Auto-reconnect with exponential backoff\\n   - Buffer replay support\\n   - Dispatch events to orchestration store\\n   - Heartbeat handling\\n   - Cleanup on unmount\\n2. useAgentExecution.ts - Agent execution orchestration hook:\\n   - Manages the execute -> stream -> complete lifecycle\\n   - Calls executeAgent API, then connects SSE stream\\n   - Handles cancel/stop\\n   - Updates store with job state\\n   - Detects app startup from deployment events\\n   - Triggers preview when app URL available\\n3. useAppRunningDetector.ts - App detection:\\n   - Monitors deployment events for app startup\\n   - Triggers preview panel open\\n   - Updates preview URL in store\\nReference hooks in /Users/ggomes/dev/ekoa-dev/app/src/hooks/ for patterns.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-02-27T21:17:00.054Z\"}",
+    "timestamp": "2026-02-27T21:17:00.054Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "What's your progress on the 3 tasks (API client, stores, hooks)? Have you completed any of them? Please continue working and mark tasks as completed when done.",
+    "summary": "Checking progress on foundation tasks",
+    "timestamp": "2026-02-27T21:18:30.063Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1772227129996@integration-expert\",\"from\":\"team-lead\",\"reason\":\"I'm taking over the foundation work since I have full context. Shutting down.\",\"timestamp\":\"2026-02-27T21:18:49.996Z\"}",
+    "timestamp": "2026-02-27T21:18:49.996Z",
+    "read": true
+  }
+]

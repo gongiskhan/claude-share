@@ -1,0 +1,51 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"4\",\"subject\":\"Build simplified wizard component\",\"description\":\"Replace the current builder page wizard with a simplified one-page wizard at /Users/ggomes/dev/ekoa-dev/ekoa/components/builder/configuration-wizard.tsx:\\n- Everything on ONE page (not multi-step)\\n- Shows artifact type selection as cards at top\\n- Shows artifact-specific fields below (when type selected)\\n- Shows integration selection below\\n- Shows quality refinements section with TESTING OFF by default\\n- Has a prominent \\\"Start Building\\\" button\\n- Defaults should be pre-selected where possible\\n- Freeform/no-template option should be available\\n- The wizard appears after user sends first message, showing AI-suggested type\\n- Collapsible sections for less important options\\n- Clean, minimal design following existing app patterns\\nReference ConfigurationWizard.tsx and sub-panels in /Users/ggomes/dev/ekoa-dev/app/src/components/orchestration/ for logic.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-02-27T21:22:52.956Z\"}",
+    "timestamp": "2026-02-27T21:22:52.956Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"5\",\"subject\":\"Build chat panel with essential-only output\",\"description\":\"Rebuild the chat panel at /Users/ggomes/dev/ekoa-dev/ekoa/components/builder/chat-panel.tsx:\\n- Show only ESSENTIAL output from the agent in chat: user messages, key status updates, phase transitions, final results, errors\\n- Filter out verbose tool_use, tool_result, and detailed progress from chat view (these go to output tab)\\n- Show a compact progress indicator during execution (phase name + spinner)\\n- Message input with file attachment support (click to select files)\\n- Cancel/stop button during execution\\n- Auto-scroll to bottom on new messages\\n- Quick action buttons for common prompts\\n- Markdown rendering for assistant messages\\n- Code blocks with syntax highlighting\\n- Show file attachment chips before sending\\nReference ChatPanel.tsx in /Users/ggomes/dev/ekoa-dev/app/src/components/orchestration/ for patterns but significantly simplify the output.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-02-27T21:22:53.398Z\"}",
+    "timestamp": "2026-02-27T21:22:53.398Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"6\",\"subject\":\"Build output tab with colored terminal formatting\",\"description\":\"Build the output tab component at /Users/ggomes/dev/ekoa-dev/ekoa/components/builder/output-panel.tsx:\\n- Shows ALL output from the agent (everything the chat panel filters out, plus more)\\n- Terminal-style dark background with colored text\\n- Color coding: green for success/status, blue for tool names, yellow for progress, red for errors, gray for tool results, white for regular output\\n- ANSI-like color formatting (can use a library like ansi-to-html or custom CSS)\\n- Monospace font\\n- Auto-scroll with scroll-lock (pause auto-scroll when user scrolls up)\\n- Show timestamps for each entry\\n- Show phase headers/separators\\n- Show tool use details (which tool, what input, what result) in a structured way\\n- Show file operations clearly (created, modified, deleted with paths)\\n- Copy button for output\\n- Clear button\\n- The current mock output in the side panel is a good reference for style\\nThis should look like a professional terminal/IDE output panel.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-02-27T21:22:53.967Z\"}",
+    "timestamp": "2026-02-27T21:22:53.967Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"7\",\"subject\":\"Build preview panel with iframe and controls\",\"description\":\"Rebuild the preview panel at /Users/ggomes/dev/ekoa-dev/ekoa/components/builder/preview-panel.tsx:\\n- Iframe showing the running app via proxy URL\\n- Viewport size switching (Desktop, Tablet 768px, Mobile 375px)\\n- Status indicator (building, starting, running, failed, stopped)\\n- Refresh button (reload iframe)\\n- Open in new tab button (opens proxy URL in new browser tab)\\n- Stop app button (calls stopPreview API)\\n- Loading skeleton while app starts\\n- Error display when app fails\\n- Port info display\\n- The preview should auto-open when deployment events indicate app is running\\nReference PreviewPanel.tsx in /Users/ggomes/dev/ekoa-dev/app/src/components/orchestration/ for patterns.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-02-27T21:22:54.503Z\"}",
+    "timestamp": "2026-02-27T21:22:54.503Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"8\",\"subject\":\"Build file tree component\",\"description\":\"Build/improve the file tree component at /Users/ggomes/dev/ekoa-dev/ekoa/components/builder/file-tree-panel.tsx:\\n- Shows files created/modified/deleted by the agent\\n- Tree structure with folder expand/collapse\\n- File type icons (or indicators)\\n- Show status (created=green, modified=blue, deleted=red)\\n- Extract file operations from streaming output events\\n- Clickable files (future: open in editor)\\nReference FileTreePanel.tsx in /Users/ggomes/dev/ekoa-dev/app/src/components/orchestration/ for patterns.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-02-27T21:22:55.046Z\"}",
+    "timestamp": "2026-02-27T21:22:55.046Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"9\",\"subject\":\"Integrate all components and wire up the builder page\",\"description\":\"Wire up the main builder page at /Users/ggomes/dev/ekoa-dev/ekoa/app/(dashboard)/page.tsx:\\n- Connect all components to stores and hooks\\n- Implement the full workflow: message -> wizard -> execute -> stream -> preview\\n- File attachment flow: select -> display chips -> send with message\\n- Stop/cancel: button clicks -> API call -> update state\\n- Session switching: load session -> restore state -> reconnect stream if active\\n- Preview auto-open on deployment events\\n- Side panel tab switching (files, output, preview)\\n- Error handling for all API calls\\n- Loading states everywhere\\n- Handle edge cases (reconnect, stale state, etc.)\\nThis is the main integration task that brings everything together.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-02-27T21:22:55.807Z\"}",
+    "timestamp": "2026-02-27T21:22:55.807Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "What's your current progress? Have you started writing code? Please prioritize:\n1. First create the configuration-wizard.tsx and output-panel.tsx (new files)\n2. Then rewrite chat-panel.tsx, sessions-panel.tsx, side-panel.tsx  \n3. Finally wire up page.tsx\n\nStart writing code immediately - you have all the context needed. The stores and hooks are ready at /Users/ggomes/dev/ekoa-dev/ekoa/stores/ and /Users/ggomes/dev/ekoa-dev/ekoa/hooks/.",
+    "summary": "Checking progress, pushing to start coding",
+    "timestamp": "2026-02-27T21:24:10.309Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1772227463385@frontend-dev\",\"from\":\"team-lead\",\"reason\":\"Taking over UI implementation. Thank you.\",\"timestamp\":\"2026-02-27T21:24:23.385Z\"}",
+    "timestamp": "2026-02-27T21:24:23.385Z",
+    "read": true
+  }
+]

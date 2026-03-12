@@ -1,6 +1,6 @@
 ---
 name: ralph-prompt-builder
-description: Build structured prompts for the /ralph-loop:ralph-loop command using Claude Code agent teams. Use when user asks to create a ralph-loop prompt, build an agentic loop task, automate a feature with browser verification, or run a task with Chrome extension testing. Always spawns agent teams with specialized roles for implementation, testing, UI/UX, and documentation.
+description: Build structured prompts for the /ralph-loop:ralph-loop command using Claude Code agent teams. Use when user asks to create a ralph-loop prompt, build an agentic loop task, automate a feature with browser verification, or run a task with agent-browser testing. Always spawns agent teams with specialized roles for implementation, testing, UI/UX, and documentation.
 ---
 
 # Ralph Loop Prompt Builder (Agent Teams Edition)
@@ -14,9 +14,9 @@ These are non-negotiable. Everything else is guidance.
 1. **Every ralph-loop prompt MUST create an agent team.** Single-agent execution is not allowed.
 2. **The main agent (you) MUST NOT do any implementation, testing, or other task work directly.** Your only job is to: create the team, spawn the team lead and teammates, and clean up the team when done. ALL actual work - coding, testing, reviewing, documenting - is done by agents in the team. This keeps the main agent context window clean and avoids bloating it with implementation details.
 3. **The team lead MUST NOT do any work either.** The team lead is a coordinator: it holds knowledge of what needs to be done, breaks down tasks, assigns them to teammates, tracks progress, resolves blockers, and synthesizes results. It never writes code, never runs tests, never edits files. It delegates everything to specialized teammates who talk to each other directly.
-4. **A tester agent is ALWAYS required.** It uses the `/e2e-testing` skill. For web apps it uses `mcp__claude-in-chrome__*` tools, for Electron apps it uses `mcp__electron__*` tools. It iterates with other agents until ALL tests pass - task features AND related area regressions. Screenshots are required as proof. The tester is the critical gate for completion.
+4. **A tester agent is ALWAYS required.** It uses the `/e2e-testing` skill. For web apps it uses the `agent-browser` CLI, for Electron apps it uses `mcp__electron__*` tools. For apps requiring login, the tester should first try connecting to an existing browser session via CDP (`agent-browser --cdp 9222`), then try loading saved auth state (`agent-browser state load`), and if neither works, open a headed browser (`agent-browser open <url> --headed`) and ask the user to log in before continuing. It iterates with other agents until ALL tests pass - task features AND related area regressions. Screenshots are required as proof. The tester is the critical gate for completion.
 5. **The promise MUST NOT be output until the tester confirms full test passage.** No exceptions. No assumptions. No "it should work" - only confirmed with screenshots.
-6. **For Capacitor apps, do NOT use Chrome MCP tools.** Use simulator screenshots instead.
+6. **For Capacitor apps, do NOT use agent-browser for testing.** Use simulator screenshots instead.
 
 ## Our Preferences (not rules - Claude Code should use its judgment)
 
@@ -147,9 +147,9 @@ Simple ~5-7 | Medium ~8-12 | Complex ~12-18 | Major ~18-25
 
 ## Electron Apps
 
-For Electron apps, the tester uses `mcp__electron__*` MCP tools instead of Chrome MCP tools. Include this context:
+For Electron apps, the tester uses `mcp__electron__*` MCP tools instead of agent-browser. Include this context:
 
-- This is an Electron app - use `mcp__electron__*` tools for testing, NOT Chrome MCP tools
+- This is an Electron app - use `mcp__electron__*` tools for testing, NOT agent-browser
 - Use `mcp__electron__take_screenshot` for screenshots
 - Use `mcp__electron__send_command_to_electron` for interactions (click_by_text, fill_input, get_page_structure, etc.)
 - Use `mcp__electron__read_electron_logs` to check for console errors
@@ -158,7 +158,7 @@ For Electron apps, the tester uses `mcp__electron__*` MCP tools instead of Chrom
 ### Electron Example
 
 ```
-/ralph-loop:ralph-loop "Add keyboard shortcut preferences panel to the settings view. PLAN FIRST then AUTO-ACCEPT and implement without waiting for confirmation. DELEGATION RULE: You (the main agent) MUST NOT do any implementation or testing directly. Create the agent team and let it handle everything. Your only job is team setup and cleanup. AGENT TEAM SETUP: Create an agent team for this task. Spawn a team lead in delegate mode - it coordinates only, never writes code. This is an Electron app - the tester MUST use mcp__electron__* tools (NOT Chrome MCP tools) for all testing. We care about frontend quality so consider a UI polish pass. Decide the right teammates. Teammates talk to each other directly. CONTEXT: Electron app with React frontend. Settings view exists at hash route #settings. No keyboard shortcut customization exists yet. REQUIREMENTS: 1) Add shortcuts preferences section to settings, 2) Allow rebinding common actions, 3) Persist changes to config, 4) Show current bindings with edit controls. TESTER INSTRUCTIONS: A tester agent MUST be spawned that invokes the /e2e-testing skill. This is an Electron app so use mcp__electron__* tools: use mcp__electron__take_screenshot for screenshots, mcp__electron__send_command_to_electron for interactions and page inspection, mcp__electron__read_electron_logs to check for errors. Test: 1) Navigate to settings, 2) Verify shortcuts section renders, 3) Test rebinding a shortcut, 4) Verify persistence after reload, 5) Take screenshots. Report failures to implementer. Iterate until ALL pass. COMPLETION: The team lead outputs <promise>SHORTCUTS_PANEL_DONE</promise> ONLY when tester confirms ALL tests pass with screenshots and all agents confirm done. Then clean up the team." --max-iterations 12 --completion-promise "SHORTCUTS_PANEL_DONE"
+/ralph-loop:ralph-loop "Add keyboard shortcut preferences panel to the settings view. PLAN FIRST then AUTO-ACCEPT and implement without waiting for confirmation. DELEGATION RULE: You (the main agent) MUST NOT do any implementation or testing directly. Create the agent team and let it handle everything. Your only job is team setup and cleanup. AGENT TEAM SETUP: Create an agent team for this task. Spawn a team lead in delegate mode - it coordinates only, never writes code. This is an Electron app - the tester MUST use mcp__electron__* tools (NOT agent-browser) for all testing. We care about frontend quality so consider a UI polish pass. Decide the right teammates. Teammates talk to each other directly. CONTEXT: Electron app with React frontend. Settings view exists at hash route #settings. No keyboard shortcut customization exists yet. REQUIREMENTS: 1) Add shortcuts preferences section to settings, 2) Allow rebinding common actions, 3) Persist changes to config, 4) Show current bindings with edit controls. TESTER INSTRUCTIONS: A tester agent MUST be spawned that invokes the /e2e-testing skill. This is an Electron app so use mcp__electron__* tools: use mcp__electron__take_screenshot for screenshots, mcp__electron__send_command_to_electron for interactions and page inspection, mcp__electron__read_electron_logs to check for errors. Test: 1) Navigate to settings, 2) Verify shortcuts section renders, 3) Test rebinding a shortcut, 4) Verify persistence after reload, 5) Take screenshots. Report failures to implementer. Iterate until ALL pass. COMPLETION: The team lead outputs <promise>SHORTCUTS_PANEL_DONE</promise> ONLY when tester confirms ALL tests pass with screenshots and all agents confirm done. Then clean up the team." --max-iterations 12 --completion-promise "SHORTCUTS_PANEL_DONE"
 ```
 
 ## Capacitor Apps
@@ -166,7 +166,7 @@ For Electron apps, the tester uses `mcp__electron__*` MCP tools instead of Chrom
 For Capacitor shell apps, the testing approach is different. Include this context:
 
 - This is a Capacitor shell app that loads remote websites via CSS/JS injections
-- Do NOT use Chrome MCP tools for testing - use simulator screenshots and user verification
+- Do NOT use agent-browser for testing - use simulator screenshots and user verification
 - CSS fixes go in `dev-server/adjustments/css/`, JS fixes in `dev-server/adjustments/js/`
 - DEV_MODE is in `ios/App/App/Info.plist`
 - Verification loop: make change -> wait for hot reload -> screenshot -> user confirms
@@ -175,7 +175,7 @@ For Capacitor shell apps, the testing approach is different. Include this contex
 ### Capacitor Example
 
 ```
-/ralph-loop:ralph-loop "Fix bottom navigation overlap on Cinepolis USA mobile view. PLAN FIRST then AUTO-ACCEPT and implement without waiting for confirmation. DELEGATION RULE: You (the main agent) MUST NOT do any implementation or testing directly. Create the agent team and let it handle everything. Your only job is team setup and cleanup. AGENT TEAM SETUP: Create an agent team for this task. Spawn a team lead in delegate mode - it coordinates only, never writes code. This is a Capacitor shell app - do NOT use Chrome MCP tools for testing, use simulator screenshots instead. All fixes are CSS/JS injections - we do not control source HTML. Decide the right teammates for a mobile CSS fix. Teammates talk to each other directly. CONTEXT: Key files: CSS fixes in dev-server/adjustments/css/, JS fixes in dev-server/adjustments/js/, DEV_MODE in ios/App/App/Info.plist. The bottom navigation bar overlaps with the native tab bar on smaller iPhones. REQUIREMENTS: 1) Add bottom padding to prevent overlap, 2) Only affect mobile viewport widths, 3) Test on iPhone SE size. VERIFICATION: For each change: make it, wait for hot reload, take screenshot with ./scripts/screenshot.sh cinepolis-bottomnav, request user confirmation. Test against https://cinepolisusa.com home and movie detail pages. FINALIZATION: When tests pass: set DEV_MODE to false in Info.plist, run yarn finalize:bundle and npx cap sync, verify without dev server, take final screenshot, commit and push. COMPLETION: Output <promise>BOTTOMNAV_FIXED</promise> ONLY after all tests verified, finalized, and committed. Clean up the team." --max-iterations 10 --completion-promise "BOTTOMNAV_FIXED"
+/ralph-loop:ralph-loop "Fix bottom navigation overlap on Cinepolis USA mobile view. PLAN FIRST then AUTO-ACCEPT and implement without waiting for confirmation. DELEGATION RULE: You (the main agent) MUST NOT do any implementation or testing directly. Create the agent team and let it handle everything. Your only job is team setup and cleanup. AGENT TEAM SETUP: Create an agent team for this task. Spawn a team lead in delegate mode - it coordinates only, never writes code. This is a Capacitor shell app - do NOT use agent-browser for testing, use simulator screenshots instead. All fixes are CSS/JS injections - we do not control source HTML. Decide the right teammates for a mobile CSS fix. Teammates talk to each other directly. CONTEXT: Key files: CSS fixes in dev-server/adjustments/css/, JS fixes in dev-server/adjustments/js/, DEV_MODE in ios/App/App/Info.plist. The bottom navigation bar overlaps with the native tab bar on smaller iPhones. REQUIREMENTS: 1) Add bottom padding to prevent overlap, 2) Only affect mobile viewport widths, 3) Test on iPhone SE size. VERIFICATION: For each change: make it, wait for hot reload, take screenshot with ./scripts/screenshot.sh cinepolis-bottomnav, request user confirmation. Test against https://cinepolisusa.com home and movie detail pages. FINALIZATION: When tests pass: set DEV_MODE to false in Info.plist, run yarn finalize:bundle and npx cap sync, verify without dev server, take final screenshot, commit and push. COMPLETION: Output <promise>BOTTOMNAV_FIXED</promise> ONLY after all tests verified, finalized, and committed. Clean up the team." --max-iterations 10 --completion-promise "BOTTOMNAV_FIXED"
 ```
 
 ## Image Handling
@@ -198,7 +198,7 @@ HARD RULES:
   - Always spawn a tester using /e2e-testing skill
   - Tester iterates until ALL tests pass with screenshots
   - Promise ONLY after tester confirms + all agents done
-  - Capacitor: no Chrome MCP, use simulator screenshots
+  - Capacitor: no agent-browser, use simulator screenshots
 
 PREFERENCES (context for Claude Code, not rules):
   - Frontend quality matters: /polish-ui + /frontend-design

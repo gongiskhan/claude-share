@@ -1,0 +1,8 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1772819801252@cleaner\",\"from\":\"team-lead\",\"reason\":\"Your task is complete. Shutting down.\",\"timestamp\":\"2026-03-06T17:56:41.252Z\"}",
+    "timestamp": "2026-03-06T17:56:41.252Z",
+    "read": true
+  }
+]

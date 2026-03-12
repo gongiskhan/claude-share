@@ -1,0 +1,20 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"Find untranslated Spanish strings via browser\",\"description\":\"Browse the SPCM app at http://localhost:5178 with language set to Spanish (es). Navigate all pages and identify any text still displayed in English. Use agent-browser to:\\n1. Open http://localhost:5178\\n2. Switch language to Spanish using the language selector\\n3. Navigate through all pages: plan definitions list, plan wizard (all 5 steps), dialogs, filters, pagination\\n4. Take screenshots and document every string that appears in English when it should be Spanish\\n5. Report all findings to the es-translator agent via SendMessage\\n\\nKnown missing keys from JSON comparison (74 missing + 31 untranslated):\\n\\nMISSING FROM ES (74 keys - same set as PT, these exist in en.json but not in es.json):\\n- spcm.planDefinition.section.* (planIdentity, usageAllowance, pricing, planType, renewals, rollover, expiry)\\n- spcm.planDefinition.step.0-4 (Basic Plan Settings, Advanced Plan Settings, Policy Profiles, Usage Counters, Usage Rules)\\n- spcm.planDefinition.* (saveAndFinish, savePlanFirst, requiredNote, chargeable, corePlan, nonCorePlan, unlimited, limited, allowableUsage, purchaseLimits, expiryWarning, rolloverOnRenewal, confirmDeleteSubEntity, specifyTimeOfDay)\\n- spcm.usageRuleDefinition.thresholdPccProfiles\\n- spcm.usageCounterDefinition.* (resetTimeType, pccProfilesColumn, section.general, section.reset, generalHelp, resetHelp, pccProfiles, selectProfile, resetTimeHelp, addTitle, editTitle)\\n- spcm.pccProfile.* (meteringHelp, section.general, section.settings, section.constraints, thresholdHelp, settingsHelp, constraintsHelp, info, addTitle, editTitle)\\n- spcm.enum.resetTimeType.* (ABSOLUTE, RELATIVE)\\n- spcm.filter.* (name, allPlans, live, draft)\\n- spcm.status.* (draft, available, unavailable)\\n- spcm.pagination.* (showing, of, previous, next)\\n- spcm.versionsDrawer.* (title, version, state, current, actions)\\n- spcm.cloneDialog.* (title, newName)\\n- spcm.resetTimeType.* (ABSOLUTE, RELATIVE)\\n- spcm.button.* (viewVersions, deleteSelected, addNew, createVersion)\\n\\nES-SPECIFIC untranslated (value same as English):\\n- common.accordion.general = \\\"General\\\" (should stay \\\"General\\\" in Spanish actually)\\n- spcm.planDefinition.section.general = \\\"General\\\"\\n- spcm.enum.state.EDITABLE = \\\"Editable\\\"\\n- spcm.enum.usageScope.PLAN = \\\"Plan\\\"\\n\\nAlso look for any hardcoded English text in the UI not covered by i18n keys.\\n\\nIMPORTANT: The app may have errors loading data from backend (502s) - that's fine, focus on the UI labels, buttons, section headers, and navigation that render regardless.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-03-06T05:29:32.780Z\"}",
+    "timestamp": "2026-03-06T05:29:32.780Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1772775264899@es-finder\",\"from\":\"team-lead\",\"reason\":\"Findings delivered to es-translator. Shutting down.\",\"timestamp\":\"2026-03-06T05:34:24.899Z\"}",
+    "timestamp": "2026-03-06T05:34:24.899Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1772775516394@es-finder\",\"from\":\"team-lead\",\"reason\":\"All done, shutting down.\",\"timestamp\":\"2026-03-06T05:38:36.394Z\"}",
+    "timestamp": "2026-03-06T05:38:36.394Z",
+    "read": false
+  }
+]

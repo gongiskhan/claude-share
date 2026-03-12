@@ -1,0 +1,8 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"4\",\"subject\":\"Upgrade i18n infrastructure for full app\",\"description\":\"Based on research from Task 1, upgrade ekoa/lib/i18n.ts to support the full app. Create translation files (ekoa/lib/i18n/en.ts and ekoa/lib/i18n/pt.ts) with all strings from the catalog (Task 2) plus strings from the reference app. Create a React hook (useTranslation or useT) and/or context provider so components can access translations reactively. Ensure locale changes trigger re-renders. Keep it lightweight -- no external i18n library unless the reference app used one.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-03-02T07:46:21.620Z\"}",
+    "timestamp": "2026-03-02T07:46:21.620Z",
+    "read": false
+  }
+]

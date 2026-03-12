@@ -1,17 +1,17 @@
 /**
  * E2E Test Runner Helper Script
  *
- * This script is for Strategies 3-4 of the e2e-testing fallback chain.
- * Strategies 1-2 (Claude for Chrome MCP) are handled directly by Claude.
+ * This script provides Playwright-based browser strategies as a secondary option.
+ * The primary tool for web app E2E testing is agent-browser CLI.
  *
  * Usage:
  *   npx tsx run_e2e_test.ts --url http://localhost:3000 --action "click Login"
  *
- * Strategy order (when MCP fails):
- *   3. Chrome debug mode (connect via CDP if running)
- *   4. Chromium persistent context
+ * Strategies:
+ *   1. Chrome debug mode (connect via CDP if running)
+ *   2. Chromium persistent context
  *
- * If all strategies fail, Claude should use the agent-browser skill directly.
+ * If all strategies fail, use agent-browser CLI directly.
  */
 
 import { chromium, type BrowserContext, type Page } from 'playwright';
@@ -119,13 +119,13 @@ async function tryChromiumPersistent(): Promise<BrowserResult | null> {
 /**
  * Get browser using fallback strategy (Strategies 3-4)
  *
- * NOTE: Strategies 1-2 (Claude for Chrome MCP) should be tried before
- * calling this script. If this script also fails, use the agent-browser
- * skill as the final fallback.
+ * NOTE: agent-browser CLI is the primary tool for web app E2E testing.
+ * This script is a secondary option. If this script fails, use
+ * agent-browser CLI directly.
  */
 export async function getBrowser(): Promise<BrowserResult> {
-  console.log('=== E2E Testing: Strategies 3-4 ===\n');
-  console.log('Note: MCP strategies (1-2) should have been tried first.\n');
+  console.log('=== E2E Testing: Playwright Strategies ===\n');
+  console.log('Note: agent-browser CLI is the primary tool. This is a secondary option.\n');
 
   let result: BrowserResult | null;
 
@@ -197,8 +197,8 @@ if (args.includes('--help') || args.length === 0) {
   console.log(`
 E2E Test Runner Helper Script
 
-This script handles Strategies 3-4 of the e2e-testing fallback chain.
-Strategies 1-2 (Claude for Chrome MCP) are handled directly by Claude.
+This script provides Playwright-based browser strategies.
+The primary tool for web app E2E testing is agent-browser CLI.
 
 Usage:
   npx tsx run_e2e_test.ts --url <URL> [--action <ACTION>]
@@ -213,12 +213,11 @@ Examples:
   npx tsx run_e2e_test.ts --url http://localhost:3000 --action "click Sign In"
 
 Strategy Order:
-  1. Claude for Chrome (MCP) - handled directly by Claude
-  2. Chrome Debug Mode + retry MCP - handled directly by Claude
-  3. Chrome Debug Mode (CDP) - this script
-  4. Chromium Persistent Context - this script
+  Primary: agent-browser CLI (preferred for all web app testing)
+  1. Chrome Debug Mode (CDP) - this script
+  2. Chromium Persistent Context - this script
 
-Final fallback: agent-browser skill (if this script fails)
+If this script fails, use agent-browser CLI directly.
 `);
   process.exit(0);
 }

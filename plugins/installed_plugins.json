@@ -4,28 +4,28 @@
     "frontend-design@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/frontend-design/aa89767d3642",
-        "version": "aa89767d3642",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/frontend-design/df78aec6161c",
+        "version": "df78aec6161c",
         "installedAt": "2026-01-07T06:58:17.907Z",
-        "lastUpdated": "2026-02-20T13:23:39.846Z"
+        "lastUpdated": "2026-02-24T11:35:10.924Z"
       }
     ],
     "agent-sdk-dev@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/agent-sdk-dev/aa89767d3642",
-        "version": "aa89767d3642",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/agent-sdk-dev/df78aec6161c",
+        "version": "df78aec6161c",
         "installedAt": "2026-01-07T06:58:17.936Z",
-        "lastUpdated": "2026-02-20T13:23:39.847Z"
+        "lastUpdated": "2026-02-24T11:35:10.924Z"
       }
     ],
     "ralph-loop@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/ralph-loop/aa89767d3642",
-        "version": "aa89767d3642",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/ralph-loop/df78aec6161c",
+        "version": "df78aec6161c",
         "installedAt": "2026-01-07T06:58:17.967Z",
-        "lastUpdated": "2026-02-20T13:23:39.846Z"
+        "lastUpdated": "2026-02-24T11:35:10.923Z"
       }
     ],
     "swift-lsp@claude-plugins-official": [
@@ -40,19 +40,19 @@
     "plugin-dev@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/plugin-dev/aa89767d3642",
-        "version": "aa89767d3642",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/plugin-dev/df78aec6161c",
+        "version": "df78aec6161c",
         "installedAt": "2026-01-08T14:20:41.276Z",
-        "lastUpdated": "2026-02-20T13:23:39.844Z"
+        "lastUpdated": "2026-02-24T11:35:10.922Z"
       }
     ],
     "context7@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/context7/aa89767d3642",
-        "version": "aa89767d3642",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/context7/df78aec6161c",
+        "version": "df78aec6161c",
         "installedAt": "2026-01-09T18:13:37.938Z",
-        "lastUpdated": "2026-02-20T13:23:39.847Z"
+        "lastUpdated": "2026-02-24T11:35:10.924Z"
       }
     ],
     "code-simplifier@claude-plugins-official": [
@@ -92,6 +92,26 @@
         "installedAt": "2026-01-21T21:24:28.671Z",
         "lastUpdated": "2026-01-21T21:24:28.671Z",
         "gitCommitSha": "69c0b1a0674149f27b61b2635f935524b6add202"
+      }
+    ],
+    "ui-ux-pro-max@ui-ux-pro-max-skill": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/ui-ux-pro-max-skill/ui-ux-pro-max/2.0.1",
+        "version": "2.0.1",
+        "installedAt": "2026-02-26T16:46:30.468Z",
+        "lastUpdated": "2026-02-26T16:46:30.468Z",
+        "gitCommitSha": "6623f12b4058d09618c89cffb2de59a47c45f999"
+      }
+    ],
+    "obsidian@obsidian-skills": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/obsidian-skills/obsidian/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-02-26T16:51:48.729Z",
+        "lastUpdated": "2026-02-26T16:51:48.729Z",
+        "gitCommitSha": "be978124b80dc6b60586773e1d125d1cdf36d26a"
       }
     ]
   }

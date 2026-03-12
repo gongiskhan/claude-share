@@ -1,0 +1,8 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"Write branding and integration agent skills for engine\",\"description\":\"Create content files for branding and integration agents:\\n- skills/branding/*.md - Branding knowledge (colors, fonts, voice, logo handling)\\n- instructions/branding-agent.md - Branding agent procedure\\n- skills/integration/*.md - Integration query skills (GA4, Stripe, HubSpot, etc.)\\n- instructions/integration-agent.md - Integration agent procedure\\n\\nExtract from agent-api/src/services/executors/branding-agent.ts (1369 lines) and integration-agent.ts (1253 lines). Follow conventions.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-03-06T21:07:12.759Z\"}",
+    "timestamp": "2026-03-06T21:07:12.759Z",
+    "read": false
+  }
+]

@@ -1,0 +1,9 @@
+[
+  {
+    "from": "i18n-wizard",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"9\",\"subject\":\"i18n-wizard\",\"description\":\"Apply i18n translations to the configuration wizard at `/Users/ggomes/dev/ekoa-dev/ekoa/components/b\",\"assignedBy\":\"i18n-wizard\",\"timestamp\":\"2026-03-02T08:04:40.034Z\"}",
+    "timestamp": "2026-03-02T08:04:40.034Z",
+    "color": "purple",
+    "read": true
+  }
+]
