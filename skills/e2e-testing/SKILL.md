@@ -12,13 +12,14 @@ description: End-to-end testing using real browser/app automation. Use this skil
 1. **NEVER write Playwright test scripts** - Do not write .spec.ts files, do not write test() blocks
 2. **NEVER write unit tests** - This skill uses REAL browsers/apps, not test frameworks
 3. **NEVER create test files** - No files in __tests__, no .test.ts, no .spec.ts
-4. **USE agent-browser --headed FOR WEB APPS (PRIMARY)** - Call agent-browser CLI in headed mode directly via Bash. This is the preferred and default tool.
-5. **USE Claude for Chrome (mcp__claude-in-chrome__*) AS FALLBACK** - Only when agent-browser cannot accomplish something (e.g., interacting with the user's existing authenticated session, complex multi-tab scenarios, or extensions-dependent flows).
-6. **USE mcp__electron__* FOR ELECTRON APPS** - Call Electron MCP tools directly
-7. **TAKE SCREENSHOTS** - Always capture visual proof of test results
-8. **DETECT APP TYPE** - Determine if you are testing a web app or an Electron app and use the correct tools accordingly
-9. **RECORD THE SCREEN (NON-NEGOTIABLE)** - You MUST record the screen during the entire browser automation session and serve the recording at the end. See "Screen Recording" section below. This is not optional.
-10. **SERVE AND LINK THE RECORDING (NON-NEGOTIABLE)** - At the end of every E2E testing task, you MUST serve the recording over HTTP and provide the link in your answer. No exceptions.
+4. **NEVER write programmatic test scripts as a workaround** - Do not write Node.js/Python scripts that test via WebSocket, HTTP API, or other programmatic means. This skill is about VISUAL browser automation, not programmatic testing.
+5. **ALWAYS USE agent-browser --headed FOR WEB APPS FIRST** - This is NON-NEGOTIABLE. Call agent-browser CLI in headed mode directly via Bash. Do NOT skip to Chrome MCP or programmatic testing. agent-browser MUST be your first and primary tool. See "Resilience" section for what to do if it fails.
+6. **Claude for Chrome (mcp__claude-in-chrome__*) is a RARE FALLBACK** - Only use it when agent-browser truly cannot accomplish the task (e.g., you need the user's existing authenticated session and CDP is unavailable, or the user explicitly requests it). Always try agent-browser first.
+8. **USE mcp__electron__* FOR ELECTRON APPS** - Call Electron MCP tools directly
+9. **TAKE SCREENSHOTS** - Always capture visual proof of test results
+10. **DETECT APP TYPE** - Determine if you are testing a web app or an Electron app and use the correct tools accordingly
+11. **RECORD THE BROWSER (NON-NEGOTIABLE)** - You MUST record the browser during the entire automation session using `agent-browser record start/stop` and serve the recording at the end. See "Screen Recording" section below. This is not optional.
+12. **SERVE AND LINK THE RECORDING (NON-NEGOTIABLE)** - At the end of every E2E testing task, you MUST serve the recording over HTTP and provide the link in your answer. No exceptions.
 
 ---
 
@@ -28,38 +29,35 @@ Every E2E testing session MUST be screen-recorded. This is mandatory and cannot 
 
 ### How It Works
 
-Uses `ffmpeg` with macOS AVFoundation to record the screen where the headed browser is visible. The recording is saved to `/tmp/e2e-recordings/` and served via a Python HTTP server so it can be accessed remotely (e.g., over Tailscale).
+Uses `agent-browser record` (Playwright's built-in viewport recording) to capture the browser content directly. This records the actual page viewport -- it does NOT depend on screen positions, foreground/background state, or display configuration. The recording is saved to `/tmp/e2e-recordings/` and served via a Python HTTP server so it can be accessed remotely (e.g., over Tailscale).
 
-### Step 1: Start Recording BEFORE Any Browser Automation
+### Step 1: Open the Browser and Start Recording
 
-Run this BEFORE opening the browser or performing any actions:
+Open the headed browser and immediately start recording. The recording captures the browser viewport directly, so screen detection is unnecessary:
 
 ```bash
 mkdir -p /tmp/e2e-recordings
-RECORDING_FILE="/tmp/e2e-recordings/e2e-$(date +%Y%m%d-%H%M%S).mp4"
-ffmpeg -f avfoundation -i "2:none" -r 15 -pix_fmt yuv420p -y "$RECORDING_FILE" </dev/null >/dev/null 2>&1 &
-FFMPEG_PID=$!
-echo "Recording PID: $FFMPEG_PID -> $RECORDING_FILE"
+RECORDING_FILE="/tmp/e2e-recordings/e2e-$(date +%Y%m%d-%H%M%S).webm"
+agent-browser open <target-url> --headed
+agent-browser record start "$RECORDING_FILE"
+echo "Recording -> $RECORDING_FILE"
 ```
 
 Notes:
-- `-i "2:none"` captures screen 0 with no audio. If the browser appears on a different screen, adjust the device index (run `ffmpeg -f avfoundation -list_devices true -i "" 2>&1` to list devices).
-- `-r 15` = 15 fps (good balance between quality and file size).
-- The `</dev/null` prevents ffmpeg from reading stdin which would conflict with the shell.
+- `agent-browser record` uses Playwright's built-in video capture -- it records the page viewport directly, not the screen.
+- Works regardless of which monitor the browser is on, whether the window is in the foreground, or display configuration.
+- Output format is WebM (playable in all modern browsers).
 
 ### Step 2: Run All Browser Automation
 
-Perform all agent-browser or Claude for Chrome actions as described in the sections below.
+Perform all agent-browser actions as described in the sections below. The browser is already open from Step 1 -- continue interacting with it.
 
 ### Step 3: Stop Recording AFTER All Automation Is Done
 
 ```bash
-kill -INT $FFMPEG_PID 2>/dev/null
-wait $FFMPEG_PID 2>/dev/null
+agent-browser record stop
 echo "Recording saved: $RECORDING_FILE"
 ```
-
-Use `-INT` (SIGINT) so ffmpeg finalizes the MP4 file properly. Do NOT use `kill -9` as it will corrupt the file.
 
 ### Step 4: Serve the Recording and Provide the Link
 
@@ -74,15 +72,29 @@ BASENAME=$(basename "$RECORDING_FILE")
 echo "Recording URL: http://${HOSTNAME}:8765/${BASENAME}"
 ```
 
-The recording will be accessible at `http://<hostname>:8765/<filename>.mp4`. With Tailscale, this is accessible from any device on the tailnet.
+The recording will be accessible at `http://<hostname>:8765/<filename>.webm`. With Tailscale, this is accessible from any device on the tailnet.
 
 ### MANDATORY: Final Output
 
 At the END of your response, you MUST include the recording link in this format:
 
-> Screen recording: http://<hostname>:8765/<filename>.mp4
+> Screen recording: http://<hostname>:8765/<filename>.webm
 
 If the recording failed for any reason, explicitly state WHY it failed. Do not silently skip it.
+
+### Fallback: ffmpeg Screen Recording (Claude for Chrome only)
+
+When using Claude for Chrome (mcp__claude-in-chrome__*) instead of agent-browser, `agent-browser record` is not available. In that case, fall back to ffmpeg screen recording:
+
+```bash
+mkdir -p /tmp/e2e-recordings
+FFMPEG_DEVICE=$(python3 ~/.claude/skills/e2e-testing/detect_recording_screen.py 2>/dev/null)
+RECORDING_FILE="/tmp/e2e-recordings/e2e-$(date +%Y%m%d-%H%M%S).mp4"
+ffmpeg -f avfoundation -i "${FFMPEG_DEVICE}:none" -r 15 -pix_fmt yuv420p -y "$RECORDING_FILE" </dev/null >/dev/null 2>&1 &
+FFMPEG_PID=$!
+```
+
+Stop with `kill -INT $FFMPEG_PID && wait $FFMPEG_PID 2>/dev/null` (use SIGINT so ffmpeg finalizes the MP4 properly).
 
 ---
 
@@ -143,13 +155,42 @@ After authentication is established (via any of the above steps), proceed with t
 
 ### Core Workflow
 
-1. **Start recording** (see Screen Recording section above)
-2. **Navigate**: `agent-browser open <url> --headed`
-3. **Snapshot**: `agent-browser snapshot -i` (returns interactive elements with refs like `@e1`, `@e2`)
-4. **Interact**: Use refs from the snapshot to click, fill, etc.
-5. **Re-snapshot**: After navigation or significant DOM changes
-6. **Screenshot**: `agent-browser screenshot result.png` for visual proof
-7. **Stop recording, serve, and provide link** (see Screen Recording section above)
+1. **Open browser headed + start recording**: `agent-browser open <url> --headed` then `agent-browser record start <path>.webm`
+2. **Snapshot**: `agent-browser snapshot -i` (returns interactive elements with refs like `@e1`, `@e2`)
+3. **Interact**: Use refs from the snapshot to click, fill, etc.
+4. **Re-snapshot**: After navigation or significant DOM changes
+5. **Screenshot**: `agent-browser screenshot result.png` for visual proof
+6. **Stop recording**: `agent-browser record stop`
+7. **Serve and provide link** (see Screen Recording section above)
+
+### Resilience: Do NOT Give Up on agent-browser
+
+agent-browser is reliable but may occasionally have transient issues. **You MUST persist through errors before considering any alternative.** Follow this escalation:
+
+#### If `agent-browser open` fails:
+1. **Retry once** -- transient failures happen (browser startup race conditions)
+2. **Check if the server is running** -- `curl -s -o /dev/null -w "%{http_code}" <url>` to verify the URL is reachable
+3. **Wait for the server** -- if it's still starting, `sleep 3` and retry
+4. **Try a different port** -- the app may be on a non-standard port; check running processes with `lsof -i -P | grep LISTEN`
+5. **Only after all retries fail**, report the error to the user and ask for guidance
+
+#### If `agent-browser snapshot` returns empty or unexpected content:
+1. **Wait for the page to load** -- `agent-browser wait --load networkidle` then retry snapshot
+2. **Check for JavaScript errors** -- `agent-browser errors` to see if the app is crashing
+3. **Try a full snapshot** -- `agent-browser snapshot` (without `-i`) to see ALL elements, not just interactive ones
+4. **Take a screenshot** -- `agent-browser screenshot debug.png` to visually see what's rendered
+
+#### If `agent-browser click` or `agent-browser fill` fails:
+1. **Re-snapshot** -- element refs may have changed after DOM updates: `agent-browser snapshot -i`
+2. **Wait for the element** -- `agent-browser wait @eN` before interacting
+3. **Try a different selector** -- use CSS selector instead of ref: `agent-browser click "button.submit"`
+4. **Use JavaScript as last resort** -- `agent-browser eval "document.querySelector('button').click()"`
+
+#### NEVER do these as a "fallback":
+- Do NOT switch to Claude for Chrome MCP for localhost URLs (it CANNOT reach localhost)
+- Do NOT write programmatic test scripts (WebSocket clients, HTTP test scripts, etc.)
+- Do NOT abandon browser automation and resort to `curl` or API-level testing
+- Do NOT tell the user "browser automation failed" after only 1 attempt
 
 ### Step-by-Step: How to Perform E2E Tests
 
@@ -214,15 +255,14 @@ agent-browser screenshot test-result.png
 ### Complete Example: Testing a Login Flow
 
 ```bash
-# 1. Start screen recording
+# 1. Open browser headed and start recording
 mkdir -p /tmp/e2e-recordings
-RECORDING_FILE="/tmp/e2e-recordings/e2e-$(date +%Y%m%d-%H%M%S).mp4"
-ffmpeg -f avfoundation -i "2:none" -r 15 -pix_fmt yuv420p -y "$RECORDING_FILE" </dev/null >/dev/null 2>&1 &
-FFMPEG_PID=$!
-
-# 2. Run the test (always --headed)
+RECORDING_FILE="/tmp/e2e-recordings/e2e-$(date +%Y%m%d-%H%M%S).webm"
 agent-browser set viewport 1440 900
 agent-browser open http://localhost:3000/login --headed
+agent-browser record start "$RECORDING_FILE"
+
+# 2. Run the test
 agent-browser screenshot login-page.png
 agent-browser snapshot -i
 # Output: textbox "Email" [ref=e1], textbox "Password" [ref=e2], button "Login" [ref=e3]
@@ -234,7 +274,7 @@ agent-browser snapshot -i
 agent-browser screenshot login-result.png
 
 # 3. Stop recording
-kill -INT $FFMPEG_PID && wait $FFMPEG_PID 2>/dev/null
+agent-browser record stop
 
 # 4. Serve and provide link
 lsof -ti:8765 | xargs kill 2>/dev/null
@@ -287,19 +327,23 @@ Call agent-browser commands directly via Bash. Do not write code files.
 | Save auth state | `agent-browser state save auth.json` |
 | Load auth state | `agent-browser state load auth.json` |
 | Headed mode (DEFAULT) | `agent-browser open <url> --headed` |
+| Start recording | `agent-browser record start <path>.webm` |
+| Stop recording | `agent-browser record stop` |
 | Console logs | `agent-browser console` |
 | Page errors | `agent-browser errors` |
 
 ---
 
-## Web App Testing with Claude for Chrome (FALLBACK ONLY)
+## Web App Testing with Claude for Chrome (RARE FALLBACK ONLY)
 
-Use `mcp__claude-in-chrome__*` MCP tools ONLY when agent-browser cannot accomplish the task. Common reasons to fall back:
+**You MUST try agent-browser first.** Only fall back to Chrome MCP after agent-browser has been attempted and cannot accomplish the task.
 
-- The test requires interaction with the user's existing authenticated Chrome session and CDP is not available
-- The test involves browser extensions that agent-browser cannot access
-- Complex multi-tab scenarios where agent-browser's tab management falls short
-- The user explicitly requests Claude for Chrome
+### When Chrome MCP is appropriate (rare)
+
+Use `mcp__claude-in-chrome__*` MCP tools ONLY when:
+1. You need the user's **existing authenticated Chrome session** (cookies, login state) AND CDP is unavailable
+2. The test involves **browser extensions** that agent-browser cannot access
+3. The user **explicitly requests** Claude for Chrome
 
 ### When Using Claude for Chrome
 
@@ -311,7 +355,7 @@ Follow the standard Claude for Chrome workflow:
 5. `mcp__claude-in-chrome__form_input` for form filling
 6. `mcp__claude-in-chrome__javascript_tool` for custom JS execution
 
-Note: The screen recording (ffmpeg) still applies when using Claude for Chrome. The Chrome window must be visible on the recorded screen.
+Note: When using Claude for Chrome, `agent-browser record` is NOT available. Use the ffmpeg fallback described in the Screen Recording section. The Chrome window must be visible on the recorded screen.
 
 ---
 
@@ -467,7 +511,7 @@ mcp__electron__send_command_to_electron with command="verify_form_state"
 
 | App Type | Tools | How to Detect |
 |----------|-------|---------------|
-| **Web app** (Next.js, React, etc.) | `agent-browser --headed` (PRIMARY), `mcp__claude-in-chrome__*` (FALLBACK) | Runs in browser, has URL with localhost or domain |
+| **Web app** (Next.js, React, etc.) | `agent-browser --headed` (PRIMARY, always try first), Chrome MCP (rare fallback) | Runs in browser, has URL with localhost or domain |
 | **Electron app** | `mcp__electron__*` | Has `electron` in package.json, runs as desktop app |
 | **Capacitor app** | Simulator screenshots, user verification | Capacitor shell app, CSS/JS injections |
 
@@ -475,11 +519,12 @@ When in doubt, check `package.json` for `electron` or `@capacitor/core` dependen
 
 ## Summary
 
-1. **RECORD THE SCREEN (NON-NEGOTIABLE)** - Start ffmpeg BEFORE any automation, stop AFTER, serve via HTTP, provide link
-2. **USE agent-browser --headed FOR WEB APPS** - Primary tool for browser-based testing. Always headed mode.
-3. **USE Claude for Chrome AS FALLBACK** - Only when agent-browser cannot do what's needed
-4. **USE mcp__electron__* FOR ELECTRON APPS** - MCP tools for desktop app testing
-5. **DO NOT WRITE TEST FILES** - No Playwright, no Jest, no test frameworks
-6. **HANDLE AUTH PROPERLY** - Try CDP connection first, then saved state, then headed mode with user login
-7. **TAKE SCREENSHOTS** - Visual verification is required
-8. **ALWAYS END WITH THE RECORDING LINK** - Your final output MUST include `Screen recording: http://<hostname>:8765/<filename>.mp4`
+1. **ALWAYS USE agent-browser --headed FOR WEB APPS FIRST** - This is the primary tool. Always try it before Chrome MCP. No exceptions.
+2. **BE RESILIENT** - If agent-browser fails, retry, debug, check the server, wait. Do NOT give up after 1 attempt. See the Resilience section.
+3. **NEVER WRITE PROGRAMMATIC TEST SCRIPTS** - No WebSocket clients, no HTTP test scripts, no Node.js test files. This skill is about visual browser automation.
+4. **Chrome MCP is a RARE FALLBACK** - Only when you need existing auth session and CDP unavailable, or user explicitly requests it.
+5. **RECORD THE BROWSER (NON-NEGOTIABLE)** - Use `agent-browser record start/stop` to capture the viewport directly. Serve via HTTP, provide link.
+6. **USE mcp__electron__* FOR ELECTRON APPS** - MCP tools for desktop app testing.
+7. **HANDLE AUTH PROPERLY** - Try CDP connection first, then saved state, then headed mode with user login.
+8. **TAKE SCREENSHOTS** - Visual verification is required.
+9. **ALWAYS END WITH THE RECORDING LINK** - Your final output MUST include `Screen recording: http://<hostname>:8765/<filename>.webm`
