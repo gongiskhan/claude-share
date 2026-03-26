@@ -1,8 +1,0 @@
-[
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Phase 1a: Extend recipe interpreter + create recipe apps + slim handlers\",\"description\":\"Extend cortex/src/apps/interpreter.ts with 6 new operations (find_item, update_item, filter_items, sort_items, paginate, count_where). Create recipe apps for ekoa.deployments, ekoa.governance, ekoa.activity. Slim the corresponding handlers. Add compliance comments to teams, agent-config, execute handlers.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-03-12T09:15:09.372Z\"}",
-    "timestamp": "2026-03-12T09:15:09.372Z",
-    "read": false
-  }
-]

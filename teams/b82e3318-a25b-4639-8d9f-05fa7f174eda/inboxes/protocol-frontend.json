@@ -1,8 +1,0 @@
-[
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"Phase 2: Frontend migration from WS to HTTP+SSE\",\"description\":\"Create ekoa/lib/cortex/connection.ts (HTTP+SSE). Update ekoa/lib/api/client.ts (wsAction -> httpAction). Update ekoa/components/providers/cortex-provider.tsx. Delete ekoa/lib/ws/connection.ts. Verify all pages, stores, hooks.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-03-12T09:27:05.543Z\"}",
-    "timestamp": "2026-03-12T09:27:05.543Z",
-    "read": false
-  }
-]

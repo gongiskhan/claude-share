@@ -1,24 +1,50 @@
-# Sensitive files
+# Sensitive / credentials
 .credentials.json
+credentials.json
+*.bak
+
+# Session and runtime data
 history.jsonl
 stats-cache.json
+.refresh-backoff.lock
+session-env/
+sessions/
+shell-snapshots/
 
 # Cache and temporary files
 .DS_Store
 cache/
 chrome/
 debug/
+downloads/
 file-history/
 ide/
+image-cache/
 paste-cache/
 plans/
+
+# Plugin caches (plugin configs ARE tracked)
+plugins/cache/
+plugins/marketplaces/
+plugins/data/
+plugins/install-counts-cache.json
+
+# Project-specific data (auto-generated per working directory)
 projects/
+
+# Ephemeral / auto-generated
+backups/
+logs/
 prompts-manager-docs/
 scripts/
-session-env/
-shell-snapshots/
 skills_archive/
 statsig/
 tasks/
+teams/
 telemetry/
 todos/
+
+# Misc
+*.zip
+__pycache__/
+*.pyc

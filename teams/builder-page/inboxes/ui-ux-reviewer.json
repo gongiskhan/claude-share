@@ -1,8 +1,0 @@
-[
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"10\",\"subject\":\"UI/UX review and polish using ui-ux-pro-max patterns\",\"description\":\"Review and polish the entire builder page UI/UX using the ui-ux-pro-max skill patterns:\\n- Review layout proportions and responsiveness\\n- Ensure consistent spacing, colors, and typography\\n- Polish animations and transitions (Framer Motion)\\n- Improve visual hierarchy and readability\\n- Ensure dark-on-light theme consistency with rest of app\\n- Polish the terminal output colors and formatting\\n- Review the wizard for clarity and usability\\n- Check all interactive states (hover, focus, active, disabled)\\n- Ensure no emoji in UI (use Lucide icons)\\n- Check accessibility basics (contrast, focus indicators)\\n- Polish loading and empty states\\n- Review error displays\\nUse the /ui-ux-pro-max skill for guidance on design patterns.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-02-27T21:29:39.830Z\"}",
-    "timestamp": "2026-02-27T21:29:39.830Z",
-    "read": true
-  }
-]

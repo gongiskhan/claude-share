@@ -1,8 +1,0 @@
-[
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"Write coding agent skills, instructions, and recipes for engine\",\"description\":\"Create all content files for the coding agent in the ai-engine:\\n- skills/coding/*.md - Skills covering app building, technology choices, file structure, Ekoa templates, deployment, sandboxing, quality refinements\\n- instructions/coding-agent.md - Step-by-step procedure for how the coding agent processes build requests\\n- recipes/coding/*.json - Deterministic recipes for common build patterns\\n\\nMust extract all domain knowledge from agent-api/src/services/executors/coding-agent.ts (3385 lines), planning-agent.ts, testing-agent.ts, ui-agent.ts and convert coded logic into declarative content files. Include bilingual support (EN/PT-PT). Follow ai-engine/skills/CONVENTIONS.md.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-03-06T21:07:11.979Z\"}",
-    "timestamp": "2026-03-06T21:07:11.979Z",
-    "read": false
-  }
-]

@@ -1,8 +1,0 @@
-[
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Explore current executors and job system\",\"description\":\"Read and summarize all executor files (coding-agent.ts, branding-agent.ts, integration-agent.ts, planning-agent.ts, testing-agent.ts, ui-agent.ts), job-manager.ts, execute.ts route, and useJobStream.ts hook. Produce a detailed summary of what each does, what system prompt logic they contain, how they use Claude SDK, how SSE streaming works, and what needs to be ported to the engine.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-03-06T21:07:11.543Z\"}",
-    "timestamp": "2026-03-06T21:07:11.543Z",
-    "read": false
-  }
-]

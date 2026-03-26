@@ -144,14 +144,13 @@ For Electron apps, use `mcp__electron__*` MCP tools. See the main SKILL.md for f
 
 ---
 
-## Strategy 3: Claude for Chrome (RARE FALLBACK ONLY)
+## Strategy 2: Claude for Chrome (FALLBACK ONLY)
 
-**You MUST try agent-browser first.** Only fall back to Chrome MCP after agent-browser has been attempted and cannot accomplish the task.
-
-Use `mcp__claude-in-chrome__*` MCP tools ONLY when:
-- You need the user's **existing authenticated Chrome session** AND CDP is unavailable
-- The test involves **browser extensions** that agent-browser cannot access
-- The user **explicitly requests** Claude for Chrome
+Use `mcp__claude-in-chrome__*` MCP tools ONLY when agent-browser cannot accomplish the task:
+- Interacting with user's existing authenticated Chrome session when CDP is unavailable
+- Browser extension-dependent flows
+- Complex multi-tab scenarios
+- User explicitly requests it
 
 See SKILL.md for the full Claude for Chrome workflow.
 
@@ -161,12 +160,12 @@ See SKILL.md for the full Claude for Chrome workflow.
 
 | Scenario | Strategy |
 |----------|----------|
-| Web app testing (any URL) | agent-browser --headed (PRIMARY, always try first) |
-| Needing user's existing auth session (no CDP) | Chrome MCP (rare fallback) |
+| Web app testing | agent-browser --headed (PRIMARY) |
+| Web app, agent-browser insufficient | Claude for Chrome mcp__claude-in-chrome__* (FALLBACK) |
 | Web app needing auth (user has Chrome with CDP) | agent-browser --cdp 9222 |
 | Web app needing auth (saved state exists) | agent-browser state load |
 | Web app needing auth (first time) | agent-browser --headed + user login |
 | Electron app testing | mcp__electron__* MCP tools |
 | Capacitor app testing | Simulator screenshots + user verification |
 
-**NEVER write Playwright test scripts or programmatic test scripts. ALWAYS use agent-browser --headed for web apps. NEVER use Chrome MCP for localhost. ALWAYS record with `agent-browser record start/stop` and serve the recording at the end.**
+**NEVER write Playwright test scripts. Always use agent-browser --headed for web apps (primary), Claude for Chrome as fallback, and mcp__electron__* for Electron apps. ALWAYS record the screen with ffmpeg and serve the recording at the end.**

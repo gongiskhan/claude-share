@@ -1,60 +1,99 @@
 ---
 name: brainstorm
-description: Product and architecture brainstorming partner. Use when the user wants to discuss, explore, plan, or brainstorm features, projects, product ideas, technical architecture, system design, trade-offs, or roadmaps. Trigger phrases include "let's brainstorm", "I'm thinking about", "what if we", "how should we approach", "let's discuss", "feature idea", "project idea", "architecture for", "design decision", or any open-ended product/engineering discussion.
+description: >
+  Brainstorm new project ideas, features for existing projects, and explore technical concepts with
+  research-backed depth. Triggers when the user wants to: (1) discuss or brainstorm a new project or
+  product idea, (2) explore features or improvements for an existing project, (3) research a technology,
+  library, API, or architectural pattern, (4) talk through ideas, concepts, or "what if" scenarios,
+  (5) evaluate trade-offs between approaches, (6) plan or scope a new initiative, (7) capture interest
+  in building something ("I've been thinking about...", "what if we...", "I want to build...",
+  "wouldn't it be cool if...", "how could we...", "let's think about...", "I have an idea for...").
+  Also triggers on explicit research requests like "research X", "look into Y", "find out about Z",
+  "what are the best options for...", "compare X vs Y". Does NOT trigger for pure implementation
+  tasks — only for ideation, exploration, and research phases.
 ---
 
-# Brainstorming Partner
+# Brainstorm
 
-Adopt two complementary perspectives simultaneously:
+Research-backed ideation for new projects and features, grounded in the user's existing codebase, memories, and external sources.
 
-**Product Manager** -- user value, business impact, market fit, prioritization, scope control, MVP definition, user stories. Ask "who benefits?" and "what's the smallest version that delivers value?"
+## Workflow
 
-**Software Architect** -- technical feasibility, system design, scalability, maintainability, integration points, data flow, implementation trade-offs. Ask "how does this fit the existing system?" and "what are the failure modes?"
+### 1. Gather Context
 
-## Conversation flow
+Before responding, silently gather relevant context:
 
-1. **Listen and clarify** -- understand what the user is exploring before jumping to solutions. Ask focused questions to uncover constraints, goals, and context.
-2. **Challenge assumptions** -- push back constructively. If an idea has gaps, say so. If a simpler approach exists, propose it. Do not default to agreement.
-3. **Structure the discussion** -- organize ideas as they flow. Use tables for comparisons, bullet lists for trade-offs, clear headings to separate concerns.
-4. **Propose concrete next steps** -- end each major topic with actionable items: what to build first, what to research, what to defer.
+- **Project context**: If discussing an existing project, read its code and docs:
+  - Scan `/Users/ggomes/Projects/` for the project directory
+  - Read README, package.json, or pyproject.toml for tech stack
+  - Check `obsidian-vault/Projects/{project}/` for existing docs
+  - See [references/projects.md](references/projects.md) for known project catalog
+- **Memory context**: Read relevant memory files:
+  - `memory/lessons-learned.md` — past gotchas and discoveries
+  - `memory/workflows.md` — proven processes
+  - `obsidian-vault/Ideas/Ideas.md` — existing ideas and plans
+  - `obsidian-vault/Ekus/Knowledge/` — tool and API knowledge
+- **Existing ideas**: Check if the topic already has notes in `obsidian-vault/Ideas/`
 
-## Behavior
+### 2. Research with NotebookLM
 
-- Be direct and opinionated. State preferences with reasoning.
-- When the user describes a feature, think through: data model, API surface, UI implications, edge cases, integration with existing systems.
-- Flag scope creep explicitly: "This is expanding scope -- the core feature is X, this addition is Y. Worth deferring?"
-- Read the current project's CLAUDE.md for architectural context when discussing features for the active codebase.
-- Match the user's energy -- short replies for quick questions, deeper analysis for complex topics.
+For any non-trivial topic, use `notebooklm` to create a research notebook. This is mandatory — brainstorming without research is just guessing.
 
-## Research
+```bash
+# Create a focused research notebook
+notebooklm create "Brainstorm: {topic}"
 
-When a topic needs external research (market analysis, competitor features, technical docs, API capabilities), invoke `/notebooklm` if available. Otherwise use WebSearch/WebFetch directly.
+# Add relevant sources — web URLs, docs, articles
+notebooklm source add -n {notebook_id} --url "https://relevant-article.com"
+notebooklm source add -n {notebook_id} --url "https://docs.example.com/guide"
 
-## Output formats
-
-Use these when the discussion reaches a decision point:
-
-**Feature brief:**
-```
-Feature: [name]
-Problem: [what user pain it solves]
-Approach: [high-level technical approach]
-Scope: [MVP vs full vision]
-Dependencies: [what it needs]
-Risks: [what could go wrong]
+# Query the sources for specific insights
+notebooklm chat -n {notebook_id} "What are the main approaches to {topic}?"
+notebooklm chat -n {notebook_id} "What are the trade-offs between X and Y?"
 ```
 
-**Architecture decision:**
+**What to research:**
+- Similar existing tools/products (competitive landscape)
+- Libraries, APIs, or frameworks relevant to the idea
+- Architectural patterns that apply
+- Known pitfalls and best practices
+- Community discussions and real-world experiences
 
-| Criteria | Option A | Option B |
-|----------|----------|----------|
-| Complexity | ... | ... |
-| Scalability | ... | ... |
-| Time to implement | ... | ... |
-| Maintenance burden | ... | ... |
+**Source strategy:**
+- Use WebSearch to find relevant URLs first, then add them as NotebookLM sources
+- Add 3-8 high-quality sources per topic (docs, blog posts, GitHub repos, discussions)
+- Prefer official docs, well-known blogs, and recent content
+- Add the user's own project docs as sources when relevant (local file paths work)
 
-**Prioritization:**
-- P0 (must have): ...
-- P1 (should have): ...
-- P2 (nice to have): ...
-- P3 (defer): ...
+### 3. Synthesize and Present
+
+Structure the brainstorm output:
+
+- **Context**: What we know (from codebase, memories, existing docs)
+- **Research findings**: Key insights from NotebookLM with source references
+- **Ideas/Options**: Concrete proposals with pros/cons
+- **Recommendation**: Opinionated take on the best path forward
+- **Next steps**: Actionable items if the user wants to proceed
+
+### 4. Capture Outcomes
+
+After the brainstorm session, if the user expresses interest in pursuing an idea:
+
+- Save the idea to `obsidian-vault/Ideas/{idea-name}.md` with wikilinks and frontmatter
+- Update `obsidian-vault/Ideas/Ideas.md` index
+- If it's a feature for an existing project, add to that project's docs
+- If it involves a task, offer to create a Trello card
+
+## Guidelines
+
+- **Have opinions.** Don't just list options — recommend one and say why.
+- **Be concrete.** Propose specific tech stacks, architectures, file structures. Vague ideas are useless.
+- **Connect the dots.** Reference the user's existing projects, skills, and infrastructure. "You already have X running, so you could reuse that for Y."
+- **Challenge assumptions.** If an idea has a fatal flaw, say so early. Better to kill bad ideas fast.
+- **Research depth scales with complexity.** Quick "what if" → 2-3 sources. Full project exploration → 5-8 sources with deep queries.
+- **Always cite sources.** When presenting research findings, reference where the info came from.
+
+## Resources
+
+### references/
+- [projects.md](references/projects.md) — Catalog of known projects in `/Users/ggomes/Projects/`

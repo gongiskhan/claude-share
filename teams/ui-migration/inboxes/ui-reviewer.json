@@ -1,9 +1,0 @@
-[
-  {
-    "from": "ui-reviewer",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"5\",\"subject\":\"Review and fix new UI builder flow in ekoa/ folder\",\"description\":\"Compare old UI (_app-reference/) with new UI (ekoa/) and fix: 1) Preview auto-start on template copy, 2) SSE streaming URL mismatch, 3) Chat panel essential messages, 4) Output panel improvements, 5) API client functions, 6) Store compatibility\",\"assignedBy\":\"ui-reviewer\",\"timestamp\":\"2026-03-01T00:45:39.158Z\"}",
-    "timestamp": "2026-03-01T00:45:39.158Z",
-    "color": "blue",
-    "read": true
-  }
-]

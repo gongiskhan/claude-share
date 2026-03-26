@@ -1,8 +1,0 @@
-[
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"Phase 1b: Build HTTP+SSE backend, remove WebSocket\",\"description\":\"Create cortex/src/sse.ts (SSE client manager). Rewrite cortex/src/server.ts to add POST /api/v1/action + GET /api/v1/events, remove all WS code. Update cortex/src/auth.ts with HTTP token extraction. Make cortex/src/handlers/index.ts transport-agnostic. Update cortex/src/index.ts to use new server API.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-03-12T09:15:09.654Z\"}",
-    "timestamp": "2026-03-12T09:15:09.654Z",
-    "read": false
-  }
-]

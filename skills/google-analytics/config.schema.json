@@ -1,0 +1,175 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ekoa.os/schemas/integrations/google-analytics.json",
+  "title": "Google Analytics Integration Config",
+  "description": "Configuration schema for Google Analytics 4 integration with Ekoa OS",
+  "type": "object",
+  "required": ["propertyId", "authType", "configured"],
+  "properties": {
+    "propertyId": {
+      "type": "string",
+      "description": "GA4 Property ID (numeric only, e.g., '123456789')",
+      "pattern": "^[0-9]+$",
+      "examples": ["123456789", "987654321"]
+    },
+    "authType": {
+      "type": "string",
+      "enum": ["service_account", "oauth"],
+      "description": "Authentication method",
+      "default": "service_account"
+    },
+    "credentials": {
+      "type": "object",
+      "description": "Authentication credentials (varies by authType)",
+      "oneOf": [
+        {
+          "title": "Service Account Credentials",
+          "properties": {
+            "serviceAccountKey": {
+              "type": "object",
+              "description": "Full service account JSON key",
+              "required": ["type", "project_id", "private_key", "client_email"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "service_account"
+                },
+                "project_id": {
+                  "type": "string"
+                },
+                "private_key_id": {
+                  "type": "string"
+                },
+                "private_key": {
+                  "type": "string",
+                  "description": "PEM-encoded private key"
+                },
+                "client_email": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "client_id": {
+                  "type": "string"
+                },
+                "auth_uri": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "token_uri": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "auth_provider_x509_cert_url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "client_x509_cert_url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "required": ["serviceAccountKey"]
+        },
+        {
+          "title": "OAuth Credentials",
+          "properties": {
+            "clientId": {
+              "type": "string",
+              "description": "OAuth 2.0 Client ID"
+            },
+            "clientSecret": {
+              "type": "string",
+              "description": "OAuth 2.0 Client Secret"
+            },
+            "refreshToken": {
+              "type": "string",
+              "description": "OAuth 2.0 Refresh Token (obtained after first auth)"
+            },
+            "accessToken": {
+              "type": "string",
+              "description": "Current access token (auto-managed)"
+            },
+            "tokenExpiry": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Access token expiration time"
+            }
+          },
+          "required": ["clientId", "clientSecret", "refreshToken"]
+        }
+      ]
+    },
+    "configured": {
+      "type": "boolean",
+      "description": "Whether setup is complete and credentials are valid",
+      "default": false
+    },
+    "configuredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when configuration was completed"
+    },
+    "propertyName": {
+      "type": "string",
+      "description": "Human-readable property name for display"
+    },
+    "websiteUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Primary website URL for this property"
+    },
+    "timezone": {
+      "type": "string",
+      "description": "Property timezone (e.g., 'America/New_York')",
+      "examples": ["America/New_York", "Europe/London", "Asia/Tokyo"]
+    },
+    "defaultDateRange": {
+      "type": "string",
+      "enum": ["today", "yesterday", "7daysAgo", "28daysAgo", "30daysAgo"],
+      "description": "Default date range for queries",
+      "default": "7daysAgo"
+    },
+    "cache": {
+      "type": "object",
+      "description": "Response caching settings",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "ttlMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1440,
+          "default": 15,
+          "description": "Cache time-to-live in minutes"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "propertyId": "123456789",
+      "authType": "service_account",
+      "credentials": {
+        "serviceAccountKey": {
+          "type": "service_account",
+          "project_id": "ekoa-analytics",
+          "private_key_id": "abc123",
+          "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+          "client_email": "ekoa-reader@ekoa-analytics.iam.gserviceaccount.com",
+          "client_id": "123456789",
+          "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+          "token_uri": "https://oauth2.googleapis.com/token"
+        }
+      },
+      "configured": true,
+      "configuredAt": "2026-02-04T19:42:00Z",
+      "propertyName": "My Website",
+      "websiteUrl": "https://example.com",
+      "timezone": "Europe/Lisbon"
+    }
+  ]
+}

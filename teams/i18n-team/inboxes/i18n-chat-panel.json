@@ -1,9 +1,0 @@
-[
-  {
-    "from": "i18n-chat-panel",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"Catalog all hardcoded strings in ekoa/ app\",\"description\":\"Go through every component, page, store, and hook in ekoa/ and catalog all user-facing hardcoded strings that need internationalization. Group by file and component. Include: page titles, button labels, placeholders, status messages, error messages, tooltips, sidebar labels, etc.\",\"assignedBy\":\"i18n-chat-panel\",\"timestamp\":\"2026-03-02T08:04:38.877Z\"}",
-    "timestamp": "2026-03-02T08:04:38.877Z",
-    "color": "orange",
-    "read": true
-  }
-]

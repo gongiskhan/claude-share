@@ -46,7 +46,7 @@ Do not micromanage the team structure. Describe the task, state our preferences,
 2. If user provides screenshot/image, ask them to describe it in text (Claude Code cannot see images)
 3. Identify project type (Next.js / Node.js / Electron / Capacitor)
 4. Generate the prompt incorporating hard rules, preferences as context, and task details
-5. **Present TWO versions** of the prompt (see Output Format below)
+5. **Present TWO versions** (see Output Format below)
 
 ## Output Format (MANDATORY)
 
@@ -137,6 +137,12 @@ Simple ~5-7 | Medium ~8-12 | Complex ~12-18 | Major ~18-25
 
 ```
 /ralph-loop:ralph-loop "Add user profile settings page with avatar upload and theme preferences. PLAN FIRST then AUTO-ACCEPT and implement without waiting for confirmation. DELEGATION RULE: You (the main agent) MUST NOT do any implementation or testing directly. Create the agent team and let it handle everything. Your only job is team setup and cleanup. AGENT TEAM SETUP: Create an agent team for this task. Spawn a team lead in delegate mode - it coordinates only, never writes code. This is a medium-complexity feature with significant UI work. Our preferences: we care a lot about frontend quality (consider using /polish-ui and /frontend-design skills). This is a Next.js App Router project using Tailwind CSS and shadcn/ui. Decide the right teammates to spawn. Teammates talk to each other directly. CONTEXT: The app has a settings section at /settings but no profile page yet. Auth is handled via NextAuth with session management. REQUIREMENTS: 1) Create /settings/profile page, 2) Add avatar upload with preview, 3) Add theme preference toggle (light/dark/system), 4) Add display name edit field, 5) Save changes via API route, 6) Show success/error feedback. TESTER INSTRUCTIONS: A tester agent MUST be spawned that invokes the /e2e-testing skill. FIRST check .env for UI_PORT. Test all requirements plus regression test /settings and navigation. Take screenshots of each test. Report failures with details. Iterate until ALL pass. COMPLETION: The team lead outputs <promise>PROFILE_SETTINGS_DONE</promise> ONLY when tester confirms ALL tests pass with screenshots and all agents confirm done. Then clean up the team." --max-iterations 12 --completion-promise "PROFILE_SETTINGS_DONE"
+```
+
+### Example 3: Complex Feature
+
+```
+/ralph-loop:ralph-loop "Implement real-time notifications system with in-app bell icon, notification panel, and mark-as-read functionality. PLAN FIRST then AUTO-ACCEPT and implement without waiting for confirmation. DELEGATION RULE: You (the main agent) MUST NOT do any implementation or testing directly. Create the agent team and let it handle everything. Your only job is team setup and cleanup. AGENT TEAM SETUP: Create an agent team for this task. Spawn a team lead in delegate mode - it coordinates only, never writes code. This is a complex full-stack feature. Our preferences: a planning phase would be valuable before implementation starts, we care about frontend quality (consider /polish-ui and /frontend-design skills), this is significant enough to warrant documentation updates (keep CLAUDE.md minimal with links, put details in docs/ folder). This is a Next.js 14 App Router project with Prisma ORM and PostgreSQL. If using multiple implementers, assign distinct file ownership to avoid conflicts. Decide the right teammates to spawn. Teammates talk to each other directly. CONTEXT: No notification system exists yet. Auth via NextAuth. REQUIREMENTS: 1) Database schema for notifications, 2) API routes for fetching, creating, marking as read, 3) Bell icon in header with unread count badge, 4) Notification dropdown panel, 5) Mark individual or all as read, 6) Real-time updates via polling or SSE. TESTER INSTRUCTIONS: A tester agent MUST be spawned that invokes the /e2e-testing skill. FIRST check .env for UI_PORT. Test all requirements including empty state. Regression test header nav and other pages. Report failures with screenshots. Iterate until ALL pass. COMPLETION: The team lead outputs <promise>NOTIFICATIONS_DONE</promise> ONLY when tester confirms ALL tests pass with screenshots and all agents confirm done. Then clean up the team." --max-iterations 18 --completion-promise "NOTIFICATIONS_DONE"
 ```
 
 ## Electron Apps

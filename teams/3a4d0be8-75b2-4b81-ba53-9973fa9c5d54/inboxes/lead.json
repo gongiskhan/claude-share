@@ -1,8 +1,0 @@
-[
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"4\",\"subject\":\"Add SSE streaming to engine and new Fastify routes\",\"description\":\"Add Server-Sent Events streaming support:\\n1. Engine chat() method already has StreamCallbacks - wire these to SSE\\n2. Create SSE endpoint in ai-engine/src/index.ts Fastify plugin: POST /engine/chat/stream\\n3. Update ai-engine-bridge.ts to forward stream events\\n4. Add SSE route in agent-api/src/routes/engine.ts\\n5. Engine needs to support streaming for both recipe (instant) and LLM (progressive) paths\\n6. Event types should match existing SSE contract: status, output, progress, result, error, complete\\n\\nLook at agent-api/src/routes/execute.ts and ekoa/hooks/useJobStream.ts for the existing SSE pattern.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-03-06T21:07:13.085Z\"}",
-    "timestamp": "2026-03-06T21:07:13.085Z",
-    "read": false
-  }
-]
