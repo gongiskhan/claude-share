@@ -36,7 +36,7 @@ projects/
 backups/
 logs/
 prompts-manager-docs/
-scripts/
+/scripts/
 skills_archive/
 statsig/
 tasks/
