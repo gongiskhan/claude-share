@@ -1,29 +1,19 @@
 {
+  "cleanupPeriodDays": 365,
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
-    "defaultMode": "default"
+    "defaultMode": "bypassPermissions"
   },
   "hooks": {
     "Stop": [
       {
-        "matcher": "",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/ggomes/.claude/hooks/hook-stop-notify.sh"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/ggomes/.claude/hooks/notification-hook.sh"
+            "command": "terminal-notifier -title 'Claude Code' -subtitle 'Session Complete' -message \"Finished working in $(basename \"$PWD\")\" -sound default -timeout 10"
           }
         ]
       }
@@ -47,7 +37,9 @@
     "ui-ux-pro-max@ui-ux-pro-max-skill": true,
     "obsidian@obsidian-skills": true
   },
+  "effortLevel": "high",
   "promptSuggestionEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "effortLevel": "high"
+  "autoMemoryEnabled": true,
+  "autoDreamEnabled": true
 }
