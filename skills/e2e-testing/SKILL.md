@@ -1,18 +1,31 @@
 ---
 name: e2e-testing
-description: End-to-end testing using real browser automation with playwright-cli. Use this skill when asked to test, verify, or validate web applications. ALWAYS uses real automation via playwright-cli - NEVER writes Playwright test scripts or unit tests.
+description: End-to-end testing using real browser automation with playwright-cli. Use this skill when asked to test, verify, or validate web applications. ALWAYS uses real automation via playwright-cli - NEVER writes Playwright test scripts or unit tests. Preferred approach is to delegate to Codex CLI which runs playwright-cli independently.
 ---
 
 # E2E Testing Skill
 
 **This skill performs REAL browser automation to test applications using playwright-cli.**
 
+## Preferred Approach: Delegate to Codex
+
+For most testing tasks, delegate to OpenAI Codex CLI which runs playwright-cli independently and reports back. Use the `/codex-test` skill for the full workflow. Quick version:
+
+```bash
+codex exec --full-auto -o /tmp/codex-test-result.md \
+  "Use playwright-cli to test the web app at <URL>. Open it, snapshot, check console for errors, screenshot, close. Report PASS or FAIL."
+```
+
+Then read results: `cat /tmp/codex-test-result.md`
+
+Use direct playwright-cli commands (below) only when you need fine-grained control or Codex is unavailable.
+
 ## ABSOLUTE RULES
 
 1. **NEVER write Playwright test scripts** - Do not write .spec.ts files, do not write test() blocks
 2. **NEVER write unit tests** - This skill uses REAL browsers, not test frameworks
 3. **NEVER create test files** - No files in __tests__, no .test.ts, no .spec.ts
-4. **USE playwright-cli FOR ALL WEB TESTING** - Call playwright-cli commands directly via Bash
+4. **USE playwright-cli FOR ALL WEB TESTING** - Call playwright-cli commands directly via Bash (or delegate to Codex)
 5. **TAKE SCREENSHOTS** - Always capture visual proof of test results
 6. **RECORD VIDEO WHEN POSSIBLE** - Use playwright-cli video-start/video-stop for recordings
 
