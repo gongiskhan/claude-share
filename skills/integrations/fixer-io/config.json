@@ -1,0 +1,260 @@
+{
+  "version": "2.0",
+  "skillType": "integration",
+  "integrationKey": "fixer-io",
+  "displayName": "Fixer.io Currency Exchange",
+  "description": "Real-time and historical foreign exchange rates, currency conversion, and comprehensive currency data",
+  "authType": "api_key",
+  "provider": "Fixer.io",
+  "category": "data",
+  "configSchema": [
+    {
+      "key": "api_key",
+      "label": "API Key",
+      "type": "string",
+      "required": true,
+      "secret": true,
+      "helpText": "Your Fixer.io API access key. Get it from https://fixer.io/dashboard"
+    },
+    {
+      "key": "default_base_currency",
+      "label": "Default Base Currency",
+      "type": "string",
+      "required": false,
+      "secret": false,
+      "helpText": "Default base currency for rate lookups (e.g., EUR, USD). Note: Free plans only support EUR as base."
+    }
+  ],
+  "actions": [
+    {
+      "actionName": "get_latest_rates",
+      "description": "Get the latest real-time exchange rates",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "type": "string",
+            "description": "Base currency code (e.g., USD, EUR). Uses default if not specified."
+          },
+          "symbols": {
+            "type": "string",
+            "description": "Comma-separated currency codes to limit results (e.g., USD,GBP,JPY)"
+          }
+        },
+        "required": []
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the request succeeded"
+          },
+          "base": {
+            "type": "string",
+            "description": "Base currency code"
+          },
+          "date": {
+            "type": "string",
+            "description": "Date of the rates (YYYY-MM-DD)"
+          },
+          "rates": {
+            "type": "object",
+            "description": "Object mapping currency codes to exchange rates"
+          }
+        }
+      },
+      "mutates": false
+    },
+    {
+      "actionName": "convert_currency",
+      "description": "Convert an amount from one currency to another",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Source currency code (e.g., USD)"
+          },
+          "to": {
+            "type": "string",
+            "description": "Target currency code (e.g., EUR)"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount to convert"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "amount"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the request succeeded"
+          },
+          "query": {
+            "type": "object",
+            "description": "Original query parameters"
+          },
+          "info": {
+            "type": "object",
+            "description": "Conversion info including rate"
+          },
+          "result": {
+            "type": "number",
+            "description": "Converted amount"
+          }
+        }
+      },
+      "mutates": false
+    },
+    {
+      "actionName": "get_historical_rates",
+      "description": "Get exchange rates for a specific historical date",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Date in YYYY-MM-DD format (e.g., 2024-01-15)"
+          },
+          "base": {
+            "type": "string",
+            "description": "Base currency code. Uses default if not specified."
+          },
+          "symbols": {
+            "type": "string",
+            "description": "Comma-separated currency codes to limit results"
+          }
+        },
+        "required": [
+          "date"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the request succeeded"
+          },
+          "historical": {
+            "type": "boolean",
+            "description": "Indicates historical data"
+          },
+          "date": {
+            "type": "string",
+            "description": "The requested date"
+          },
+          "base": {
+            "type": "string",
+            "description": "Base currency code"
+          },
+          "rates": {
+            "type": "object",
+            "description": "Object mapping currency codes to exchange rates"
+          }
+        }
+      },
+      "mutates": false
+    },
+    {
+      "actionName": "get_time_series",
+      "description": "Get exchange rates for a date range (for trends and charts)",
+      "argsSchema": {
+        "type": "object",
+        "properties": {
+          "start_date": {
+            "type": "string",
+            "description": "Start date in YYYY-MM-DD format"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "End date in YYYY-MM-DD format"
+          },
+          "base": {
+            "type": "string",
+            "description": "Base currency code. Uses default if not specified."
+          },
+          "symbols": {
+            "type": "string",
+            "description": "Comma-separated currency codes to limit results"
+          }
+        },
+        "required": [
+          "start_date",
+          "end_date"
+        ]
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the request succeeded"
+          },
+          "timeseries": {
+            "type": "boolean",
+            "description": "Indicates time series data"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "Start of date range"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "End of date range"
+          },
+          "base": {
+            "type": "string",
+            "description": "Base currency code"
+          },
+          "rates": {
+            "type": "object",
+            "description": "Object with dates as keys, each containing currency rates"
+          }
+        }
+      },
+      "mutates": false
+    },
+    {
+      "actionName": "get_symbols",
+      "description": "List all available currency codes and names",
+      "argsSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the request succeeded"
+          },
+          "symbols": {
+            "type": "object",
+            "description": "Object mapping currency codes to full names"
+          }
+        }
+      },
+      "mutates": false
+    }
+  ],
+  "proxyContract": {
+    "executeEndpoint": "/api/agent/integrations/execute",
+    "requiredInputs": [
+      "integrationKey",
+      "actionName",
+      "args"
+    ]
+  },
+  "createdAt": "2026-01-02T18:34:59.948Z",
+  "updatedAt": "2026-01-02T18:34:59.948Z"
+}

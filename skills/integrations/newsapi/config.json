@@ -1,0 +1,107 @@
+{
+  "version": "2.0",
+  "skillType": "integration",
+  "integrationKey": "newsapi",
+  "displayName": "NewsAPI",
+  "description": "Fetch the latest news headlines and articles from NewsAPI.org",
+  "authType": "api_key",
+  "provider": "NewsAPI",
+  "category": "data",
+  "configSchema": [
+    {
+      "key": "api_key",
+      "label": "API Key",
+      "type": "string",
+      "required": true,
+      "secret": true,
+      "helpText": "Your NewsAPI API key. Get one free at https://newsapi.org/register"
+    }
+  ],
+  "actions": [
+    {
+      "actionName": "get_top_headlines",
+      "description": "Fetches top news headlines for the United States",
+      "httpConfig": {
+        "method": "GET",
+        "baseUrl": "https://newsapi.org",
+        "path": "/v2/top-headlines",
+        "queryParams": {
+          "country": "us"
+        },
+        "headers": {
+          "X-Api-Key": "{{api_key}}"
+        }
+      },
+      "argsSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "returnSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Response status (ok or error)"
+          },
+          "totalResults": {
+            "type": "number",
+            "description": "Total number of results available"
+          },
+          "articles": {
+            "type": "array",
+            "description": "Array of news article objects",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "object",
+                  "description": "News source information"
+                },
+                "author": {
+                  "type": "string",
+                  "description": "Article author"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Article headline"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Brief article description"
+                },
+                "url": {
+                  "type": "string",
+                  "description": "Link to full article"
+                },
+                "urlToImage": {
+                  "type": "string",
+                  "description": "Featured image URL"
+                },
+                "publishedAt": {
+                  "type": "string",
+                  "description": "Publication timestamp"
+                },
+                "content": {
+                  "type": "string",
+                  "description": "Truncated article content"
+                }
+              }
+            }
+          }
+        }
+      },
+      "mutates": false
+    }
+  ],
+  "proxyContract": {
+    "executeEndpoint": "/api/agent/integrations/execute",
+    "requiredInputs": [
+      "integrationKey",
+      "actionName",
+      "args"
+    ]
+  },
+  "createdAt": "2026-01-01T23:46:48.818Z",
+  "updatedAt": "2026-01-01T23:46:48.818Z"
+}
