@@ -1,11 +1,13 @@
 ---
 name: codex-test
-description: Delegate browser testing to OpenAI Codex CLI using playwright-cli. Use when you need to test, verify, or validate a web application with real browser automation. Codex runs playwright-cli commands independently, takes screenshots, and reports results back. Trigger phrases include "test the app", "verify it works", "check the preview", "run e2e test".
+description: "Primary testing tool: delegate browser testing to OpenAI Codex CLI using playwright-cli. Use FIRST for any testing, verification, or validation of web applications. Codex runs playwright-cli independently in a headed browser (visible to user), takes screenshots, and reports results back. Trigger phrases: test the app, verify it works, check the preview, run e2e test. Always prefer this over direct playwright-cli or Chrome extension."
 ---
 
 # Codex Browser Testing
 
-Delegates browser testing to OpenAI Codex CLI, which uses `playwright-cli` to automate a real browser. Codex runs independently, takes screenshots to a shared folder, and returns a structured test report.
+Delegates browser testing to OpenAI Codex CLI, which uses `playwright-cli` to automate a real **headed** browser (visible to the user). Codex runs independently, takes screenshots to a shared folder, and returns a structured test report.
+
+**This is the PRIMARY testing tool.** Use this first. Fall back to direct playwright-cli only if Codex fails. Do NOT use `mcp__claude-in-chrome__*` tools for testing unless both codex-test and playwright-cli fail.
 
 ## When to Use
 
@@ -13,15 +15,16 @@ Delegates browser testing to OpenAI Codex CLI, which uses `playwright-cli` to au
 - When the user asks to "test", "verify", or "check" an app
 - To validate a preview URL renders correctly
 - For end-to-end testing of forms, navigation, and interactions
+- **Anytime you need to verify UI changes** -- this is the default choice
 
 ## How It Works
 
 1. Claude Code creates a timestamped screenshot folder under `/tmp/codex-screenshots/`
 2. Claude Code formulates a test prompt telling Codex to save screenshots there
-3. Codex CLI runs non-interactively with `codex exec --full-auto`
-4. Codex opens a browser, performs the test, saves screenshots to the folder
+3. Codex CLI runs non-interactively with `codex exec --dangerously-bypass-approvals-and-sandbox`
+4. Codex opens a **headed** browser (`--browser=chrome`), performs the test, saves screenshots
 5. Results are written to `/tmp/codex-test-result.md`
-6. Claude Code reads the result file and tells the user where screenshots are
+6. Claude Code reads the result file, **displays the full report** in conversation, and **reads screenshots inline** using the Read tool on each PNG
 
 ## Execution Steps
 
@@ -57,14 +60,15 @@ Tell the user:
 
 ## Test Prompt Template
 
-Always include the screenshot folder path and explicit `--filename` flags:
+Always include the screenshot folder path, `--browser=chrome` for headed mode, and explicit `--filename` flags. Tell Codex to be **very verbose** in its report:
 
 ```
 Use playwright-cli to test the web app at <URL>.
 Save all screenshots to <SCREENSHOTS_FOLDER>/.
+IMPORTANT: Use --browser=chrome when opening the browser so it runs headed (visible).
 
 Steps:
-1. playwright-cli open <URL>
+1. playwright-cli open <URL> --browser=chrome
 2. playwright-cli resize 1440 900
 3. playwright-cli snapshot
 4. playwright-cli screenshot --filename=<SCREENSHOTS_FOLDER>/01-initial-load.png
@@ -73,11 +77,13 @@ Steps:
 7. playwright-cli screenshot --filename=<SCREENSHOTS_FOLDER>/99-final-state.png
 8. playwright-cli close
 
-Report:
-- Whether the page loaded successfully
-- What elements are visible (list key UI components from snapshot)
-- Any console errors or warnings
-- End with: PASS or FAIL with explanation
+VERBOSE REPORT (include ALL of the following):
+- Every action you took and what happened (step by step)
+- Every element you found in each snapshot (list key UI components)
+- Every assertion you made and whether it passed or failed
+- Full console output (errors, warnings, and info)
+- Any network errors or unexpected behavior
+- End with: PASS or FAIL with detailed explanation
 ```
 
 ## Complete Example: Testing a Built App
@@ -91,9 +97,10 @@ codex exec \
   -o /tmp/codex-test-result.md \
   "Use playwright-cli to test the web app at http://localhost:4111/apps/abc123/.
 Save all screenshots to $SCREENSHOTS/.
+IMPORTANT: Use --browser=chrome when opening the browser so it runs headed (visible).
 
 Steps:
-1. playwright-cli open http://localhost:4111/apps/abc123/
+1. playwright-cli open http://localhost:4111/apps/abc123/ --browser=chrome
 2. playwright-cli resize 1440 900
 3. playwright-cli snapshot
 4. playwright-cli screenshot --filename=$SCREENSHOTS/01-initial-load.png
@@ -101,13 +108,14 @@ Steps:
 6. playwright-cli screenshot --filename=$SCREENSHOTS/02-final.png
 7. playwright-cli close
 
-Report whether the app loaded correctly, list the main UI elements visible, note any console errors. End with PASS or FAIL."
+VERBOSE REPORT: List every action taken, every element found in snapshots, every assertion made (pass/fail), full console output. End with PASS or FAIL with detailed explanation."
 
-# Read results
+# Read and display full results
 cat /tmp/codex-test-result.md
-echo "Screenshots saved to: $SCREENSHOTS"
 ls "$SCREENSHOTS/"
 ```
+
+**After Codex finishes:** Read `/tmp/codex-test-result.md` and output the FULL report to the conversation. Then use the Read tool on each screenshot PNG to display them inline.
 
 ## Complete Example: Testing Login Flow
 
@@ -120,9 +128,10 @@ codex exec \
   -o /tmp/codex-test-result.md \
   "Use playwright-cli to test login at http://localhost:3111.
 Save all screenshots to $SCREENSHOTS/.
+IMPORTANT: Use --browser=chrome when opening the browser so it runs headed (visible).
 
 Steps:
-1. playwright-cli open http://localhost:3111
+1. playwright-cli open http://localhost:3111 --browser=chrome
 2. playwright-cli resize 1440 900
 3. playwright-cli snapshot
 4. playwright-cli screenshot --filename=$SCREENSHOTS/01-login-page.png
@@ -133,12 +142,14 @@ Steps:
 9. playwright-cli console
 10. playwright-cli close
 
-Report: did login succeed? What page loaded after login? Any errors? PASS or FAIL."
+VERBOSE REPORT: List every action taken, every element found, all assertions (pass/fail), full console output. End with PASS or FAIL with detailed explanation."
 
+# Read and display full results
 cat /tmp/codex-test-result.md
-echo "Screenshots: $SCREENSHOTS"
 ls "$SCREENSHOTS/"
 ```
+
+**After Codex finishes:** Read `/tmp/codex-test-result.md` and output the FULL report. Then Read each screenshot PNG to display inline.
 
 ## Rules
 
@@ -146,7 +157,9 @@ ls "$SCREENSHOTS/"
 2. Always use `-o /tmp/codex-test-result.md` to capture output
 3. Always create a timestamped folder under `/tmp/codex-screenshots/` for screenshots
 4. Always tell Codex to use `--filename=<folder>/NN-description.png` for screenshots
-5. Always include `playwright-cli close` at the end of test steps
-6. Always ask for PASS/FAIL in the report
-7. After Codex finishes, read the result file AND list the screenshots folder
-8. Report both the test result and the screenshot folder path to the user
+5. Always tell Codex to use `--browser=chrome` when opening the browser (headed mode, visible to user)
+6. Always include `playwright-cli close` at the end of test steps
+7. Always ask for a VERBOSE PASS/FAIL report (every action, every element, every assertion)
+8. After Codex finishes, **output the FULL test report** into the conversation (not a summary)
+9. After reporting, **Read each screenshot PNG** using the Read tool to display them inline in the conversation
+10. Report the screenshot folder path so the user can review them in Finder too

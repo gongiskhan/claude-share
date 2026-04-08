@@ -1,24 +1,19 @@
 ---
 name: e2e-testing
-description: End-to-end testing using real browser automation with playwright-cli. Use this skill when asked to test, verify, or validate web applications. ALWAYS uses real automation via playwright-cli - NEVER writes Playwright test scripts or unit tests. Preferred approach is to delegate to Codex CLI which runs playwright-cli independently.
+description: End-to-end testing using real browser automation with playwright-cli. Use this skill when asked to test, verify, or validate web applications. ALWAYS uses real automation via playwright-cli - NEVER writes Playwright test scripts or unit tests. REQUIRED first choice is to delegate to Codex CLI via /codex-test skill.
 ---
 
 # E2E Testing Skill
 
 **This skill performs REAL browser automation to test applications using playwright-cli.**
 
-## Preferred Approach: Delegate to Codex
+## Required First Choice: Delegate to Codex
 
-For most testing tasks, delegate to OpenAI Codex CLI which runs playwright-cli independently and reports back. Use the `/codex-test` skill for the full workflow. Quick version:
+For ALL testing tasks, first try delegating to OpenAI Codex CLI which runs playwright-cli independently and reports back. Use the `/codex-test` skill for the full workflow. This is the **required first choice** -- it uses Codex tokens instead of Claude tokens.
 
-```bash
-codex exec --full-auto -o /tmp/codex-test-result.md \
-  "Use playwright-cli to test the web app at <URL>. Open it, snapshot, check console for errors, screenshot, close. Report PASS or FAIL."
-```
+Use direct playwright-cli commands (below) only when Codex fails or is unavailable.
 
-Then read results: `cat /tmp/codex-test-result.md`
-
-Use direct playwright-cli commands (below) only when you need fine-grained control or Codex is unavailable.
+**Do NOT use `mcp__claude-in-chrome__*` tools for testing.** Chrome extension is a last resort only -- use it only if both codex-test AND direct playwright-cli fail.
 
 ## ABSOLUTE RULES
 
@@ -28,6 +23,8 @@ Use direct playwright-cli commands (below) only when you need fine-grained contr
 4. **USE playwright-cli FOR ALL WEB TESTING** - Call playwright-cli commands directly via Bash (or delegate to Codex)
 5. **TAKE SCREENSHOTS** - Always capture visual proof of test results
 6. **RECORD VIDEO WHEN POSSIBLE** - Use playwright-cli video-start/video-stop for recordings
+7. **DO NOT use mcp__claude-in-chrome__* tools for testing** - Always use playwright-cli (via Codex or directly). Chrome extension is a last resort only when both codex-test and direct playwright-cli fail.
+8. **Always use --browser=chrome** when opening playwright-cli for headed mode (visible to user)
 
 ---
 

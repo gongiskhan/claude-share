@@ -29,6 +29,7 @@ The tester agent is the final authority on whether a task is complete. The teste
 6. **Iterate with the implementer** when tests fail. The tester reports failures with details (what failed, screenshots, expected vs actual). The implementer fixes. The tester re-tests. This loop continues until ALL tests pass.
 7. **Never approve partial completion.** If 9 out of 10 requirements pass but 1 fails, the task is not done.
 8. **Report the final test results** with screenshots to the team lead before the task is marked complete.
+9. **Use codex-test as the primary testing tool.** The tester MUST use `/codex-test` skill first (Codex CLI + playwright-cli in headed mode). Fall back to direct playwright-cli only if Codex fails. Do NOT use `mcp__claude-in-chrome__*` tools unless both codex-test and playwright-cli fail.
 
 ### Authentication Strategy for Testing
 
