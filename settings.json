@@ -21,6 +21,42 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/session-start.py",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/session-end.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/pre-compact.py",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
   "statusLine": {

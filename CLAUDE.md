@@ -25,3 +25,11 @@
   - No emoji in notes
 - **Current content:** Ekoa project fully documented in `Projects/Ekoa/` (17 notes covering architecture, routes, services, agents, frontend, stores, hooks, translations, standalone mode, electron, GCE deployment, scripts, testing, guardrails, tech stack, shared types)
 - **When asked to document in Obsidian:** Write markdown files directly to the vault folder. Obsidian picks up changes instantly. Use the Obsidian CLI skill if CLI is available, otherwise write files directly.
+
+## Knowledge Base
+
+- **Location:** `~/.claude/memory-compiler/knowledge/`
+- **Symlinked into Obsidian vault** at `Knowledge Base/` for graph view browsing
+- **Auto-compiled** from conversation transcripts via Claude Code hooks (SessionStart, SessionEnd, PreCompact)
+- **Manual compile:** `cd ~/.claude/memory-compiler && uv run python scripts/compile.py`
+- **Query:** `cd ~/.claude/memory-compiler && uv run python scripts/query.py "question"`
