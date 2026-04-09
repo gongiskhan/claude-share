@@ -19,11 +19,11 @@ Delegates browser testing to OpenAI Codex CLI, which uses `playwright-cli` to au
 
 ## How It Works
 
-1. Claude Code creates a timestamped screenshot folder under `/tmp/codex-screenshots/`
+1. Claude Code creates a timestamped screenshot folder under `.codex-screenshots/` in the project root
 2. Claude Code formulates a test prompt telling Codex to save screenshots there
 3. Codex CLI runs non-interactively with `codex exec --dangerously-bypass-approvals-and-sandbox`
 4. Codex opens a **headed** browser (`--browser=chrome`), performs the test, saves screenshots
-5. Results are written to `/tmp/codex-test-result.md`
+5. Results are written to `.codex-screenshots/codex-test-result.md` in the project root
 6. Claude Code reads the result file, **displays the full report** in conversation, and **reads screenshots inline** using the Read tool on each PNG
 
 ## Execution Steps
@@ -31,23 +31,30 @@ Delegates browser testing to OpenAI Codex CLI, which uses `playwright-cli` to au
 ### Step 1: Create screenshot folder
 
 ```bash
-SCREENSHOTS="/tmp/codex-screenshots/$(date +%Y%m%d-%H%M%S)"
+SCREENSHOTS=".codex-screenshots/$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$SCREENSHOTS"
 ```
 
-### Step 2: Run Codex
+### Step 2: Run Codex (background, no timeout)
+
+Run via Bash with `run_in_background: true`. Tests can take anywhere from 1 to 20 minutes -- never use a fixed timeout. You will be automatically notified when the command finishes. Do NOT poll or sleep while waiting.
 
 ```bash
+# run_in_background: true
 codex exec \
   --dangerously-bypass-approvals-and-sandbox \
-  -o /tmp/codex-test-result.md \
+  -o .codex-screenshots/codex-test-result.md \
   "<test prompt with $SCREENSHOTS path>"
 ```
 
-### Step 3: Read results and list screenshots
+Tell the user Codex is running and they can watch the headed browser. Continue with other work or wait for the background notification.
+
+### Step 3: Read results and list screenshots (after background completes)
+
+Once notified that the background command finished:
 
 ```bash
-cat /tmp/codex-test-result.md
+cat .codex-screenshots/codex-test-result.md
 ls -la "$SCREENSHOTS/"
 ```
 
@@ -88,13 +95,18 @@ VERBOSE REPORT (include ALL of the following):
 
 ## Complete Example: Testing a Built App
 
+**Step A: Create folder and store path**
 ```bash
-SCREENSHOTS="/tmp/codex-screenshots/$(date +%Y%m%d-%H%M%S)"
-mkdir -p "$SCREENSHOTS"
+SCREENSHOTS=".codex-screenshots/$(date +%Y%m%d-%H%M%S)"
+mkdir -p "$SCREENSHOTS" && echo "$SCREENSHOTS"
+```
 
+**Step B: Run Codex (use Bash with `run_in_background: true`)**
+```bash
+# run_in_background: true
 codex exec \
   --dangerously-bypass-approvals-and-sandbox \
-  -o /tmp/codex-test-result.md \
+  -o .codex-screenshots/codex-test-result.md \
   "Use playwright-cli to test the web app at http://localhost:4111/apps/abc123/.
 Save all screenshots to $SCREENSHOTS/.
 IMPORTANT: Use --browser=chrome when opening the browser so it runs headed (visible).
@@ -109,23 +121,30 @@ Steps:
 7. playwright-cli close
 
 VERBOSE REPORT: List every action taken, every element found in snapshots, every assertion made (pass/fail), full console output. End with PASS or FAIL with detailed explanation."
+```
 
-# Read and display full results
-cat /tmp/codex-test-result.md
+**Step C: After background notification, read results**
+```bash
+cat .codex-screenshots/codex-test-result.md
 ls "$SCREENSHOTS/"
 ```
 
-**After Codex finishes:** Read `/tmp/codex-test-result.md` and output the FULL report to the conversation. Then use the Read tool on each screenshot PNG to display them inline.
+**After Codex finishes:** Read `.codex-screenshots/codex-test-result.md` and output the FULL report to the conversation. Then use the Read tool on each screenshot PNG to display them inline.
 
 ## Complete Example: Testing Login Flow
 
+**Step A: Create folder and store path**
 ```bash
-SCREENSHOTS="/tmp/codex-screenshots/$(date +%Y%m%d-%H%M%S)"
-mkdir -p "$SCREENSHOTS"
+SCREENSHOTS=".codex-screenshots/$(date +%Y%m%d-%H%M%S)"
+mkdir -p "$SCREENSHOTS" && echo "$SCREENSHOTS"
+```
 
+**Step B: Run Codex (use Bash with `run_in_background: true`)**
+```bash
+# run_in_background: true
 codex exec \
   --dangerously-bypass-approvals-and-sandbox \
-  -o /tmp/codex-test-result.md \
+  -o .codex-screenshots/codex-test-result.md \
   "Use playwright-cli to test login at http://localhost:3111.
 Save all screenshots to $SCREENSHOTS/.
 IMPORTANT: Use --browser=chrome when opening the browser so it runs headed (visible).
@@ -143,19 +162,22 @@ Steps:
 10. playwright-cli close
 
 VERBOSE REPORT: List every action taken, every element found, all assertions (pass/fail), full console output. End with PASS or FAIL with detailed explanation."
+```
 
-# Read and display full results
-cat /tmp/codex-test-result.md
+**Step C: After background notification, read results**
+```bash
+cat .codex-screenshots/codex-test-result.md
 ls "$SCREENSHOTS/"
 ```
 
-**After Codex finishes:** Read `/tmp/codex-test-result.md` and output the FULL report. Then Read each screenshot PNG to display inline.
+**After Codex finishes:** Read `.codex-screenshots/codex-test-result.md` and output the FULL report. Then Read each screenshot PNG to display inline.
 
 ## Rules
 
 1. Always use `--dangerously-bypass-approvals-and-sandbox` for non-interactive execution (needed for localhost access and playwright-cli sockets)
-2. Always use `-o /tmp/codex-test-result.md` to capture output
-3. Always create a timestamped folder under `/tmp/codex-screenshots/` for screenshots
+2. Always use `-o .codex-screenshots/codex-test-result.md` to capture output
+3. Always create a timestamped folder under `.codex-screenshots/` for screenshots (project-relative, never `/tmp/`)
+4. Always run the `codex exec` command with Bash `run_in_background: true` -- tests can take 1-20 minutes, never use a fixed timeout. Wait for background completion notification before reading results
 4. Always tell Codex to use `--filename=<folder>/NN-description.png` for screenshots
 5. Always tell Codex to use `--browser=chrome` when opening the browser (headed mode, visible to user)
 6. Always include `playwright-cli close` at the end of test steps
