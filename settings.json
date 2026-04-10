@@ -1,13 +1,25 @@
 {
   "cleanupPeriodDays": 365,
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "HAIKU_API_KEY": "REDACTED"
   },
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
   "model": "sonnet",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/ggomes/.nvm/versions/node/v20.19.4/bin/node /Users/ggomes/.claude/hooks/prompt-router.mjs",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "*",
@@ -19,6 +31,15 @@
           {
             "type": "command",
             "command": "[ -f /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh ] && bash /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh || true"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/ggomes/.nvm/versions/node/v20.19.4/bin/node /Users/ggomes/.claude/hooks/test-enforcement.mjs",
+            "timeout": 10
           }
         ]
       }
