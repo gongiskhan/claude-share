@@ -4,19 +4,19 @@
     "frontend-design@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/frontend-design/38616d83f337",
-        "version": "38616d83f337",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/frontend-design/547651f456ef",
+        "version": "547651f456ef",
         "installedAt": "2026-01-07T06:58:17.907Z",
-        "lastUpdated": "2026-04-09T11:51:22.587Z"
+        "lastUpdated": "2026-04-10T09:51:10.536Z"
       }
     ],
     "agent-sdk-dev@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/agent-sdk-dev/38616d83f337",
-        "version": "38616d83f337",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/agent-sdk-dev/547651f456ef",
+        "version": "547651f456ef",
         "installedAt": "2026-01-07T06:58:17.936Z",
-        "lastUpdated": "2026-04-09T11:51:22.587Z"
+        "lastUpdated": "2026-04-10T09:51:10.536Z"
       }
     ],
     "ralph-loop@claude-plugins-official": [
@@ -40,19 +40,19 @@
     "plugin-dev@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/plugin-dev/38616d83f337",
-        "version": "38616d83f337",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/plugin-dev/547651f456ef",
+        "version": "547651f456ef",
         "installedAt": "2026-01-08T14:20:41.276Z",
-        "lastUpdated": "2026-04-09T11:51:22.587Z"
+        "lastUpdated": "2026-04-10T09:51:10.536Z"
       }
     ],
     "context7@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/context7/38616d83f337",
-        "version": "38616d83f337",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/context7/547651f456ef",
+        "version": "547651f456ef",
         "installedAt": "2026-01-09T18:13:37.938Z",
-        "lastUpdated": "2026-04-09T11:51:22.586Z"
+        "lastUpdated": "2026-04-10T09:51:10.535Z"
       }
     ],
     "code-simplifier@claude-plugins-official": [

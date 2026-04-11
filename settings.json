@@ -6,101 +6,16 @@
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
-  "model": "sonnet",
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/ggomes/.nvm/versions/node/v20.19.4/bin/node /Users/ggomes/.claude/hooks/prompt-router.mjs",
-            "timeout": 15
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "terminal-notifier -title 'Claude Code' -subtitle 'Session Complete' -message \"Finished working in $(basename \"$PWD\")\" -sound default -timeout 10"
-          },
-          {
-            "type": "command",
-            "command": "[ -f /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh ] && bash /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh || true"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/ggomes/.nvm/versions/node/v20.19.4/bin/node /Users/ggomes/.claude/hooks/test-enforcement.mjs",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/session-start.py",
-            "timeout": 15
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/session-end.py",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/pre-compact.py",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  },
+  "model": "opusplan",
+  "hooks": {},
   "statusLine": {
     "type": "command",
     "command": "input=$(cat); dir=$(basename \"$(echo \"$input\" | jq -r '.workspace.current_dir')\"); branch=$(cd \"$(echo \"$input\" | jq -r '.workspace.current_dir')\" 2>/dev/null && git -c core.useBuiltinFSMonitor=false rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); usage=$(echo \"$input\" | jq '.context_window.current_usage'); if [ \"$usage\" != \"null\" ]; then current=$(echo \"$usage\" | jq '.input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens'); size=$(echo \"$input\" | jq '.context_window.context_window_size'); pct=$((current * 100 / size)); ctx=\"${pct}%\"; else ctx='0%'; fi; version=$(echo \"$input\" | jq -r '.version'); if [ -n \"$branch\" ]; then printf '%s | %s | %s | v%s' \"$dir\" \"$branch\" \"$ctx\" \"$version\"; else printf '%s | %s | v%s' \"$dir\" \"$ctx\" \"$version\"; fi"
   },
-  "enabledPlugins": {
-    "frontend-design@claude-plugins-official": true,
-    "agent-sdk-dev@claude-plugins-official": true,
-    "ralph-loop@claude-plugins-official": false,
-    "swift-lsp@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": false,
-    "context7@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "dev-browser@dev-browser-marketplace": false,
-    "document-skills@anthropic-agent-skills": true,
-    "example-skills@anthropic-agent-skills": false,
-    "ui-ux-pro-max@ui-ux-pro-max-skill": false,
-    "obsidian@obsidian-skills": true
-  },
-  "effortLevel": "high",
+  "enabledPlugins": {},
   "promptSuggestionEnabled": false,
   "autoMemoryEnabled": true,
   "autoDreamEnabled": true,
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "advisorModel": "opus"
 }
