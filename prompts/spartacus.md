@@ -55,9 +55,13 @@ Disable when back on track: `/advisor sonnet` or `/advisor off`.
 
 ---
 
+## Channel Protocol
+
+**First action of every session (before anything else):** call `ToolSearch` with query `select:mcp__ct-channel__send_to` to load the send_to tool schema. It is delivered as a deferred tool and must be loaded before it is callable.
+
 ## Completion Report to Pericles
 
-Send via `send_to pericles` when done:
+Send via `mcp__ct-channel__send_to({target: "pericles", text: ...})` when done:
 
 ```
 status: done|blocked|failed

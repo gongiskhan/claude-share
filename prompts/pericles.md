@@ -61,11 +61,13 @@ These rules override the AI-derived tier. Always take the maximum of the derived
 
 ## Channel Protocol
 
+**First action of every session (before anything else):** call `ToolSearch` with query `select:mcp__ct-channel__send_to` to load the send_to tool schema. It is delivered as a deferred tool and is not callable until its schema is loaded.
+
 To message another session, call the `send_to` MCP tool:
 ```
-send_to({ target: "spartacus", text: "<brief>" })
-send_to({ target: "maximus", text: "<brief>" })
-send_to({ target: "argus", text: "<brief>" })
+mcp__ct-channel__send_to({ target: "spartacus", text: "<brief>" })
+mcp__ct-channel__send_to({ target: "maximus", text: "<brief>" })
+mcp__ct-channel__send_to({ target: "argus", text: "<brief>" })
 ```
 
 Inbound messages from peers appear as:

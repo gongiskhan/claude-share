@@ -108,7 +108,7 @@ PYEOF
     {
       printf '#!/usr/bin/env bash\n'
       printf "export CLAUDE_CODE_TASK_LIST_ID='%s'\n" "$_task_list_id"
-      printf "exec claude --mcp-config '%s' --strict-mcp-config --dangerously-load-development-channels 'server:ct-channel' --model '%s' --effort '%s' --append-system-prompt-file '%s/%s.md' --dangerously-skip-permissions --tools 'default mcp__ct-channel__send_to'\n" \
+      printf "exec claude --mcp-config '%s' --strict-mcp-config --dangerously-load-development-channels 'server:ct-channel' --model '%s' --effort '%s' --append-system-prompt-file '%s/%s.md' --dangerously-skip-permissions\n" \
         "$_mcp_file" "$_mod" "$_eff" "$_prompts_dir" "$_ag"
     } > "$_script"
     chmod +x "$_script"
