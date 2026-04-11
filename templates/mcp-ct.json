@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ct-channel": {
+      "command": "/Users/ggomes/.nvm/versions/node/v20.19.4/bin/node",
+      "args": ["/Users/ggomes/.claude/hooks/channel/server.mjs"]
+    }
+  }
+}
