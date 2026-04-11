@@ -47,7 +47,8 @@ ct() {
 
   local _peers="{\"pericles\":${_base},\"spartacus\":$((_base+1)),\"maximus\":$((_base+2)),\"argus\":$((_base+3))}"
   local _task_list_id="ct-$_slug"
-  local _mcp_config="$HOME/.claude/templates/mcp-ct.json"
+  local _node_bin="/Users/ggomes/.nvm/versions/node/v20.19.4/bin/node"
+  local _server_mjs="$HOME/.claude/hooks/channel/server.mjs"
   local _prompts_dir="$HOME/.claude/prompts"
   _count=$((_count + 1))
 
@@ -81,8 +82,10 @@ PYEOF
   tmux set-option       -t "$_session" remain-on-exit on
   tmux set-option       -t "$_session" pane-border-status top
 
-  # Write per-pane startup scripts, set pane titles, and send launch commands
-  local _entry _ag _off _mod _eff _title _pt _script
+  # Write per-pane MCP config + startup script, set pane title, launch
+  # MCP subprocess does NOT inherit the parent shell env — env vars must be
+  # explicitly declared in the MCP config's env block (jq handles escaping).
+  local _entry _ag _off _mod _eff _title _pt _script _mcp_file
   for _entry in \
     "pericles:0:sonnet:medium:Pericles" \
     "spartacus:1:opusplan:medium:Spartacus" \
@@ -91,18 +94,27 @@ PYEOF
     IFS=: read -r _ag _off _mod _eff _title <<< "$_entry"
     _pt="$((_base + _off))"
     _script="/tmp/ct-${_slug}-${_ag}.sh"
+    _mcp_file="/tmp/ct-${_slug}-${_ag}.mcp.json"
+
+    jq -n \
+      --arg node    "$_node_bin" \
+      --arg server  "$_server_mjs" \
+      --arg ag      "$_ag" \
+      --arg project "$_slug" \
+      --arg port    "$_pt" \
+      --arg peers   "$_peers" \
+      '{mcpServers: {"ct-channel": {command: $node, args: [$server],
+        env: {CT_AGENT: $ag, CT_PROJECT: $project, CT_CHANNEL_PORT: $port, CT_PEERS: $peers}}}}' \
+      > "$_mcp_file"
+
     {
       printf '#!/usr/bin/env bash\n'
-      printf "export CT_AGENT='%s'\n"                   "$_ag"
-      printf "export CT_PROJECT='%s'\n"                 "$_slug"
-      printf "export CT_CHANNEL_PORT=%s\n"              "$_pt"
-      printf "export CT_PEERS='%s'\n"                   "$_peers"
-      printf "export CLAUDE_CODE_TASK_LIST_ID='%s'\n"   "$_task_list_id"
-      printf 'export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1\n'
-      printf "exec claude --model '%s' --effort '%s' --append-system-prompt-file '%s/%s.md' --dangerously-skip-permissions --dangerously-load-development-channels 'server:ct-channel' --mcp-config '%s'\n" \
-        "$_mod" "$_eff" "$_prompts_dir" "$_ag" "$_mcp_config"
+      printf "export CLAUDE_CODE_TASK_LIST_ID='%s'\n" "$_task_list_id"
+      printf "exec claude --model '%s' --effort '%s' --append-system-prompt-file '%s/%s.md' --dangerously-skip-permissions --dangerously-load-development-channels 'server:ct-channel' --mcp-config '%s' --strict-mcp-config --tools 'default mcp__ct-channel__send_to'\n" \
+        "$_mod" "$_eff" "$_prompts_dir" "$_ag" "$_mcp_file"
     } > "$_script"
     chmod +x "$_script"
+
     tmux select-pane -t "${_session}:0.${_off}" -T "$_title"
     tmux send-keys   -t "${_session}:0.${_off}" "source /tmp/ct-${_slug}-${_ag}.sh" Enter
   done
