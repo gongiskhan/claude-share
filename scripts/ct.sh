@@ -13,12 +13,8 @@ ct() {
   [[ -z "$_slug" ]] && _slug="project"
 
   local _session="ct-$_slug"
-
-  # Idempotent: attach to existing session without re-launching
-  if tmux has-session -t "$_session" 2>/dev/null; then
-    exec tmux attach-session -t "$_session"
-    return
-  fi
+  local _attaching=0
+  tmux has-session -t "$_session" 2>/dev/null && _attaching=1
 
   local _state_dir="$HOME/.claude/workspaces/$_slug"
   local _state_file="$_state_dir/state.json"
@@ -73,14 +69,16 @@ with open("$_state_file", "w") as f:
     json.dump(data, f, indent=2)
 PYEOF
 
-  # Build tmux session: 2x2 grid
-  tmux new-session -d -s "$_session" -c "$_path" -x 240 -y 70
-  tmux split-window -h  -t "${_session}:0"   -c "$_path"   # creates pane 0.1 (right)
-  tmux split-window -v  -t "${_session}:0.0" -c "$_path"   # creates pane 0.2 (bottom-left)
-  tmux split-window -v  -t "${_session}:0.1" -c "$_path"   # creates pane 0.3 (bottom-right)
-  tmux select-layout    -t "${_session}:0" tiled
-  tmux set-option       -t "$_session" remain-on-exit on
-  tmux set-option       -t "$_session" pane-border-status top
+  # Build tmux session: 2x2 grid (only if not attaching)
+  if [[ $_attaching -eq 0 ]]; then
+    tmux new-session -d -s "$_session" -c "$_path" -x 240 -y 70
+    tmux split-window -h  -t "${_session}:0"   -c "$_path"   # creates pane 0.1 (right)
+    tmux split-window -v  -t "${_session}:0.0" -c "$_path"   # creates pane 0.2 (bottom-left)
+    tmux split-window -v  -t "${_session}:0.1" -c "$_path"   # creates pane 0.3 (bottom-right)
+    tmux select-layout    -t "${_session}:0" tiled
+    tmux set-option       -t "$_session" remain-on-exit on
+    tmux set-option       -t "$_session" pane-border-status top
+  fi
 
   # Write per-pane MCP config + startup script, set pane title, launch
   # MCP subprocess does NOT inherit the parent shell env — env vars must be
@@ -115,29 +113,34 @@ PYEOF
     } > "$_script"
     chmod +x "$_script"
 
-    tmux select-pane -t "${_session}:0.${_off}" -T "$_title"
-    tmux send-keys   -t "${_session}:0.${_off}" "source /tmp/ct-${_slug}-${_ag}.sh" Enter
+    if [[ $_attaching -eq 0 ]]; then
+      tmux select-pane -t "${_session}:0.${_off}" -T "$_title"
+      tmux send-keys   -t "${_session}:0.${_off}" "source /tmp/ct-${_slug}-${_ag}.sh" Enter
+    fi
   done
 
-  # Auto-dismiss the --dangerously-load-development-channels confirmation prompt
-  # (Claude v2.1.80+ shows it once before attaching a channel server)
-  (sleep 4
-   for _pane in 0.0 0.1 0.2 0.3; do
-     tmux send-keys -t "${_session}:${_pane}" "" Enter 2>/dev/null || true
-   done) &
+  # Fresh-launch-only post-launch actions
+  if [[ $_attaching -eq 0 ]]; then
+    # Auto-dismiss the --dangerously-load-development-channels confirmation prompt
+    # (Claude v2.1.80+ shows it once before attaching a channel server)
+    (sleep 4
+     for _pane in 0.0 0.1 0.2 0.3; do
+       tmux send-keys -t "${_session}:${_pane}" "" Enter 2>/dev/null || true
+     done) &
 
-  # Bootstrap if project classifier is missing
-  if [[ ! -f "$_path/.claude/project-classifier.md" ]]; then
-    (sleep 9 && tmux send-keys -t "${_session}:0.0" \
-      "Bootstrap required: .claude/project-classifier.md is missing. Brief Spartacus to analyze this project and generate it from ~/.claude/templates/project-classifier.md. Block all other routing until complete." \
-      Enter) &
-  fi
+    # Bootstrap if project classifier is missing
+    if [[ ! -f "$_path/.claude/project-classifier.md" ]]; then
+      (sleep 9 && tmux send-keys -t "${_session}:0.0" \
+        "Bootstrap required: .claude/project-classifier.md is missing. Brief Spartacus to analyze this project and generate it from ~/.claude/templates/project-classifier.md. Block all other routing until complete." \
+        Enter) &
+    fi
 
-  # Classifier refresh every 50 sessions
-  if [[ $_count -gt 0 && $((_count % 50)) -eq 0 ]]; then
-    (sleep 9 && tmux send-keys -t "${_session}:0.0" \
-      "Classifier refresh due (session #${_count}): brief Spartacus to regenerate .claude/project-classifier.md from the current codebase state." \
-      Enter) &
+    # Classifier refresh every 50 sessions
+    if [[ $_count -gt 0 && $((_count % 50)) -eq 0 ]]; then
+      (sleep 9 && tmux send-keys -t "${_session}:0.0" \
+        "Classifier refresh due (session #${_count}): brief Spartacus to regenerate .claude/project-classifier.md from the current codebase state." \
+        Enter) &
+    fi
   fi
 
   exec tmux attach-session -t "$_session"
