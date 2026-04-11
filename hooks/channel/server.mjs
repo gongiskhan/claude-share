@@ -3,14 +3,10 @@
  * ct Channel Server
  *
  * MCP channel server that bridges ct workspace peer sessions.
- * Receives messages via HTTP from peer agents, pushes them to
- * the local Claude session via MCP notifications, and forwards
- * outbound messages directly to peer HTTP servers.
- *
  * Protocol:
  *   - stdio: MCP connection to Claude Code (spawned as subprocess)
- *   - HTTP :CT_CHANNEL_PORT: receives messages from peers, serves health check
- *   - POST to http://127.0.0.1:<peer_port>/message: sends to peer agents
+ *   - HTTP :CT_CHANNEL_PORT: receives /message POSTs from peers, serves /health
+ *   - Outbound: fetch() to http://127.0.0.1:<peer_port>/message
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -26,8 +22,7 @@ const CT_PROJECT = process.env.CT_PROJECT || "unknown";
 const CT_CHANNEL_PORT = parseInt(process.env.CT_CHANNEL_PORT || "8788", 10);
 const CT_PEERS = JSON.parse(process.env.CT_PEERS || "{}");
 const SERVER_NAME = `ct-${CT_PROJECT}-${CT_AGENT}`;
-
-// ── MCP Server ──────────────────────────────────────────────────────
+const AGENTS = ["pericles", "spartacus", "maximus", "argus"];
 
 const mcp = new Server(
   { name: SERVER_NAME, version: "0.1.0" },
@@ -36,24 +31,22 @@ const mcp = new Server(
       experimental: { "claude/channel": {} },
       tools: {},
     },
-    instructions: `You are running in a ct multi-session workspace. You can send messages to peer sessions using the send_to tool. Peers: pericles, spartacus, maximus, argus.`,
+    instructions: `You are running in a ct multi-session workspace. You can send messages to peer sessions using the send_to tool. Peers: ${AGENTS.join(", ")}.`,
   }
 );
-
-// ── send_to Tool ────────────────────────────────────────────────────
 
 mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
       name: "send_to",
-      description:
-        "Send a message to another ct session. target must be one of: pericles, spartacus, maximus, argus.",
+      description: "Send a message to another ct session.",
       inputSchema: {
         type: "object",
         properties: {
           target: {
             type: "string",
-            enum: ["pericles", "spartacus", "maximus", "argus"],
+            enum: AGENTS,
+            description: "Recipient agent.",
           },
           text: {
             type: "string",
@@ -61,8 +54,7 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
           },
           urgent: {
             type: "boolean",
-            description:
-              "If true, bypass idle queue and interrupt target (optional)",
+            description: "If true, interrupt target immediately (optional)",
           },
         },
         required: ["target", "text"],
@@ -88,39 +80,25 @@ mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
     }
 
     try {
-      const body = JSON.stringify({ from: CT_AGENT, text, urgent: urgent ?? false });
-      await new Promise((resolve, reject) => {
-        const reqOptions = {
-          hostname: "127.0.0.1",
-          port: targetPort,
-          path: "/message",
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Content-Length": Buffer.byteLength(body),
-          },
-        };
-        const outReq = http.request(reqOptions, (res) => {
-          res.resume();
-          res.on("end", resolve);
-        });
-        outReq.on("error", reject);
-        outReq.write(body);
-        outReq.end();
+      const resp = await fetch(`http://127.0.0.1:${targetPort}/message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ from: CT_AGENT, text, urgent: urgent ?? false }),
+        signal: AbortSignal.timeout(5000),
       });
-
+      if (!resp.ok) {
+        throw new Error(`peer returned HTTP ${resp.status}`);
+      }
       console.error(
         `[${SERVER_NAME}] Message sent to ${target}:${targetPort}, ${text.length} chars`
       );
       return { content: [{ type: "text", text: `sent to ${target}` }] };
     } catch (e) {
-      console.error(`[${SERVER_NAME}] Failed to send to ${target}: ${e.message}`);
+      const msg = e.cause?.message ?? e.message;
+      console.error(`[${SERVER_NAME}] Failed to send to ${target}: ${msg}`);
       return {
         content: [
-          {
-            type: "text",
-            text: `Send failed (${target} unreachable): ${e.message}`,
-          },
+          { type: "text", text: `Send failed (${target} unreachable): ${msg}` },
         ],
       };
     }
@@ -129,14 +107,10 @@ mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
   throw new Error(`Unknown tool: ${req.params.name}`);
 });
 
-// ── Connect to Claude Code ──────────────────────────────────────────
-
 await mcp.connect(new StdioServerTransport());
 console.error(
   `[${SERVER_NAME}] MCP connected, starting HTTP server on :${CT_CHANNEL_PORT}`
 );
-
-// ── HTTP Server ─────────────────────────────────────────────────────
 
 const httpServer = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://127.0.0.1:${CT_CHANNEL_PORT}`);
@@ -161,7 +135,6 @@ const httpServer = http.createServer(async (req, res) => {
 
       const content = `<channel source="ct" from="${body.from}" ts="${new Date().toISOString()}">\n${body.text}\n</channel>`;
 
-      // Push notification to Claude
       await mcp.notification({
         method: "notifications/claude/channel",
         params: { content, meta: { from: body.from } },
