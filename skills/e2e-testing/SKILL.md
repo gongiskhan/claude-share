@@ -1,30 +1,21 @@
 ---
 name: e2e-testing
-description: End-to-end testing using real browser automation with playwright-cli. Use this skill when asked to test, verify, or validate web applications. ALWAYS uses real automation via playwright-cli - NEVER writes Playwright test scripts or unit tests. REQUIRED first choice is to delegate to Codex CLI via /codex-test skill.
+description: End-to-end testing using real browser automation with playwright-cli. Use this skill when asked to test, verify, or validate web applications. ALWAYS uses real automation via playwright-cli - NEVER writes Playwright test scripts or unit tests.
 ---
 
 # E2E Testing Skill
 
 **This skill performs REAL browser automation to test applications using playwright-cli.**
 
-## Required First Choice: Delegate to Codex
-
-For ALL testing tasks, first try delegating to OpenAI Codex CLI which runs playwright-cli independently and reports back. Use the `/codex-test` skill for the full workflow. This is the **required first choice** -- it uses Codex tokens instead of Claude tokens.
-
-Use direct playwright-cli commands (below) only when Codex fails or is unavailable.
-
-**Do NOT use `mcp__claude-in-chrome__*` tools for testing.** Chrome extension is a last resort only -- use it only if both codex-test AND direct playwright-cli fail.
-
 ## ABSOLUTE RULES
 
 1. **NEVER write Playwright test scripts** - Do not write .spec.ts files, do not write test() blocks
 2. **NEVER write unit tests** - This skill uses REAL browsers, not test frameworks
 3. **NEVER create test files** - No files in __tests__, no .test.ts, no .spec.ts
-4. **USE playwright-cli FOR ALL WEB TESTING** - Call playwright-cli commands directly via Bash (or delegate to Codex)
+4. **USE playwright-cli FOR ALL WEB TESTING** - Call playwright-cli commands directly via Bash
 5. **TAKE SCREENSHOTS** - Always capture visual proof of test results
 6. **RECORD VIDEO WHEN POSSIBLE** - Use playwright-cli video-start/video-stop for recordings
-7. **DO NOT use mcp__claude-in-chrome__* tools for testing** - Always use playwright-cli (via Codex or directly). Chrome extension is a last resort only when both codex-test and direct playwright-cli fail.
-8. **Always use --browser=chrome** when opening playwright-cli for headed mode (visible to user)
+7. **Always use --browser=chrome** when opening playwright-cli for headed mode (visible to user)
 
 ---
 
@@ -150,33 +141,6 @@ playwright-cli goto http://localhost:3000
 
 ```bash
 playwright-cli cookie-set session_id abc123 --domain=localhost
-```
-
----
-
-## Complete Example: Testing a Login Flow
-
-```bash
-# Open browser
-playwright-cli open http://localhost:3000/login
-playwright-cli resize 1440 900
-playwright-cli screenshot
-
-# Discover elements
-playwright-cli snapshot
-# Output: textbox "Email" [ref=e1], textbox "Password" [ref=e2], button "Login" [ref=e3]
-
-# Fill and submit
-playwright-cli fill e1 "test@example.com"
-playwright-cli fill e2 "password123"
-playwright-cli click e3
-
-# Verify result
-playwright-cli snapshot
-playwright-cli screenshot
-
-# Close browser
-playwright-cli close
 ```
 
 ---
