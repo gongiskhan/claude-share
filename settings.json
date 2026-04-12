@@ -6,14 +6,19 @@
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
-  "model": "opusplan",
   "hooks": {
     "Stop": [
       {
         "matcher": "*",
         "hooks": [
-          { "type": "command", "command": "bash /Users/ggomes/.claude/hooks/hook-stop-notify.sh" },
-          { "type": "command", "command": "[ -f /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh ] && bash /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh || true" }
+          {
+            "type": "command",
+            "command": "bash /Users/ggomes/.claude/hooks/hook-stop-notify.sh"
+          },
+          {
+            "type": "command",
+            "command": "[ -f /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh ] && bash /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh || true"
+          }
         ]
       }
     ],
@@ -21,7 +26,10 @@
       {
         "matcher": "*",
         "hooks": [
-          { "type": "command", "command": "bash /Users/ggomes/.claude/hooks/notification-hook.sh" }
+          {
+            "type": "command",
+            "command": "bash /Users/ggomes/.claude/hooks/notification-hook.sh"
+          }
         ]
       }
     ],
@@ -29,7 +37,11 @@
       {
         "matcher": "",
         "hooks": [
-          { "type": "command", "command": "[ -f /Users/ggomes/.claude/memory-compiler/hooks/session-start.py ] && uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/session-start.py || true", "timeout": 15 }
+          {
+            "type": "command",
+            "command": "[ -f /Users/ggomes/.claude/memory-compiler/hooks/session-start.py ] && uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/session-start.py || true",
+            "timeout": 15
+          }
         ]
       }
     ],
@@ -37,7 +49,11 @@
       {
         "matcher": "",
         "hooks": [
-          { "type": "command", "command": "[ -f /Users/ggomes/.claude/memory-compiler/hooks/session-end.py ] && uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/session-end.py || true", "timeout": 10 }
+          {
+            "type": "command",
+            "command": "[ -f /Users/ggomes/.claude/memory-compiler/hooks/session-end.py ] && uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/session-end.py || true",
+            "timeout": 10
+          }
         ]
       }
     ],
@@ -45,7 +61,11 @@
       {
         "matcher": "",
         "hooks": [
-          { "type": "command", "command": "[ -f /Users/ggomes/.claude/memory-compiler/hooks/pre-compact.py ] && uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/pre-compact.py || true", "timeout": 10 }
+          {
+            "type": "command",
+            "command": "[ -f /Users/ggomes/.claude/memory-compiler/hooks/pre-compact.py ] && uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/pre-compact.py || true",
+            "timeout": 10
+          }
         ]
       }
     ]
@@ -55,9 +75,9 @@
     "command": "input=$(cat); dir=$(basename \"$(echo \"$input\" | jq -r '.workspace.current_dir')\"); branch=$(cd \"$(echo \"$input\" | jq -r '.workspace.current_dir')\" 2>/dev/null && git -c core.useBuiltinFSMonitor=false rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); usage=$(echo \"$input\" | jq '.context_window.current_usage'); if [ \"$usage\" != \"null\" ]; then current=$(echo \"$usage\" | jq '.input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens'); size=$(echo \"$input\" | jq '.context_window.context_window_size'); pct=$((current * 100 / size)); ctx=\"${pct}%\"; else ctx='0%'; fi; version=$(echo \"$input\" | jq -r '.version'); if [ -n \"$branch\" ]; then printf '%s | %s | %s | v%s' \"$dir\" \"$branch\" \"$ctx\" \"$version\"; else printf '%s | %s | v%s' \"$dir\" \"$ctx\" \"$version\"; fi"
   },
   "enabledPlugins": {},
+  "advisorModel": "opus",
   "promptSuggestionEnabled": false,
   "autoMemoryEnabled": true,
   "autoDreamEnabled": true,
-  "skipDangerousModePermissionPrompt": true,
-  "advisorModel": "opus"
+  "skipDangerousModePermissionPrompt": true
 }
