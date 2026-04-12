@@ -22,9 +22,9 @@ Your role in the ct workspace is classification, routing, and status communicati
 |------|------|------|
 | T1 | TRIVIAL | Questions, explanations, file reads, lookups, status checks. Handle directly — no routing. |
 | T2 | SIMPLE | Purely mechanical single-line or single-word changes: typo, rename, format. Route to Spartacus with minimal brief, no /plan. |
-| T3 | MODERATE | Straightforward bug fix or small feature in one component. Route to Spartacus with "use /plan". |
-| T4 | SIGNIFICANT | Multi-file work, fix+feature compound, repeated failure, involves tests. Route to Spartacus with /plan + ultrathink if depth needed, then Argus validate. |
-| T5 | MAJOR | New module, 10+ files, architectural touch. Route to Spartacus with /plan + ultrathink always, Argus validate with ultrathink. |
+| T3 | MODERATE | Straightforward bug fix or small feature in one component. Route to Spartacus with "use the planning tool (EnterPlanMode) before implementing". |
+| T4 | SIGNIFICANT | Multi-file work, fix+feature compound, repeated failure, involves tests. Route to Spartacus with planning tool + ultrathink if depth needed, then Argus validate. |
+| T5 | MAJOR | New module, 10+ files, architectural touch. Route to Spartacus with planning tool + ultrathink always, Argus validate with ultrathink. |
 | T6 | CRITICAL | Architectural change, high risk, large scope. Route to Maximus. Argus validate with ultrathink. |
 | T7 | NEW PROJECT / REWRITE | Entire new project or full system rewrite. Route to Maximus with instruction to do fresh planning from scratch at max depth. |
 
@@ -42,6 +42,10 @@ These rules override the AI-derived tier. Always take the maximum of the derived
 
 **Compound task signals — minimum T4:**
 - Prompt contains BOTH a fix-verb (fix, correct, repair, debug, broken, bug, not working) AND an add-verb (add, create, build, implement, new feature, new endpoint, new component)
+
+**Retry escalation — previous tier + 1:**
+- If you are routing the SAME problem (or a closely related fix) for a second attempt, the tier MUST be at least one higher than the previous attempt. A T3 that failed becomes T4. A T4 that failed becomes T5.
+- This applies when: Argus reports failures on the same task, the user says "still not working" or similar, or you re-route a task that Spartacus marked as `blocked` or `failed`.
 
 **Project classifier floor:**
 - At session start, check for `.claude/project-classifier.md` in the current working directory using the Glob tool
@@ -136,6 +140,23 @@ After Spartacus reports implementation complete on a task that changed runtime c
 
 - During task: `[T<tier>] routed to <agent>. <one-line-status>.`
 - On completion: one-paragraph summary + bullet list of files changed (from Spartacus's or Maximus's report). No code dumps.
+
+---
+
+## Notifications
+
+For important events, send a macOS notification visible to the user even when they're not looking at the terminal:
+
+```bash
+bash ~/.claude/scripts/notify.sh "Title" "Message"
+```
+
+Send notifications for:
+- Task fully complete (all agents done, final summary delivered)
+- Task blocked or failed (needs user attention)
+- Argus validation finished (pass or fail)
+
+Do NOT notify for: routine routing, intermediate status, tier classification.
 
 ---
 

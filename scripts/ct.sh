@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 # ct — Multi-session Claude Code workspace launcher
-# Usage: ct [project_path]   (defaults to $PWD)
+# Usage: ct [project_path]          fresh session (or attach to existing)
+#        ct -c [project_path]       continue previous claude sessions
+#        ctc [project_path]         alias for ct -c
+#
 # Source in ~/.zshrc:  source ~/.claude/scripts/ct.sh
 
 ct() {
+  local _continue=0
+  if [[ "$1" == "-c" || "$1" == "--continue" ]]; then
+    _continue=1; shift
+  fi
+
   local _path="${1:-$PWD}"
   _path="$(cd "$_path" 2>/dev/null && pwd)" || { echo "ct: invalid path: ${1}" >&2; return 1; }
 
@@ -18,6 +26,7 @@ ct() {
 
   local _state_dir="$HOME/.claude/workspaces/$_slug"
   local _state_file="$_state_dir/state.json"
+  local _log_file="$HOME/.claude/bus/$_slug/channel.log"
   mkdir -p "$_state_dir" "$HOME/.claude/bus/$_slug"
 
   # Read portBase and sessionCount in one jq call; fall back gracefully if absent
@@ -80,13 +89,19 @@ PYEOF
     tmux set-option       -t "$_session" pane-border-status top
   fi
 
+  # Determine claude resume flag
+  local _resume_flag=""
+  if [[ $_continue -eq 1 ]]; then
+    _resume_flag="--continue"
+  fi
+
   # Write per-pane MCP config + startup script, set pane title, launch
   # MCP subprocess does NOT inherit the parent shell env — env vars must be
   # explicitly declared in the MCP config's env block (jq handles escaping).
   local _entry _ag _off _mod _eff _title _pt _script _mcp_file
   for _entry in \
     "pericles:0:sonnet:medium:Pericles" \
-    "spartacus:1:opusplan:medium:Spartacus" \
+    "spartacus:1:opusplan:high:Spartacus" \
     "maximus:2:opus[1m]:max:Maximus" \
     "argus:3:sonnet:medium:Argus"; do
     IFS=: read -r _ag _off _mod _eff _title <<< "$_entry"
@@ -101,15 +116,21 @@ PYEOF
       --arg project "$_slug" \
       --arg port    "$_pt" \
       --arg peers   "$_peers" \
+      --arg logfile "$_log_file" \
       '{mcpServers: {"ct-channel": {command: $node, args: [$server],
-        env: {CT_AGENT: $ag, CT_PROJECT: $project, CT_CHANNEL_PORT: $port, CT_PEERS: $peers}}}}' \
+        env: {CT_AGENT: $ag, CT_PROJECT: $project, CT_CHANNEL_PORT: $port, CT_PEERS: $peers, CT_LOG_FILE: $logfile}}}}' \
       > "$_mcp_file"
 
     {
       printf '#!/usr/bin/env bash\n'
       printf "export CLAUDE_CODE_TASK_LIST_ID='%s'\n" "$_task_list_id"
-      printf "exec claude --mcp-config '%s' --strict-mcp-config --dangerously-load-development-channels 'server:ct-channel' --model '%s' --effort '%s' --append-system-prompt-file '%s/%s.md' --dangerously-skip-permissions\n" \
-        "$_mcp_file" "$_mod" "$_eff" "$_prompts_dir" "$_ag"
+      if [[ -n "$_resume_flag" ]]; then
+        printf "exec claude %s --mcp-config '%s' --strict-mcp-config --dangerously-load-development-channels 'server:ct-channel' --model '%s' --effort '%s' --append-system-prompt-file '%s/%s.md' --dangerously-skip-permissions\n" \
+          "$_resume_flag" "$_mcp_file" "$_mod" "$_eff" "$_prompts_dir" "$_ag"
+      else
+        printf "exec claude --mcp-config '%s' --strict-mcp-config --dangerously-load-development-channels 'server:ct-channel' --model '%s' --effort '%s' --append-system-prompt-file '%s/%s.md' --dangerously-skip-permissions\n" \
+          "$_mcp_file" "$_mod" "$_eff" "$_prompts_dir" "$_ag"
+      fi
     } > "$_script"
     chmod +x "$_script"
 
@@ -122,23 +143,24 @@ PYEOF
   # Fresh-launch-only post-launch actions
   if [[ $_attaching -eq 0 ]]; then
     # Auto-dismiss the --dangerously-load-development-channels confirmation prompt
-    # (Claude v2.1.80+ shows it once before attaching a channel server)
     (sleep 4
      for _pane in 0.0 0.1 0.2 0.3; do
        tmux send-keys -t "${_session}:${_pane}" "" Enter 2>/dev/null || true
      done) &
 
-    # Bootstrap if project classifier is missing
-    if [[ ! -f "$_path/.claude/project-classifier.md" ]]; then
-      (sleep 9 && tmux send-keys -t "${_session}:0.0" \
-        "Bootstrap required: .claude/project-classifier.md is missing. Brief Spartacus to analyze this project and generate it from ~/.claude/templates/project-classifier.md. Analyze package.json scripts, Makefiles, docker-compose, and existing dev scripts to fill the Dev Environment section. Block all other routing until complete." \
-        Enter) &
-    else
-      # Auto-start dev environment from classifier if a start command is defined
-      local _dev_start
-      _dev_start=$(grep -A1 '^\- Start command:' "$_path/.claude/project-classifier.md" 2>/dev/null | head -1 | sed 's/.*`\(.*\)`.*/\1/' | grep -v '^\-')
-      if [[ -n "$_dev_start" && "$_dev_start" != *"<"* ]]; then
-        (sleep 6 && cd "$_path" && eval "$_dev_start" &>/dev/null &) &
+    # Bootstrap if project classifier is missing (skip for --continue)
+    if [[ $_continue -eq 0 ]]; then
+      if [[ ! -f "$_path/.claude/project-classifier.md" ]]; then
+        (sleep 9 && tmux send-keys -t "${_session}:0.0" \
+          "Bootstrap required: .claude/project-classifier.md is missing. Brief Spartacus to analyze this project and generate it from ~/.claude/templates/project-classifier.md. Analyze package.json scripts, Makefiles, docker-compose, and existing dev scripts to fill the Dev Environment section. Block all other routing until complete." \
+          Enter) &
+      else
+        # Auto-start dev environment from classifier if a start command is defined
+        local _dev_start
+        _dev_start=$(grep -A1 '^\- Start command:' "$_path/.claude/project-classifier.md" 2>/dev/null | head -1 | sed 's/.*`\(.*\)`.*/\1/' | grep -v '^\-')
+        if [[ -n "$_dev_start" && "$_dev_start" != *"<"* ]]; then
+          (sleep 6 && cd "$_path" && eval "$_dev_start" &>/dev/null &) &
+        fi
       fi
     fi
 
@@ -152,3 +174,6 @@ PYEOF
 
   exec tmux attach-session -t "$_session"
 }
+
+# Alias for ct --continue
+ctc() { ct -c "$@"; }

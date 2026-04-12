@@ -23,6 +23,18 @@ const CT_CHANNEL_PORT = parseInt(process.env.CT_CHANNEL_PORT || "8788", 10);
 const CT_PEERS = JSON.parse(process.env.CT_PEERS || "{}");
 const SERVER_NAME = `ct-${CT_PROJECT}-${CT_AGENT}`;
 const AGENTS = ["pericles", "spartacus", "maximus", "argus"];
+const CT_LOG_FILE = process.env.CT_LOG_FILE || "";
+
+import { appendFileSync } from "node:fs";
+
+function channelLog(from, to, text) {
+  if (!CT_LOG_FILE) return;
+  const ts = new Date().toLocaleTimeString("en-GB", { hour12: false });
+  const preview = text.replace(/\n/g, " ").slice(0, 120);
+  try {
+    appendFileSync(CT_LOG_FILE, `[${ts}] ${from} → ${to}: ${preview}\n`);
+  } catch {}
+}
 
 const mcp = new Server(
   { name: SERVER_NAME, version: "0.1.0" },
@@ -89,6 +101,7 @@ mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
       if (!resp.ok) {
         throw new Error(`peer returned HTTP ${resp.status}`);
       }
+      channelLog(CT_AGENT, target, text);
       console.error(
         `[${SERVER_NAME}] Message sent to ${target}:${targetPort}, ${text.length} chars`
       );
@@ -140,6 +153,7 @@ const httpServer = http.createServer(async (req, res) => {
         params: { content, meta: { from: body.from } },
       });
 
+      channelLog(body.from, CT_AGENT, body.text);
       console.error(
         `[${SERVER_NAME}] Message pushed: from=${body.from}, ${content.length} chars`
       );

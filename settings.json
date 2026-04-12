@@ -1,7 +1,8 @@
 {
   "cleanupPeriodDays": 365,
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1"
   },
   "permissions": {
     "defaultMode": "bypassPermissions"
@@ -13,22 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /Users/ggomes/.claude/hooks/hook-stop-notify.sh"
-          },
-          {
-            "type": "command",
             "command": "[ -f /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh ] && bash /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh || true"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash /Users/ggomes/.claude/hooks/notification-hook.sh"
           }
         ]
       }
@@ -79,5 +65,6 @@
   "promptSuggestionEnabled": false,
   "autoMemoryEnabled": true,
   "autoDreamEnabled": true,
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "effortLevel": "high"
 }
