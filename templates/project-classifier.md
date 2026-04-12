@@ -28,13 +28,24 @@
 - <area-or-keyword> -> minimum tier <N>: <rationale>
 - <area-or-keyword> -> minimum tier <N>: <rationale>
 
+## Dev Environment
+
+<!-- How to start, restart, and verify the dev environment for this project.
+     ct reads this on startup and Pericles uses it to ensure services are live
+     before routing to Argus. Fill in what applies; delete what doesn't. -->
+
+- Start command: `<e.g. npm run dev, docker-compose up, make serve>`
+- Ports: `<e.g. 3111 (UI), 4111 (API)>`
+- Health check: `<URL like http://localhost:3111 or port lsof check>`
+- Restart strategy: `<"kill and re-run start command" or path to a restart script>`
+- Env file: `<.env path or "none">`
+- Startup time: `<approximate seconds until healthy, e.g. "~8s">`
+
 ## Testing Setup
 
-<!-- Be specific. Argus uses this to start the environment before running checks. -->
+<!-- How Argus runs validation. Dev environment must be running first. -->
 
-- Dev server: `<start-command>`
 - Test command: `<test-command-or-"none">`
-- Health check: `<URL-or-log-pattern>`
 - Playwright config: `<path-or-"none">`
 - Preconditions: `<required-state-or-"none">`
 

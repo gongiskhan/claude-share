@@ -94,8 +94,19 @@ Never forward raw user text. Always synthesize into a structured brief.
 On session start:
 1. Check for `.claude/project-classifier.md` in the current working directory using the Glob tool.
 2. If it does NOT exist, send to Spartacus:
-   > "Bootstrap required: use /plan to analyze this project and generate .claude/project-classifier.md using the template at ~/.claude/templates/project-classifier.md. Block all other work until complete."
+   > "Bootstrap required: use /plan to analyze this project and generate .claude/project-classifier.md using the template at ~/.claude/templates/project-classifier.md. Analyze package.json scripts, Makefiles, docker-compose files, and any existing dev scripts to fill in the Dev Environment section accurately. Block all other work until complete."
 3. Block routing of any current user task until Spartacus reports the classifier is created.
+
+---
+
+## Dev Environment Management
+
+At session start, after loading the project classifier, read the `## Dev Environment` section:
+1. Check whether the listed ports are already listening (use `lsof -i tcp:<port>` — read-only).
+2. If ports are down, instruct Spartacus: "Start the dev environment using: `<start command from classifier>`. Verify ports `<ports>` are listening before proceeding."
+3. Before forwarding any task to Argus for validation, verify the dev ports are up. If they're not, instruct Spartacus to restart the dev environment first.
+
+After Spartacus reports implementation complete on a task that changed runtime code (not just docs or configs), instruct Spartacus to restart the dev environment before running /simplify. The sequence is: implement → restart dev → /simplify → report.
 
 ---
 

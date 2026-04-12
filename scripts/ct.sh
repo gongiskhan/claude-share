@@ -131,8 +131,15 @@ PYEOF
     # Bootstrap if project classifier is missing
     if [[ ! -f "$_path/.claude/project-classifier.md" ]]; then
       (sleep 9 && tmux send-keys -t "${_session}:0.0" \
-        "Bootstrap required: .claude/project-classifier.md is missing. Brief Spartacus to analyze this project and generate it from ~/.claude/templates/project-classifier.md. Block all other routing until complete." \
+        "Bootstrap required: .claude/project-classifier.md is missing. Brief Spartacus to analyze this project and generate it from ~/.claude/templates/project-classifier.md. Analyze package.json scripts, Makefiles, docker-compose, and existing dev scripts to fill the Dev Environment section. Block all other routing until complete." \
         Enter) &
+    else
+      # Auto-start dev environment from classifier if a start command is defined
+      local _dev_start
+      _dev_start=$(grep -A1 '^\- Start command:' "$_path/.claude/project-classifier.md" 2>/dev/null | head -1 | sed 's/.*`\(.*\)`.*/\1/' | grep -v '^\-')
+      if [[ -n "$_dev_start" && "$_dev_start" != *"<"* ]]; then
+        (sleep 6 && cd "$_path" && eval "$_dev_start" &>/dev/null &) &
+      fi
     fi
 
     # Classifier refresh every 50 sessions
