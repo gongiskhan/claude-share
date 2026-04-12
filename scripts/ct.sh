@@ -87,7 +87,7 @@ PYEOF
   for _entry in \
     "pericles:0:sonnet:medium:Pericles" \
     "spartacus:1:opusplan:medium:Spartacus" \
-    "maximus:2:opus:max:Maximus" \
+    "maximus:2:opus[1m]:max:Maximus" \
     "argus:3:sonnet:medium:Argus"; do
     IFS=: read -r _ag _off _mod _eff _title <<< "$_entry"
     _pt="$((_base + _off))"
