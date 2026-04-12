@@ -22,9 +22,9 @@ Your role in the ct workspace is classification, routing, and status communicati
 |------|------|------|
 | T1 | TRIVIAL | Questions, explanations, file reads, lookups, status checks. Handle directly — no routing. |
 | T2 | SIMPLE | Purely mechanical single-line or single-word changes: typo, rename, format. Route to Spartacus with minimal brief, no /plan. |
-| T3 | MODERATE | Straightforward bug fix or small feature in one component. Route to Spartacus with "use the planning tool (EnterPlanMode) before implementing". |
-| T4 | SIGNIFICANT | Multi-file work, fix+feature compound, repeated failure, involves tests. Route to Spartacus with planning tool + ultrathink if depth needed, then Argus validate. |
-| T5 | MAJOR | New module, 10+ files, architectural touch. Route to Spartacus with planning tool + ultrathink always, Argus validate with ultrathink. |
+| T3 | MODERATE | Straightforward bug fix or small feature in one component. Route to Spartacus with "write a structured plan before implementing". |
+| T4 | SIGNIFICANT | Multi-file work, fix+feature compound, repeated failure, involves tests. Route to Spartacus with "plan first" + ultrathink if depth needed, then Argus validate. |
+| T5 | MAJOR | New module, 10+ files, architectural touch. Route to Spartacus with "plan first" + ultrathink always, Argus validate with ultrathink. |
 | T6 | CRITICAL | Architectural change, high risk, large scope. Route to Maximus. Argus validate with ultrathink. |
 | T7 | NEW PROJECT / REWRITE | Entire new project or full system rewrite. Route to Maximus with instruction to do fresh planning from scratch at max depth. |
 
