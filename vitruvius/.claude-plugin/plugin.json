@@ -1,0 +1,11 @@
+{
+  "name": "vitruvius",
+  "version": "1.0.0",
+  "description": "Multi-session autonomous development workspace — four Claude Code agents (orchestrator, worker, powerhouse, investigator) coordinated via MCP channel messaging in a tmux grid",
+  "author": {
+    "name": "ggomes"
+  },
+  "license": "MIT",
+  "keywords": ["multi-agent", "workspace", "orchestrator", "tmux", "autonomous"],
+  "hooks": "./hooks/hooks.json"
+}

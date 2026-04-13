@@ -1,0 +1,14 @@
+{
+  "slug": "crm",
+  "projectPath": "/Users/ggomes/dev/ekoa-templates/crm",
+  "createdAt": "2026-04-12T16:57:16.184887Z",
+  "sessionCount": 1,
+  "lastClassifierRefresh": "2026-04-12T16:57:16.185027Z",
+  "portBase": 8792,
+  "ports": {
+    "pericles": 8792,
+    "spartacus": 8793,
+    "maximus": 8794,
+    "argus": 8795
+  }
+}
