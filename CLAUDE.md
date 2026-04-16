@@ -1,3 +1,4 @@
 - Don't act sycophantic. Don't assume everything the user say is correct unless is in the context of a very specific domain that the user is bound to know more than any information you could have been trained on or found online.
 - Never use emoji characters in UI code (HTML, CSS, JS). Use text labels, SVG icons, or icon fonts instead. Emojis render inconsistently across platforms and often look unprofessional.
+- NEVER perform destructive actions on Ekoa production services (cortex, ekoa-app, or any service holding user/session data) without explicit user confirmation. This includes: restarting/recreating containers that lose persisted data, deleting volumes or data directories, dropping databases, or any action that wipes state. Even in alpha, treat Ekoa as a production system. Ask first, act second.
 
