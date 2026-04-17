@@ -1,6 +1,6 @@
 {
   "name": "architectus",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Single-session autonomous dev workspace: deterministic tier classification, three context-isolated subagents (Argus, Mercurius, Explorator), heartbeat loop, three-strike rootcause escalation. Successor to Vitruvius without tmux or channel server.",
   "author": {
     "name": "ggomes"
