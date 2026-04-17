@@ -1,0 +1,16 @@
+{
+  "name": "architectus-local",
+  "owner": {
+    "name": "ggomes"
+  },
+  "metadata": {
+    "description": "Local marketplace wrapper for the Architectus plugin (single-session autonomous development workspace)."
+  },
+  "plugins": [
+    {
+      "name": "architectus",
+      "source": "./architectus",
+      "description": "Single-session autonomous dev workspace: deterministic tier classification, three context-isolated subagents (Argus, Mercurius, Explorator), heartbeat loop, three-strike rootcause escalation."
+    }
+  ]
+}
