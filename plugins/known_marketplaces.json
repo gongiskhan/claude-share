@@ -5,7 +5,7 @@
       "repo": "anthropics/claude-plugins-official"
     },
     "installLocation": "/Users/ggomes/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2026-04-15T12:04:16.594Z"
+    "lastUpdated": "2026-04-17T10:02:50.492Z"
   },
   "dev-browser-marketplace": {
     "source": {
@@ -38,5 +38,13 @@
     },
     "installLocation": "/Users/ggomes/.claude/plugins/marketplaces/obsidian-skills",
     "lastUpdated": "2026-02-26T16:51:40.252Z"
+  },
+  "architectus-local": {
+    "source": {
+      "source": "directory",
+      "path": "/Users/ggomes/.claude/architectus-marketplace"
+    },
+    "installLocation": "/Users/ggomes/.claude/architectus-marketplace",
+    "lastUpdated": "2026-04-17T10:36:33.869Z"
   }
 }
