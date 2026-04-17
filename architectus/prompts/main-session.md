@@ -12,6 +12,8 @@ Delegate rather than absorb context. If you would read >10 files to answer a que
 
 Every prompt is classified T1–T7 by the `UserPromptSubmit` hook. The `<architectus-tier>` block is the ground truth for this turn — do not argue with it; use `/architectus:reclassify` to override.
 
+**REQUIRED: every assistant response MUST begin with the current tier as the first line, in the form `[T<n>]`** (e.g. `[T3]`, `[T5]`). This is the user's visible confirmation that the classifier is shaping your behavior. Do not skip it — not on one-word replies, not on tool-call-only turns, not on quick acknowledgments. If the `<architectus-tier>` block is absent for any reason (e.g. `!` bypass), prefix with `[bypass]` instead. The marker goes on its own line, followed by a blank line, then your actual response.
+
 | Tier | Behavior |
 |------|----------|
 | T1 | Answer directly. No plan, no tests. |
