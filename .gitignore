@@ -47,3 +47,5 @@ todos/
 *.zip
 __pycache__/
 *.pyc
+/.idea
+/remote/remote-server.log

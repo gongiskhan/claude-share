@@ -1,11 +1,177 @@
 {
   "cleanupPeriodDays": 365,
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
-    "defaultMode": "bypassPermissions"
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "LS",
+      "WebFetch",
+      "WebSearch",
+      "TodoWrite",
+      "NotebookRead",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(file:*)",
+      "Bash(stat:*)",
+      "Bash(readlink:*)",
+      "Bash(realpath:*)",
+      "Bash(which:*)",
+      "Bash(type:*)",
+      "Bash(echo:*)",
+      "Bash(printf:*)",
+      "Bash(pwd)",
+      "Bash(whoami)",
+      "Bash(hostname)",
+      "Bash(date:*)",
+      "Bash(env)",
+      "Bash(uname:*)",
+      "Bash(find:*)",
+      "Bash(rg:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(cut:*)",
+      "Bash(tr:*)",
+      "Bash(jq:*)",
+      "Bash(yq:*)",
+      "Bash(diff:*)",
+      "Bash(cmp:*)",
+      "Bash(tree:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(ln:*)",
+      "Bash(touch:*)",
+      "Bash(chmod:*)",
+      "Bash(rsync:*)",
+      "Bash(tar:*)",
+      "Bash(zip:*)",
+      "Bash(unzip:*)",
+      "Bash(git status)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git switch:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git stash:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(git worktree:*)",
+      "Bash(git tag:*)",
+      "Bash(git remote:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh issue:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh auth status)",
+      "Bash(npm test)",
+      "Bash(npm test:*)",
+      "Bash(npm run test)",
+      "Bash(npm run test:*)",
+      "Bash(npm run build)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run format)",
+      "Bash(npm run format:*)",
+      "Bash(npm ci)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm outdated)",
+      "Bash(npm view:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx prettier:*)",
+      "Bash(npx playwright:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npx jest:*)",
+      "Bash(pnpm test)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm run test:*)",
+      "Bash(pnpm run build)",
+      "Bash(pnpm run lint)",
+      "Bash(pnpm install)",
+      "Bash(pnpm ls:*)",
+      "Bash(yarn test)",
+      "Bash(yarn test:*)",
+      "Bash(yarn build)",
+      "Bash(yarn lint)",
+      "Bash(yarn install)",
+      "Bash(yarn tsc:*)",
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(nvm current)",
+      "Bash(nvm use:*)",
+      "Bash(tmux list-sessions)",
+      "Bash(tmux ls)",
+      "Bash(tmux list-windows:*)",
+      "Bash(tmux list-panes:*)",
+      "Bash(tmux new-session:*)",
+      "Bash(tmux send-keys:*)",
+      "Bash(tmux capture-pane:*)",
+      "Bash(tmux kill-session:*)",
+      "Bash(tmux has-session:*)",
+      "Bash(tmux attach:*)",
+      "Bash(tmux detach:*)",
+      "Bash(tmux rename-session:*)",
+      "Bash(launchctl list)",
+      "Bash(launchctl list:*)",
+      "Bash(launchctl asuser:*)",
+      "Bash(launchctl print:*)",
+      "Bash(ps:*)",
+      "Bash(pgrep:*)",
+      "Bash(lsof -i:*)",
+      "Bash(lsof -p:*)",
+      "Bash(netstat:*)",
+      "Bash(docker ps)",
+      "Bash(docker ps:*)",
+      "Bash(docker images)",
+      "Bash(docker logs:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker-compose:*)",
+      "Bash(gcloud auth list)",
+      "Bash(gcloud config list)",
+      "Bash(gcloud projects list)",
+      "Bash(gcloud compute instances list:*)",
+      "Bash(tailscale status)",
+      "Bash(tailscale ip:*)",
+      "Bash(supabase status)",
+      "Bash(supabase db:*)",
+      "Bash(supabase gen:*)",
+      "Bash(claude --version)",
+      "Bash(claude mcp list)",
+      "Bash(uv run:*)",
+      "Bash(python --version)",
+      "Bash(python3 --version)",
+      "Bash(curl -s localhost:*)",
+      "Bash(curl -s http://localhost:*)",
+      "Bash(curl -s 127.0.0.1:*)",
+      "Edit",
+      "Write",
+      "MultiEdit",
+      "NotebookEdit"
+    ],
+    "defaultMode": "auto"
   },
   "hooks": {
     "Stop": [
@@ -14,9 +180,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ -f /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh ] && bash /Users/ggomes/dev/harmonika-all/.harmonika/scripts/sync-memory.sh || true"
+            "command": "for base in \"$HOME/dev\" \"$HOME/Projects\"; do if [ -f \"$base/harmonika-all/.harmonika/scripts/sync-memory.sh\" ]; then bash \"$base/harmonika-all/.harmonika/scripts/sync-memory.sh\"; break; fi; done; true"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccm hook Stop"
+          }
+        ],
+        "matcher": ""
       }
     ],
     "SessionStart": [
@@ -25,7 +200,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ -f /Users/ggomes/.claude/memory-compiler/hooks/session-start.py ] && uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/session-start.py || true",
+            "command": "[ -f \"$HOME/.claude/memory-compiler/hooks/session-start.py\" ] && uv run --directory \"$HOME/.claude/memory-compiler\" python hooks/session-start.py || true",
             "timeout": 15
           }
         ]
@@ -37,7 +212,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ -f /Users/ggomes/.claude/memory-compiler/hooks/session-end.py ] && uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/session-end.py || true",
+            "command": "[ -f \"$HOME/.claude/memory-compiler/hooks/session-end.py\" ] && uv run --directory \"$HOME/.claude/memory-compiler\" python hooks/session-end.py || true",
             "timeout": 10
           }
         ]
@@ -49,10 +224,53 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ -f /Users/ggomes/.claude/memory-compiler/hooks/pre-compact.py ] && uv run --directory /Users/ggomes/.claude/memory-compiler python hooks/pre-compact.py || true",
+            "command": "[ -f \"$HOME/.claude/memory-compiler/hooks/pre-compact.py\" ] && uv run --directory \"$HOME/.claude/memory-compiler\" python hooks/pre-compact.py || true",
             "timeout": 10
           }
         ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccm hook UserPromptSubmit"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccm hook PreToolUse"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccm hook PostToolUse"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccm hook Notification"
+          }
+        ],
+        "matcher": ""
       }
     ]
   },
@@ -60,21 +278,30 @@
     "type": "command",
     "command": "input=$(cat); dir=$(basename \"$(echo \"$input\" | jq -r '.workspace.current_dir')\"); branch=$(cd \"$(echo \"$input\" | jq -r '.workspace.current_dir')\" 2>/dev/null && git -c core.useBuiltinFSMonitor=false rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); usage=$(echo \"$input\" | jq '.context_window.current_usage'); if [ \"$usage\" != \"null\" ]; then current=$(echo \"$usage\" | jq '.input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens'); size=$(echo \"$input\" | jq '.context_window.context_window_size'); pct=$((current * 100 / size)); ctx=\"${pct}%\"; else ctx='0%'; fi; version=$(echo \"$input\" | jq -r '.version'); if [ -n \"$branch\" ]; then printf '%s | %s | %s | v%s' \"$dir\" \"$branch\" \"$ctx\" \"$version\"; else printf '%s | %s | v%s' \"$dir\" \"$ctx\" \"$version\"; fi"
   },
-  "enabledPlugins": {
-    "architectus@architectus-local": true
-  },
-  "extraKnownMarketplaces": {
-    "architectus-local": {
-      "source": {
-        "source": "directory",
-        "path": "/Users/ggomes/.claude/architectus-marketplace"
-      }
-    }
-  },
-  "effortLevel": "high",
+  "defaultModel": "opusplan",
+  "effortLevel": "max",
   "advisorModel": "opus",
   "promptSuggestionEnabled": false,
   "autoMemoryEnabled": true,
   "autoDreamEnabled": true,
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true,
+  "autoMode": {
+    "environment": [
+      "Organization: solo developer (Gonçalo, user: ggomes). No team collaborators, no shared infrastructure, no production systems that other people depend on. Primary use: software development, infrastructure automation, and personal-assistant agent work.",
+      "Development roots: ~/dev and ~/Projects are canonical development roots. They are symlinked to each other on every machine — on some machines ~/dev points to ~/Projects, on others the reverse, so the same repository may resolve via either path. Both are equally trusted. All projects under either path are owned by the user.",
+      "Key projects: Harmonika (~/dev/harmonika-all or ~/Projects/harmonika-all), Ekus (~/dev/ekus or ~/Projects/ekus), Ekoa OS (~/dev/ekoa-dev or ~/Projects/ekoa-dev), Next Border (~/dev/next-border or ~/Projects/next-border), Maestric (~/dev/maestric or ~/Projects/maestric).",
+      "Source control: GitHub org github.com/gongiskhan and all repos under it. Force-push to feature branches is routine; force-push to main/master is not.",
+      "Claude Code configuration: ~/.claude and all subdirectories (agents, commands, skills, plugins, memory-compiler, architectus-marketplace, projects) are actively developed by the user. Edits there are routine.",
+      "Canonical memory store: the Obsidian vault at ~/dev/ekus/obsidian-vault/ (or ~/Projects/ekus/obsidian-vault/) is the single source of truth for cross-session memory. It is written to frequently by automation, hooks, the memory compiler, the Harmonika orchestrator, and manual dev sessions. It has its own git via obsidian-git and auto-commits are expected. Writes to it from any working directory are expected.",
+      "Orchestration pattern: the Harmonika Chat tab runs an Anthropic Agent SDK orchestrator that delegates real work to tmux Claude Code worker sessions named harmonika-orch-<taskId>. Creating, sending keys to, capturing output from, and killing these tmux sessions is expected behavior.",
+      "Always-on services: Ekus runs as a long-lived personal assistant on the Mac Mini via launchctl asuser. Interacting with its launchd job is expected. Ralph-loop prompting (/ralph-loop:ralph-loop) spawns agent teams for long iterative tasks.",
+      "Trusted cloud and API endpoints: Anthropic API (api.anthropic.com), OpenAI API (api.openai.com), Trello (api.trello.com), ElevenLabs (api.elevenlabs.io), Hugging Face (huggingface.co), Supabase (*.supabase.co, *.supabase.com), Render (*.render.com), Cloudflare (*.cloudflare.com), Google Cloud (*.googleapis.com), Docker Hub (hub.docker.com), npm registry (registry.npmjs.org), PyPI (pypi.org), GitHub (github.com, api.github.com, raw.githubusercontent.com).",
+      "Trusted network: Tailscale hosts on the user's tailnet (*.tail*.ts.net) are the user's own machines. localhost and 127.0.0.1 are local dev servers. curl against any of these is routine.",
+      "Credential handling: .env files in project directories are expected to hold API keys for the services above. Reading them and sending credentials to their matching APIs is expected. ~/.config/harmonika/.env is the relocated Harmonika credential store decoupled from Ekus.",
+      "Retired infrastructure: the GCP instance at 100.110.159.124 is dead and should not be reached. The ekus-app UI is being retired; Harmonika is the only UI going forward.",
+      "Cross-repo work is routine: Harmonika, Ekus, Ekoa OS, and the vault are edited in the same session constantly. Writes that span multiple projects under ~/dev or ~/Projects are not suspicious.",
+      "Portability note: this settings file is versioned and deployed to multiple machines (Mac Mini primary, MacBook secondary). That is why both ~/dev and ~/Projects path prefixes appear throughout."
+    ]
+  }
 }

@@ -1,11 +1,24 @@
 ---
 name: e2e-testing
-description: End-to-end testing using real browser automation with playwright-cli. Use this skill when asked to test, verify, or validate web applications. ALWAYS uses real automation via playwright-cli - NEVER writes Playwright test scripts or unit tests.
+description: MANDATORY end-to-end validation via real browser automation with playwright-cli. MUST run before declaring any task complete that touches user-facing UI flows, HTTP/API endpoints with behavioral effects, forms, navigation, auth, routing, or anything a user can interact with in a browser. Auto-triggers on changes to route handlers, React/Vue/Svelte components, server endpoints, form logic, or any Playwright-driveable feature — do not wait to be asked. ALWAYS uses real playwright-cli automation in a real browser - NEVER writes .spec.ts files, test() blocks, or unit-test stubs.
 ---
 
 # E2E Testing Skill
 
-**This skill performs REAL browser automation to test applications using playwright-cli.**
+**This skill performs REAL browser automation to test applications using playwright-cli. It is the final gate on any task that can be exercised through a browser.**
+
+## WHEN TO RUN (MANDATORY)
+
+Run this skill **before declaring the task complete** whenever the change touches any of:
+
+- A React/Vue/Svelte/HTML component a user sees or interacts with
+- A route handler, API endpoint, or server action with behavioral effects (state changes, auth, redirects, data fetches)
+- A form, button, link, modal, navigation flow, or keyboard interaction
+- A login / signup / auth flow or session logic
+- Any page that renders differently based on data or user state
+- Anything driveable through a browser or HTTP request
+
+Type-checking passing is **not** proof the feature works. A passing unit test is **not** proof the feature works. A dev server starting up is **not** proof the feature works. Only real browser automation that exercises the user-facing path counts. If you cannot drive it through `playwright-cli` for structural reasons (CLI-only, pure library code, non-web process), say so explicitly in your completion report rather than claiming success.
 
 ## ABSOLUTE RULES
 
@@ -16,6 +29,7 @@ description: End-to-end testing using real browser automation with playwright-cl
 5. **TAKE SCREENSHOTS** - Always capture visual proof of test results
 6. **RECORD VIDEO WHEN POSSIBLE** - Use playwright-cli video-start/video-stop for recordings
 7. **Always use --browser=chrome** when opening playwright-cli for headed mode (visible to user)
+8. **DO NOT SKIP** because the change "seems small" - a one-line CSS fix can still break layout; a one-line handler change can still break the flow. If a user could notice the change in a browser, run the skill.
 
 ---
 

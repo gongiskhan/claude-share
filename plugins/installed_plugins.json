@@ -4,19 +4,19 @@
     "frontend-design@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/frontend-design/85493fe06c16",
-        "version": "85493fe06c16",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/frontend-design/e4ce32e17a44",
+        "version": "e4ce32e17a44",
         "installedAt": "2026-01-07T06:58:17.907Z",
-        "lastUpdated": "2026-04-17T12:46:30.985Z"
+        "lastUpdated": "2026-04-17T18:46:43.229Z"
       }
     ],
     "agent-sdk-dev@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/agent-sdk-dev/85493fe06c16",
-        "version": "85493fe06c16",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/agent-sdk-dev/e4ce32e17a44",
+        "version": "e4ce32e17a44",
         "installedAt": "2026-01-07T06:58:17.936Z",
-        "lastUpdated": "2026-04-17T12:46:30.987Z"
+        "lastUpdated": "2026-04-17T18:46:43.235Z"
       }
     ],
     "ralph-loop@claude-plugins-official": [
@@ -40,19 +40,19 @@
     "plugin-dev@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/plugin-dev/85493fe06c16",
-        "version": "85493fe06c16",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/plugin-dev/e4ce32e17a44",
+        "version": "e4ce32e17a44",
         "installedAt": "2026-01-08T14:20:41.276Z",
-        "lastUpdated": "2026-04-17T12:46:31.007Z"
+        "lastUpdated": "2026-04-17T18:46:43.260Z"
       }
     ],
     "context7@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/context7/85493fe06c16",
-        "version": "85493fe06c16",
+        "installPath": "/Users/ggomes/.claude/plugins/cache/claude-plugins-official/context7/e4ce32e17a44",
+        "version": "e4ce32e17a44",
         "installedAt": "2026-01-09T18:13:37.938Z",
-        "lastUpdated": "2026-04-17T12:46:30.984Z"
+        "lastUpdated": "2026-04-17T18:46:43.219Z"
       }
     ],
     "code-simplifier@claude-plugins-official": [
@@ -112,16 +112,6 @@
         "installedAt": "2026-02-26T16:51:48.729Z",
         "lastUpdated": "2026-02-26T16:51:48.729Z",
         "gitCommitSha": "be978124b80dc6b60586773e1d125d1cdf36d26a"
-      }
-    ],
-    "architectus@architectus-local": [
-      {
-        "scope": "user",
-        "installPath": "/Users/ggomes/.claude/plugins/cache/architectus-local/architectus/0.1.4",
-        "version": "0.1.4",
-        "installedAt": "2026-04-16T22:44:33.800Z",
-        "lastUpdated": "2026-04-17T12:57:34.817Z",
-        "gitCommitSha": "6e7fb8b91642ed7659f52383ec1cddf4e1e2cd5b"
       }
     ]
   }
