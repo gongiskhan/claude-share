@@ -1,10 +1,150 @@
 {
-  "cleanupPeriodDays": 365,
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  "advisorModel" : "opus",
+  "agentPushNotifEnabled" : true,
+  "autoDreamEnabled" : true,
+  "autoMemoryEnabled" : true,
+  "autoMode" : {
+    "environment" : [
+      "Organization: solo developer (Gonçalo, user: ggomes). No team collaborators, no shared infrastructure, no production systems that other people depend on. Primary use: software development, infrastructure automation, and personal-assistant agent work.",
+      "Development roots: ~\/dev and ~\/Projects are canonical development roots. They are symlinked to each other on every machine — on some machines ~\/dev points to ~\/Projects, on others the reverse, so the same repository may resolve via either path. Both are equally trusted. All projects under either path are owned by the user.",
+      "Key projects: Harmonika (~\/dev\/harmonika-all or ~\/Projects\/harmonika-all), Ekus (~\/dev\/ekus or ~\/Projects\/ekus), Ekoa OS (~\/dev\/ekoa-dev or ~\/Projects\/ekoa-dev), Next Border (~\/dev\/next-border or ~\/Projects\/next-border), Maestric (~\/dev\/maestric or ~\/Projects\/maestric).",
+      "Source control: GitHub org github.com\/gongiskhan and all repos under it. Force-push to feature branches is routine; force-push to main\/master is not.",
+      "Claude Code configuration: ~\/.claude and all subdirectories (agents, commands, skills, plugins, memory-compiler, architectus-marketplace, projects) are actively developed by the user. Edits there are routine.",
+      "Canonical memory store: the Obsidian vault at ~\/dev\/ekus\/obsidian-vault\/ (or ~\/Projects\/ekus\/obsidian-vault\/) is the single source of truth for cross-session memory. It is written to frequently by automation, hooks, the memory compiler, the Harmonika orchestrator, and manual dev sessions. It has its own git via obsidian-git and auto-commits are expected. Writes to it from any working directory are expected.",
+      "Orchestration pattern: the Harmonika Chat tab runs an Anthropic Agent SDK orchestrator that delegates real work to tmux Claude Code worker sessions named harmonika-orch-<taskId>. Creating, sending keys to, capturing output from, and killing these tmux sessions is expected behavior.",
+      "Always-on services: Ekus runs as a long-lived personal assistant on the Mac Mini via launchctl asuser. Interacting with its launchd job is expected. Ralph-loop prompting (\/ralph-loop:ralph-loop) spawns agent teams for long iterative tasks.",
+      "Trusted cloud and API endpoints: Anthropic API (api.anthropic.com), OpenAI API (api.openai.com), Trello (api.trello.com), ElevenLabs (api.elevenlabs.io), Hugging Face (huggingface.co), Supabase (*.supabase.co, *.supabase.com), Render (*.render.com), Cloudflare (*.cloudflare.com), Google Cloud (*.googleapis.com), Docker Hub (hub.docker.com), npm registry (registry.npmjs.org), PyPI (pypi.org), GitHub (github.com, api.github.com, raw.githubusercontent.com).",
+      "Trusted network: Tailscale hosts on the user's tailnet (*.tail*.ts.net) are the user's own machines. localhost and 127.0.0.1 are local dev servers. curl against any of these is routine.",
+      "Credential handling: .env files in project directories are expected to hold API keys for the services above. Reading them and sending credentials to their matching APIs is expected. ~\/.config\/harmonika\/.env is the relocated Harmonika credential store decoupled from Ekus.",
+      "Retired infrastructure: the GCP instance at 100.110.159.124 is dead and should not be reached. The ekus-app UI is being retired; Harmonika is the only UI going forward.",
+      "Cross-repo work is routine: Harmonika, Ekus, Ekoa OS, and the vault are edited in the same session constantly. Writes that span multiple projects under ~\/dev or ~\/Projects are not suspicious.",
+      "Portability note: this settings file is versioned and deployed to multiple machines (Mac Mini primary, MacBook secondary). That is why both ~\/dev and ~\/Projects path prefixes appear throughout."
+    ]
   },
-  "permissions": {
-    "allow": [
+  "cleanupPeriodDays" : 365,
+  "defaultModel" : "opusplan",
+  "env" : {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS" : "1"
+  },
+  "hooks" : {
+    "Notification" : [
+      {
+        "hooks" : [
+          {
+            "command" : "ccm hook Notification",
+            "type" : "command"
+          }
+        ],
+        "matcher" : ""
+      },
+      {
+        "hooks" : [
+          {
+            "command" : "\/Users\/ggomes\/.wrangle\/hooks\/wrangle-claude-hook.sh",
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "PostToolUse" : [
+      {
+        "hooks" : [
+          {
+            "command" : "ccm hook PostToolUse",
+            "type" : "command"
+          }
+        ],
+        "matcher" : ""
+      }
+    ],
+    "PreCompact" : [
+      {
+        "hooks" : [
+          {
+            "command" : "[ -f \"$HOME\/.claude\/memory-compiler\/hooks\/pre-compact.py\" ] && uv run --directory \"$HOME\/.claude\/memory-compiler\" python hooks\/pre-compact.py || true",
+            "timeout" : 10,
+            "type" : "command"
+          }
+        ],
+        "matcher" : ""
+      }
+    ],
+    "PreToolUse" : [
+      {
+        "hooks" : [
+          {
+            "command" : "ccm hook PreToolUse",
+            "type" : "command"
+          }
+        ],
+        "matcher" : ""
+      }
+    ],
+    "SessionEnd" : [
+      {
+        "hooks" : [
+          {
+            "command" : "[ -f \"$HOME\/.claude\/memory-compiler\/hooks\/session-end.py\" ] && uv run --directory \"$HOME\/.claude\/memory-compiler\" python hooks\/session-end.py || true",
+            "timeout" : 10,
+            "type" : "command"
+          }
+        ],
+        "matcher" : ""
+      }
+    ],
+    "SessionStart" : [
+      {
+        "hooks" : [
+          {
+            "command" : "[ -f \"$HOME\/.claude\/memory-compiler\/hooks\/session-start.py\" ] && uv run --directory \"$HOME\/.claude\/memory-compiler\" python hooks\/session-start.py || true",
+            "timeout" : 15,
+            "type" : "command"
+          }
+        ],
+        "matcher" : ""
+      }
+    ],
+    "Stop" : [
+      {
+        "hooks" : [
+          {
+            "command" : "for base in \"$HOME\/dev\" \"$HOME\/Projects\"; do if [ -f \"$base\/harmonika-all\/.harmonika\/scripts\/sync-memory.sh\" ]; then bash \"$base\/harmonika-all\/.harmonika\/scripts\/sync-memory.sh\"; break; fi; done; true",
+            "type" : "command"
+          }
+        ],
+        "matcher" : "*"
+      },
+      {
+        "hooks" : [
+          {
+            "command" : "ccm hook Stop",
+            "type" : "command"
+          }
+        ],
+        "matcher" : ""
+      },
+      {
+        "hooks" : [
+          {
+            "command" : "\/Users\/ggomes\/.wrangle\/hooks\/wrangle-claude-hook.sh",
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit" : [
+      {
+        "hooks" : [
+          {
+            "command" : "ccm hook UserPromptSubmit",
+            "type" : "command"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions" : {
+    "allow" : [
       "Read",
       "Glob",
       "Grep",
@@ -164,144 +304,22 @@
       "Bash(python --version)",
       "Bash(python3 --version)",
       "Bash(curl -s localhost:*)",
-      "Bash(curl -s http://localhost:*)",
+      "Bash(curl -s http:\/\/localhost:*)",
       "Bash(curl -s 127.0.0.1:*)",
       "Edit",
       "Write",
       "MultiEdit",
       "NotebookEdit"
     ],
-    "defaultMode": "auto"
+    "defaultMode" : "auto"
   },
-  "hooks": {
-    "Stop": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "for base in \"$HOME/dev\" \"$HOME/Projects\"; do if [ -f \"$base/harmonika-all/.harmonika/scripts/sync-memory.sh\" ]; then bash \"$base/harmonika-all/.harmonika/scripts/sync-memory.sh\"; break; fi; done; true"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ccm hook Stop"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -f \"$HOME/.claude/memory-compiler/hooks/session-start.py\" ] && uv run --directory \"$HOME/.claude/memory-compiler\" python hooks/session-start.py || true",
-            "timeout": 15
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -f \"$HOME/.claude/memory-compiler/hooks/session-end.py\" ] && uv run --directory \"$HOME/.claude/memory-compiler\" python hooks/session-end.py || true",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -f \"$HOME/.claude/memory-compiler/hooks/pre-compact.py\" ] && uv run --directory \"$HOME/.claude/memory-compiler\" python hooks/pre-compact.py || true",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ccm hook UserPromptSubmit"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ccm hook PreToolUse"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PostToolUse": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ccm hook PostToolUse"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ccm hook Notification"
-          }
-        ],
-        "matcher": ""
-      }
-    ]
+  "promptSuggestionEnabled" : false,
+  "remoteControlAtStartup" : true,
+  "skipAutoPermissionPrompt" : true,
+  "skipDangerousModePermissionPrompt" : true,
+  "statusLine" : {
+    "command" : "sh /Users/ggomes/.claude/statusline-command.sh",
+    "type" : "command"
   },
-  "statusLine": {
-    "type": "command",
-    "command": "input=$(cat); dir=$(basename \"$(echo \"$input\" | jq -r '.workspace.current_dir')\"); branch=$(cd \"$(echo \"$input\" | jq -r '.workspace.current_dir')\" 2>/dev/null && git -c core.useBuiltinFSMonitor=false rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); usage=$(echo \"$input\" | jq '.context_window.current_usage'); if [ \"$usage\" != \"null\" ]; then current=$(echo \"$usage\" | jq '.input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens'); size=$(echo \"$input\" | jq '.context_window.context_window_size'); pct=$((current * 100 / size)); ctx=\"${pct}%\"; else ctx='0%'; fi; version=$(echo \"$input\" | jq -r '.version'); if [ -n \"$branch\" ]; then printf '%s | %s | %s | v%s' \"$dir\" \"$branch\" \"$ctx\" \"$version\"; else printf '%s | %s | v%s' \"$dir\" \"$ctx\" \"$version\"; fi"
-  },
-  "defaultModel": "opusplan",
-  "effortLevel": "max",
-  "advisorModel": "opus",
-  "promptSuggestionEnabled": false,
-  "autoMemoryEnabled": true,
-  "autoDreamEnabled": true,
-  "skipDangerousModePermissionPrompt": true,
-  "skipAutoPermissionPrompt": true,
-  "autoMode": {
-    "environment": [
-      "Organization: solo developer (Gonçalo, user: ggomes). No team collaborators, no shared infrastructure, no production systems that other people depend on. Primary use: software development, infrastructure automation, and personal-assistant agent work.",
-      "Development roots: ~/dev and ~/Projects are canonical development roots. They are symlinked to each other on every machine — on some machines ~/dev points to ~/Projects, on others the reverse, so the same repository may resolve via either path. Both are equally trusted. All projects under either path are owned by the user.",
-      "Key projects: Harmonika (~/dev/harmonika-all or ~/Projects/harmonika-all), Ekus (~/dev/ekus or ~/Projects/ekus), Ekoa OS (~/dev/ekoa-dev or ~/Projects/ekoa-dev), Next Border (~/dev/next-border or ~/Projects/next-border), Maestric (~/dev/maestric or ~/Projects/maestric).",
-      "Source control: GitHub org github.com/gongiskhan and all repos under it. Force-push to feature branches is routine; force-push to main/master is not.",
-      "Claude Code configuration: ~/.claude and all subdirectories (agents, commands, skills, plugins, memory-compiler, architectus-marketplace, projects) are actively developed by the user. Edits there are routine.",
-      "Canonical memory store: the Obsidian vault at ~/dev/ekus/obsidian-vault/ (or ~/Projects/ekus/obsidian-vault/) is the single source of truth for cross-session memory. It is written to frequently by automation, hooks, the memory compiler, the Harmonika orchestrator, and manual dev sessions. It has its own git via obsidian-git and auto-commits are expected. Writes to it from any working directory are expected.",
-      "Orchestration pattern: the Harmonika Chat tab runs an Anthropic Agent SDK orchestrator that delegates real work to tmux Claude Code worker sessions named harmonika-orch-<taskId>. Creating, sending keys to, capturing output from, and killing these tmux sessions is expected behavior.",
-      "Always-on services: Ekus runs as a long-lived personal assistant on the Mac Mini via launchctl asuser. Interacting with its launchd job is expected. Ralph-loop prompting (/ralph-loop:ralph-loop) spawns agent teams for long iterative tasks.",
-      "Trusted cloud and API endpoints: Anthropic API (api.anthropic.com), OpenAI API (api.openai.com), Trello (api.trello.com), ElevenLabs (api.elevenlabs.io), Hugging Face (huggingface.co), Supabase (*.supabase.co, *.supabase.com), Render (*.render.com), Cloudflare (*.cloudflare.com), Google Cloud (*.googleapis.com), Docker Hub (hub.docker.com), npm registry (registry.npmjs.org), PyPI (pypi.org), GitHub (github.com, api.github.com, raw.githubusercontent.com).",
-      "Trusted network: Tailscale hosts on the user's tailnet (*.tail*.ts.net) are the user's own machines. localhost and 127.0.0.1 are local dev servers. curl against any of these is routine.",
-      "Credential handling: .env files in project directories are expected to hold API keys for the services above. Reading them and sending credentials to their matching APIs is expected. ~/.config/harmonika/.env is the relocated Harmonika credential store decoupled from Ekus.",
-      "Retired infrastructure: the GCP instance at 100.110.159.124 is dead and should not be reached. The ekus-app UI is being retired; Harmonika is the only UI going forward.",
-      "Cross-repo work is routine: Harmonika, Ekus, Ekoa OS, and the vault are edited in the same session constantly. Writes that span multiple projects under ~/dev or ~/Projects are not suspicious.",
-      "Portability note: this settings file is versioned and deployed to multiple machines (Mac Mini primary, MacBook secondary). That is why both ~/dev and ~/Projects path prefixes appear throughout."
-    ]
-  }
+  "theme" : "light"
 }

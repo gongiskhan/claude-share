@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "asgcard": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@asgcard/mcp-server"
+      ]
+    }
+  }
+}
