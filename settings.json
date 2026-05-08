@@ -5,8 +5,8 @@
   "autoMemoryEnabled": true,
   "autoMode": {
     "environment": [
-      "Organization: solo developer (Gon\u00e7alo, user: ggomes). No team collaborators, no shared infrastructure, no production systems that other people depend on. Primary use: software development, infrastructure automation, and personal-assistant agent work.",
-      "Development roots: ~/dev and ~/Projects are canonical development roots. They are symlinked to each other on every machine \u2014 on some machines ~/dev points to ~/Projects, on others the reverse, so the same repository may resolve via either path. Both are equally trusted. All projects under either path are owned by the user.",
+      "Organization: solo developer (Gonçalo, user: ggomes). No team collaborators, no shared infrastructure, no production systems that other people depend on. Primary use: software development, infrastructure automation, and personal-assistant agent work.",
+      "Development roots: ~/dev and ~/Projects are canonical development roots. They are symlinked to each other on every machine — on some machines ~/dev points to ~/Projects, on others the reverse, so the same repository may resolve via either path. Both are equally trusted. All projects under either path are owned by the user.",
       "Key projects: Harmonika (~/dev/harmonika-all or ~/Projects/harmonika-all), Ekus (~/dev/ekus or ~/Projects/ekus), Ekoa OS (~/dev/ekoa-dev or ~/Projects/ekoa-dev), Next Border (~/dev/next-border or ~/Projects/next-border), Maestric (~/dev/maestric or ~/Projects/maestric).",
       "Source control: GitHub org github.com/gongiskhan and all repos under it. Force-push to feature branches is routine; force-push to main/master is not.",
       "Claude Code configuration: ~/.claude and all subdirectories (agents, commands, skills, plugins, memory-compiler, architectus-marketplace, projects) are actively developed by the user. Edits there are routine.",
@@ -27,24 +27,6 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "hooks": {
-    "Notification": [
-      {
-        "hooks": [
-        ],
-        "matcher": ""
-      },
-      {
-        "hooks": [
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "hooks": [
-        ],
-        "matcher": ""
-      }
-    ],
     "PreCompact": [
       {
         "hooks": [
@@ -53,13 +35,6 @@
             "timeout": 10,
             "type": "command"
           }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PreToolUse": [
-      {
-        "hooks": [
         ],
         "matcher": ""
       }
@@ -97,23 +72,10 @@
           }
         ],
         "matcher": "*"
-      },
-      {
-        "hooks": [
-        ],
-        "matcher": ""
-      },
-      {
-        "hooks": [
-        ]
       }
     ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-        ]
-      }
-    ]
+    "UserPromptSubmit": [],
+    "Notification": []
   },
   "permissions": {
     "allow": [
