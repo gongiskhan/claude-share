@@ -1,1 +1,13 @@
-Create a professional App Store promotional screenshot for the "Wayfarer Theaters" cinema app. Portrait orientation 9:16 ratio. The image should have a solid black background. At the top center, render the Wayfarer Theaters logo from the first reference image in golden yellow (#ffce00) color - it shows a cursive W inside a lightbulb outline with "WAYFARER THEATERS" text below. Below the logo, place a photorealistic iPhone 16 Pro Max in Natural Titanium finish at a dramatic 15-degree 3D perspective angle, tilted slightly to the right. The phone screen should display the second reference image (the cinema app home page showing movie posters, golden yellow header with location bar, and teal Buy Tickets section). The phone should cast a subtle reflection on a glossy black surface. Premium, sleek, cinematic feel. No additional text besides the logo.
+Professional Google Play Store promotional screenshot, portrait 9:16, 2K resolution, for a premium independent cinema app called Chiswick Cinema.
+
+Composition (top to bottom):
+1. Pure black background #000000 across the entire canvas.
+2. At the very top, centred, the Chiswick Cinema wordmark "THE CHISWICK CINEMA" rendered in soft warm white (#F2EAD3), thin elegant uppercase serif/sans hybrid letters, sized at about 6% of canvas height. Use the second reference image (the logo) to render the wordmark accurately — match its exact letterforms, just in the warm-white colour.
+3. Below the wordmark, generous breathing room, then the headline "Event Cinema" in large bold white sans-serif (think Helvetica Neue / SF Pro Display), centred, about 9% canvas height.
+4. Directly under the headline, the sub-line "Live opera, ballet, theatre and more" in mustard gold (#C8A234), smaller (about 4% canvas height), centred.
+5. Below the text, centred, a photorealistic iPad Pro 13-inch in dark titanium with very thin bezel and rounded corners (no notch, no Dynamic Island). The device occupies roughly 60% of the canvas height. Inside the device screen, place the FIRST reference image — the actual app screenshot — crisp, full-bleed inside the screen, no alteration to its content. The screen should fit the device's aspect ratio with no distortion.
+6. Behind the device, a very subtle warm gold (#C8A234) glow at low opacity to lift it off the background. No other graphics.
+
+Style: Apple-App-Store / Google-Play-featured aesthetic — premium, cinematic, rich blacks, generous whitespace, no decoration, no extra graphics. The screenshot inside the device must remain readable.
+
+Render everything sharp and high-resolution. Do not modify the screenshot's UI content.
