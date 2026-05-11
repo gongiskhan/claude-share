@@ -225,17 +225,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -s -X POST http://localhost:3000/api/workbench/sessions/hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"Stop\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "curl -s -X POST http://localhost:3000/api/workbench/sessions/hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"Stop\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
+            "command": "curl -s -X POST http://localhost:7777/_hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"Stop\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
             "timeout": 5
           }
         ]
@@ -247,17 +237,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -s -X POST http://localhost:3000/api/workbench/sessions/hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"UserPromptSubmit\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "curl -s -X POST http://localhost:3000/api/workbench/sessions/hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"UserPromptSubmit\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
+            "command": "curl -s -X POST http://localhost:7777/_hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"UserPromptSubmit\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
             "timeout": 5
           }
         ]
@@ -269,17 +249,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -s -X POST http://localhost:3000/api/workbench/sessions/hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"Notification\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "curl -s -X POST http://localhost:3000/api/workbench/sessions/hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"Notification\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
+            "command": "curl -s -X POST http://localhost:7777/_hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"Notification\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
             "timeout": 5
           }
         ]
@@ -291,17 +261,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -s -X POST http://localhost:3000/api/workbench/sessions/hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"PostToolUse\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "curl -s -X POST http://localhost:3000/api/workbench/sessions/hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"PostToolUse\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
+            "command": "curl -s -X POST http://localhost:7777/_hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"PostToolUse\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
             "timeout": 5
           }
         ]
@@ -312,10 +272,9 @@
     "type": "command",
     "command": "sh /Users/ggomes/.claude/statusline-command.sh"
   },
-  "enabledPlugins": {
-    "swift-lsp@claude-plugins-official": true
-  },
-  "effortLevel": "xhigh",
+  "model": "opusplan",
+  "defaultModel": "opusplan",
+  "advisorModel": "opus",
   "promptSuggestionEnabled": false,
   "autoMemoryEnabled": true,
   "autoDreamEnabled": true,
@@ -341,6 +300,5 @@
       "Cross-repo work is routine: Harmonika, Ekus, Ekoa OS, and the vault are edited in the same session constantly. Writes that span multiple projects under ~/dev or ~/Projects are not suspicious.",
       "Portability note: this settings file is versioned and deployed to multiple machines (Mac Mini primary, MacBook secondary). That is why both ~/dev and ~/Projects path prefixes appear throughout."
     ]
-  },
-  "defaultModel": "opusplan"
+  }
 }
