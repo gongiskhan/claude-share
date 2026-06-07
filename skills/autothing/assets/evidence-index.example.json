@@ -1,0 +1,55 @@
+{
+  "project": "ekoa",
+  "updatedAt": "2026-06-04T15:40:00Z",
+  "galleryUrl": "http://100.108.210.116:8099/ekoa/",
+  "slices": [
+    {
+      "slice": "sso-login",
+      "title": "Microsoft 365 SSO login flow",
+      "kind": "ui",
+      "status": "passed",
+      "video": "http://100.108.210.116:8099/ekoa/2026-06-04T142150/final.mp4",
+      "verifiedAt": "2026-06-04T14:22:09Z",
+      "flagged": false,
+      "gateStatus": "docs/autothing/slices/sso-login/gate-status.json"
+    },
+    {
+      "slice": "inbox-webhook",
+      "title": "Inbound mail webhook creates an automation run",
+      "kind": "automation",
+      "status": "passed",
+      "video": "http://100.108.210.116:8099/ekoa/2026-06-04T151012/final.mp4",
+      "verifiedAt": "2026-06-04T15:11:30Z",
+      "flagged": false,
+      "gateStatus": "docs/autothing/slices/inbox-webhook/gate-status.json"
+    },
+    {
+      "slice": "sharepoint-sync",
+      "title": "SharePoint document sync surfaces in the files list",
+      "kind": "mixed",
+      "status": "blocked",
+      "video": "http://100.108.210.116:8099/ekoa/2026-06-04T153340/final.mp4",
+      "verifiedAt": "2026-06-04T15:34:50Z",
+      "flagged": true,
+      "gateStatus": "docs/autothing/slices/sharepoint-sync/gate-status.json",
+      "blockerSummary": "Graph delta token rejected by sandbox tenant; video honestly shows the failed sync. Logged in docs/decisions.md; build continued."
+    }
+  ],
+  "globalGate": {
+    "status": "in_progress",
+    "e2eAll":            { "cmd": "npx playwright test", "exit": null },
+    "verifyApp":         { "via": "/verify", "verdict": null },
+    "build":             { "cmd": "npm run build --workspaces --if-present", "exit": null },
+    "typecheck":         { "cmd": "npm run typecheck --workspaces --if-present", "exit": null },
+    "lint":              { "cmd": "npm run lint -w ekoa", "exit": null },
+    "designAudit":       { "verdict": null },
+    "everySliceVideoVerified": false
+  },
+  "_field_notes": {
+    "purpose": "Single durable handover index. Survives context compaction (autothing re-reads it to resume) and is the human-readable handover. NOTE: the /goal evaluator reads only the transcript — a small fast model that does not open files — so autothing must ALSO print the global-gate verdict into the conversation. This file is for resume + the human; the printed line is what the evaluator confirms.",
+    "slices[].status": "passed | failed | blocked | in_progress  (mirrors that slice's gate-status.json)",
+    "slices[].flagged": "true = honest-failure run (video shows it not working). Counts as recorded evidence, not a pass.",
+    "globalGate.status": "in_progress | passed | completed-with-blockers. 'passed' ONLY when every objective exit==0, verifyApp/designAudit verdict=='clean', AND everySliceVideoVerified==true. If buildable work is exhausted but any slice is blocked or its video is not verified, the terminal state is 'completed-with-blockers' (enumerated in the handover) — never reported as 'passed'.",
+    "everySliceVideoVerified": "true ONLY when every non-skipped slice has gates.video.status == 'verified'. A 'failed-but-unblocking' video does NOT count as verified — it forces 'completed-with-blockers', matching the /goal condition 'a self-verified video exists for every slice'."
+  }
+}

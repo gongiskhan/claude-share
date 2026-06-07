@@ -1,0 +1,1 @@
+/Users/ggomes/dev/garrison/compositions/default/apm_modules/_local/browser-default/.apm/skills/garrison-browser/SKILL.md

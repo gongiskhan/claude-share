@@ -1,0 +1,28 @@
+{
+  "slice": "sso-login",
+  "title": "Microsoft 365 SSO login flow",
+  "updatedAt": "2026-06-04T14:22:10Z",
+  "phase": "done",
+  "status": "passed",
+  "kind": "ui",
+  "retries": { "limit": 5, "used": 1 },
+  "gates": {
+    "tests":     { "cmd": "npm run test -w ekoa",                          "exit": 0, "at": "2026-06-04T14:20:00Z", "summary": "12 passed" },
+    "typecheck": { "cmd": "npm run typecheck --workspaces --if-present",   "exit": 0, "at": "2026-06-04T14:20:31Z", "summary": "0 errors" },
+    "lint":      { "cmd": "npm run lint -w ekoa",                          "exit": 0, "at": "2026-06-04T14:20:48Z", "summary": "clean" },
+    "build":     { "cmd": "npm run build --workspaces --if-present",       "exit": 0, "at": "2026-06-04T14:21:40Z", "summary": "next build ok" },
+    "e2e":       { "cmd": "npx playwright test e2e/sso-login.spec.ts",     "exit": 0, "at": "2026-06-04T14:21:55Z", "summary": "3 passed, 0 console errors" },
+    "designAudit": { "verdict": "clean", "by": ["frontend-design", "polish-ui"], "at": "2026-06-04T14:22:02Z", "notes": "matched design tokens; fixed 2 spacing regressions during the audit" },
+    "video":     { "status": "verified", "verifiedAt": "2026-06-04T14:22:09Z", "flagged": false, "link": "http://100.108.210.116:8099/ekoa/2026-06-04T142150/final.mp4", "runDir": ".walkthrough/runs/2026-06-04T142150" }
+  },
+  "blockers": [],
+  "_field_notes": {
+    "phase": "explore | test | gate | evidence | done | blocked  (resume reads this)",
+    "status": "in_progress | passed | failed | blocked",
+    "kind": "ui | automation | mixed  (drives testing strategy and walkthrough flow selection)",
+    "gates.<objective>.exit": "process exit code; 0 == pass. The /goal evaluator can confirm gates from these without re-running them.",
+    "gates.designAudit.verdict": "clean | issues  (subjective gate reduced to a written verdict + who produced it)",
+    "gates.video.status": "verified | failed-but-unblocking | skipped. 'failed-but-unblocking' = walkthrough hit its retry ceiling (STUCK); log a blocker and CONTINUE, never wait for input.",
+    "gates.video.flagged": "true if the run is an honest failure (the video shows it not working). An honestly-flagged run still records evidence; it does not fake success."
+  }
+}

@@ -174,6 +174,62 @@
     "defaultMode": "auto"
   },
   "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=Notification' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=Notification' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/ggomes/.claude/hooks/herdr-agent-state.sh' blocked",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=PostToolUse' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=PostToolUse' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "PreCompact": [
       {
         "matcher": "",
@@ -186,6 +242,18 @@
         ]
       }
     ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/ggomes/.claude/hooks/herdr-agent-state.sh' working",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "SessionEnd": [
       {
         "matcher": "",
@@ -193,6 +261,16 @@
           {
             "type": "command",
             "command": "[ -f \"$HOME/.claude/memory-compiler/hooks/session-end.py\" ] && uv run --directory \"$HOME/.claude/memory-compiler\" python hooks/session-end.py || true",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/ggomes/.claude/hooks/herdr-agent-state.sh' release",
             "timeout": 10
           }
         ]
@@ -221,11 +299,31 @@
         ]
       },
       {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/ggomes/.claude/hooks/herdr-agent-state.sh' idle",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "curl -s -X POST http://localhost:7777/_hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"Stop\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=Stop' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=Stop' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
             "timeout": 5
           }
         ]
@@ -233,35 +331,31 @@
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "curl -s -X POST http://localhost:7777/_hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"UserPromptSubmit\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
-            "timeout": 5
+            "command": "bash '/Users/ggomes/.claude/hooks/herdr-agent-state.sh' working",
+            "timeout": 10
           }
         ]
-      }
-    ],
-    "Notification": [
+      },
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "curl -s -X POST http://localhost:7777/_hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"Notification\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=UserPromptSubmit' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
             "timeout": 5
           }
         ]
-      }
-    ],
-    "PostToolUse": [
+      },
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "curl -s -X POST http://localhost:7777/_hook -H 'Content-Type: application/json' -d \"{\\\"event\\\":\\\"PostToolUse\\\",\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\" > /dev/null 2>&1 || true",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=UserPromptSubmit' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
             "timeout": 5
           }
         ]
@@ -272,13 +366,12 @@
     "type": "command",
     "command": "sh /Users/ggomes/.claude/statusline-command.sh"
   },
-  "model": "opusplan",
-  "defaultModel": "opusplan",
   "advisorModel": "opus",
   "promptSuggestionEnabled": false,
   "autoMemoryEnabled": true,
   "autoDreamEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
   "theme": "light",
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,

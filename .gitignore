@@ -43,6 +43,20 @@ teams/
 telemetry/
 todos/
 
+# Machine-local runtime / state (claude-share is PUBLIC — keep these off it)
+# Leading slash = repo-root only, so skills/skill-improver/ (the skill) is NOT ignored
+/skill-improver/
+/daemon/
+/daemon.log
+/jobs/
+/remote/
+*.log
+settings.local.json
+mcp-needs-auth-cache.json
+policy-limits.json
+.last-cleanup
+.last-update-result.json
+
 # Misc
 *.zip
 __pycache__/

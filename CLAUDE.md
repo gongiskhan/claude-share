@@ -25,5 +25,6 @@ This is a solo developer machine (user: ggomes). There is no shared infrastructu
 - Secrets should be redacted (patterns: `sk-*`, `ghp_*`, `xoxb-*`) when writing transcripts to the vault.
 
 ### Git posture
+- Direct (non-force) `git push` to `main`/`master` is expected and authorized on this solo machine — there is no PR-review workflow gating my own repos. When I say "commit and push", that includes pushing the current branch (often `main`) to its upstream without further confirmation.
 - Force-pushing to feature branches is fine. Force-pushing to `main`/`master` is not.
 - Auto-commits to the vault repo are expected.
