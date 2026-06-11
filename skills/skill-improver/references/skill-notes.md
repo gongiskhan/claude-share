@@ -8,8 +8,9 @@ The improver is the SINGLE mechanism that improves skills, so skill-specific kno
 - **Large skill:** edits live across `SKILL.md` + `references/*.md`. Route a prose fix to the right reference file, not always SKILL.md.
 - **Never touch:** its non-negotiables, the gate definitions, or the Phase-4 handover-before-`GLOBAL GATE:`-verdict ordering (that ordering is load-bearing for `/goal`). Those are flag-only.
 
-## walkthrough  (`~/.claude/skills/walkthrough` → symlink to `~/dev/walkthrough/walkthrough`, NOT a git repo)
-- **Resolve the symlink** and edit the real file; there's no repo there, so the snapshot is the only revert net — say so in the report.
+## walkthrough  (`~/.claude/skills/walkthrough` → symlink to `~/dev/walkthrough/walkthrough`, inside the `~/dev/walkthrough` git repo since 2026-06-10, commit `8a42086`)
+- **Resolve the symlink** and edit the real file; commit in `~/dev/walkthrough` for a native diff (snapshot still required first, as always).
+- **The working tree may carry uncommitted drift from other sessions** (e.g. `scripts/record.mjs`). `git add` ONLY the files you edited — never `-A` — and diff your commit afterwards; on 2026-06-11 a pass swept pre-existing prose into its commit and had to split it.
 - **Prose-fixable:** flow-selection guidance (SKILL.md step 4), caption rules, what-to-show/avoid, `.walkthrough/notes.md` conventions.
 - **Code → FLAG (do not auto-edit):** anything in `scripts/` — highlight coordinates / cursor / recording pipeline (`scripts/lib/browser.mjs`, `scripts/record.mjs`). Verifying these needs recording against a live app.
 
