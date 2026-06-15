@@ -1,6 +1,6 @@
 # Foundation Generation
 
-How Phase 1 creates the per-project foundation. Create **only the gaps** Phase 0 found (see `manifest.md`). Delegate; do not reinvent.
+How the **Generate** step creates the per-project foundation (autothing's Phase 1). Create **only the gaps** detection found (see `manifest.md`). Delegate; do not reinvent.
 
 **Git first:** if the repo is not already a git work tree, run `git init` + an initial commit before anything else — even for an existing non-git codebase. Flow-selection diffs (`walkthrough`), workflow `isolation: 'worktree'`, and rollback all depend on it.
 
@@ -13,12 +13,12 @@ How Phase 1 creates the per-project foundation. Create **only the gaps** Phase 0
 ## New-project bootstrap (only when the repo is empty/new)
 1. **Research brief** → invoke the `deep-research` skill with the product idea; save the synthesis to `docs/product-overview.md` as the seed. Skip for an existing codebase.
 2. **Prototype + design tokens** → invoke `frontend-design` (and `huashu-design` for hi-fi/interactive) to produce the prototype and the design tokens that become the design source of truth. Record its path in `docs/product-overview.md` and CLAUDE.md.
-3. **Repo** → init git if absent; create the standard dirs; do not scaffold the whole app here — slices build it in Phase 3.
+3. **Repo** → init git if absent; create the standard dirs; do not scaffold the whole app here — the build fills it in later (autothing's slice loop).
 
 ## Generating /docs
 - Copy each **missing** role's skeleton from `assets/docs/` into the project's `docs/`, filling placeholders from repo facts (package.json scripts, framework, paths) — not guesses. Keep each under its line budget.
 - For a role already **covered by an existing file**, do not create a duplicate — add a pointer to it in CLAUDE.md's reference list.
-- `architecture.md` and `decisions.md` are **living**: the build updates them as slices change structure or make decisions.
+- `architecture.md` and `decisions.md` are **living**: the build updates them as it changes structure or makes decisions.
 
 ## Generating the lean CLAUDE.md
 - If `CLAUDE.md` is **absent**, instantiate `assets/CLAUDE.md.template`: summary, stack, 2-3 IMPORTANT rules, design source of truth, definition of done, `@import` ONLY `docs/conventions.md` + `docs/governance.md`, reference the heavier docs by path, and fill the **routing index** with the actual generated skill names.

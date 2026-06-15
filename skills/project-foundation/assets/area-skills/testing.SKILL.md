@@ -5,7 +5,7 @@ description: Validate a slice of {{PROJECT}} by exploring the REAL running app f
 
 # {{PROJECT}}-testing
 
-<!-- REFERENCE EXEMPLAR authored for a Next.js workspaces + vitest + @playwright/test stack. autothing adapts: the frontmatter name, the commands below, and the paths — to the target project's detected stack. Procedure (verbs) lives here; bars (nouns) live in docs/governance.md, referenced by path, never duplicated. -->
+<!-- REFERENCE EXEMPLAR authored for a Next.js workspaces + vitest + @playwright/test stack. project-foundation adapts: the frontmatter name, the commands below, and the paths — to the target project's detected stack. Procedure (verbs) lives here; bars (nouns) live in docs/governance.md, referenced by path, never duplicated. -->
 
 Definition of done for the bars this skill gates: `docs/governance.md`.
 
@@ -31,7 +31,7 @@ The correctness gate must be a durable artifact checked into the repo — NOT ep
 - SSO/connection-gated automations: reuse the stored session/connection; never inline tenant secrets.
 
 ### 4. Run the gates and report exit codes
-Run each and capture its exit code (autothing records these into `gate-status.json`):
+Run each and capture its exit code (the build orchestrator records these into `gate-status.json`):
 ```
 npx playwright test e2e/<slice>.spec.ts   # e2e + console-error assertions
 npm run test -w <workspace>               # vitest unit
@@ -44,6 +44,6 @@ Print a one-line summary per gate: `GATE <name>: exit <code> — <summary>`.
 ### 5. On failure: fix forward, bounded
 - Diagnose, fix the app (or the test if the test was wrong), re-explore the changed path, re-run. **Up to 5 attempts** on the slice.
 - Keep build/typecheck/lint green throughout — a green test with a broken build is not done.
-- If still failing after the ceiling: log a blocker to `docs/decisions.md`, mark the slice `blocked` in `gate-status.json`, and let autothing continue. Never loop forever; never weaken an assertion to force green.
+- If still failing after the ceiling: log a blocker to `docs/decisions.md`, mark the slice `blocked` in `gate-status.json`, and let the build continue. Never loop forever; never weaken an assertion to force green.
 
 The committed, re-runnable, passing assertions — not vibes, not the screenshots, not the video — are the correctness gate.
