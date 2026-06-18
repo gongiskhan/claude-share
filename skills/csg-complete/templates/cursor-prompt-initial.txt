@@ -1,0 +1,41 @@
+You are applying a pre-reviewed change set to this repository. Do NOT design,
+improve, refactor, reformat, or invent anything. Your only job is to recreate
+the change set EXACTLY as specified.
+
+The specification directory is: {SPEC_DIR}
+It contains:
+  - SPEC.md       : human-readable summary of the change set
+  - files\        : the EXACT final content of every added or modified file,
+                    stored at its repository-relative path. AUTHORITATIVE.
+  - deleted.list  : repository-relative paths that must be deleted (may be empty)
+  - changes.patch : a unified diff for CONTEXT ONLY. Do not apply it. If it
+                    seems to disagree with files\, files\ wins.
+
+The repository working tree has already been reset to the intended parent
+commit. Do the following, in this exact order:
+
+1. Create and switch to a new branch named exactly: {BRANCH}
+   (use: git checkout -b {BRANCH})
+
+2. For EVERY file under {SPEC_DIR}\files\, copy it byte-for-byte to the same
+   relative path inside this repository, overwriting what is there and creating
+   directories as needed. Do not edit, reformat, or "fix" anything in them.
+
+3. Delete from the repository every path listed in {SPEC_DIR}\deleted.list,
+   if there are any.
+
+4. From the repository root, run: {LINT_COMMANDS}
+   If a lint command fails, report the failure in your final output but CONTINUE.
+
+5. Stage ONLY the files you copied in step 2 and the paths you deleted in
+   step 3, using explicit paths (git add <path> ...). Do NOT use git add -A or
+   git add . — this repository contains unrelated untracked files that must not
+   be committed. Then create ONE commit whose message is EXACTLY this single
+   line, byte-exact:
+{COMMIT_MSG}
+
+6. Do NOT push. Do NOT create a pull request. Do NOT touch any file outside
+   the change set. Do NOT modify cookies.txt or any *.log file.
+
+7. Finally print: the current branch name, the output of
+   git log -1 --oneline, and the output of git status --porcelain.

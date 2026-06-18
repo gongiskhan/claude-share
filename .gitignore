@@ -56,6 +56,11 @@ mcp-needs-auth-cache.json
 policy-limits.json
 .last-cleanup
 .last-update-result.json
+skills/skill-improver/state/
+.serena/
+plugins/.last_inuse_sweep
+# externally-cloned third-party skill (its own git repo)
+skills/watch/
 
 # Misc
 *.zip

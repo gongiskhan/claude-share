@@ -169,7 +169,15 @@
       "Edit",
       "Write",
       "MultiEdit",
-      "NotebookEdit"
+      "NotebookEdit",
+      "mcp__codegraph__codegraph_explore",
+      "mcp__codegraph__codegraph_search",
+      "mcp__codegraph__codegraph_node",
+      "mcp__codegraph__codegraph_callers",
+      "mcp__codegraph__codegraph_callees",
+      "mcp__codegraph__codegraph_impact",
+      "mcp__codegraph__codegraph_files",
+      "mcp__codegraph__codegraph_status"
     ],
     "defaultMode": "auto"
   },
@@ -191,6 +199,46 @@
           {
             "type": "command",
             "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=Notification' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=Notification' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Notification' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Notification' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Notification' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
             "timeout": 5
           }
         ]
@@ -225,6 +273,46 @@
           {
             "type": "command",
             "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=PostToolUse' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=PostToolUse' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=PostToolUse' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=PostToolUse' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=PostToolUse' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
             "timeout": 5
           }
         ]
@@ -327,6 +415,46 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=Stop' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Stop' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Stop' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Stop' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -359,6 +487,46 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=UserPromptSubmit' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=UserPromptSubmit' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=UserPromptSubmit' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=UserPromptSubmit' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
       }
     ]
   },
@@ -366,16 +534,32 @@
     "type": "command",
     "command": "sh /Users/ggomes/.claude/statusline-command.sh"
   },
-  "advisorModel": "opus",
+  "enabledPlugins": {
+    "codex@openai-codex": true
+  },
+  "extraKnownMarketplaces": {
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    }
+  },
+  "effortLevel": "xhigh",
   "promptSuggestionEnabled": false,
+  "showClearContextOnPlanAccept": true,
   "autoMemoryEnabled": true,
   "autoDreamEnabled": true,
+  "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "theme": "light",
+  "showTurnDuration": true,
+  "terminalProgressBarEnabled": true,
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
+  "useAutoModeDuringPlan": true,
   "autoMode": {
     "environment": [
       "Organization: solo developer (Gonçalo, user: ggomes). No team collaborators, no shared infrastructure, no production systems that other people depend on. Primary use: software development, infrastructure automation, and personal-assistant agent work.",

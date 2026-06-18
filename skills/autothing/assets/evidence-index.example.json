@@ -42,6 +42,7 @@
     "build":             { "cmd": "npm run build --workspaces --if-present", "exit": null },
     "typecheck":         { "cmd": "npm run typecheck --workspaces --if-present", "exit": null },
     "lint":              { "cmd": "npm run lint -w ekoa", "exit": null },
+    "crossModel":        { "reviewAllApproved": false, "pwTestAllPassed": false },
     "designAudit":       { "verdict": null },
     "everySliceVideoVerified": false
   },
@@ -49,7 +50,8 @@
     "purpose": "Single durable handover index. Survives context compaction (autothing re-reads it to resume) and is the human-readable handover. NOTE: the /goal evaluator reads only the transcript — a small fast model that does not open files — so autothing must ALSO print the global-gate verdict into the conversation. This file is for resume + the human; the printed line is what the evaluator confirms.",
     "slices[].status": "passed | failed | blocked | in_progress  (mirrors that slice's gate-status.json)",
     "slices[].flagged": "true = honest-failure run (video shows it not working). Counts as recorded evidence, not a pass.",
-    "globalGate.status": "in_progress | passed | completed-with-blockers. 'passed' ONLY when every objective exit==0, verifyApp/designAudit verdict=='clean', AND everySliceVideoVerified==true. If buildable work is exhausted but any slice is blocked or its video is not verified, the terminal state is 'completed-with-blockers' (enumerated in the handover) — never reported as 'passed'.",
+    "globalGate.status": "in_progress | passed | completed-with-blockers. 'passed' ONLY when every objective exit==0, verifyApp/designAudit verdict=='clean', crossModel.reviewAllApproved && crossModel.pwTestAllPassed (every slice got a clean Codex 'approve' — not 'approve-with-override' — and a Codex Playwright 'pass'), AND everySliceVideoVerified==true. If buildable work is exhausted but any slice is blocked, its video is not verified, or it only reached 'approve-with-override', the terminal state is 'completed-with-blockers' (enumerated in the handover) — never reported as 'passed'.",
+    "globalGate.crossModel": "reviewAllApproved == every slice's Codex adversarial review ended in a clean 'approve'. pwTestAllPassed == every slice's independent Codex Playwright pass returned 'pass'. This is the two-model-agreement requirement. Codex calls are SERIAL run-wide (concurrent codex exec revokes the shared OAuth token).",
     "everySliceVideoVerified": "true ONLY when every non-skipped slice has gates.video.status == 'verified'. A 'failed-but-unblocking' video does NOT count as verified — it forces 'completed-with-blockers', matching the /goal condition 'a self-verified video exists for every slice'."
   }
 }

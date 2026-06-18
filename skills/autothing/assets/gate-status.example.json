@@ -12,6 +12,8 @@
     "lint":      { "cmd": "npm run lint -w ekoa",                          "exit": 0, "at": "2026-06-04T14:20:48Z", "summary": "clean" },
     "build":     { "cmd": "npm run build --workspaces --if-present",       "exit": 0, "at": "2026-06-04T14:21:40Z", "summary": "next build ok" },
     "e2e":       { "cmd": "npx playwright test e2e/sso-login.spec.ts",     "exit": 0, "at": "2026-06-04T14:21:55Z", "summary": "3 passed, 0 console errors" },
+    "codexReview": { "verdict": "approve", "rounds": 2, "by": "codex/gpt-5.5", "at": "2026-06-04T14:21:30Z", "lastReport": "docs/autothing/slices/sso-login/codex-review-sso-login-r2.json", "overrides": [] },
+    "codexPwTest": { "result": "pass", "by": "codex/gpt-5.5", "at": "2026-06-04T14:21:45Z", "report": "docs/autothing/slices/sso-login/codex-pwtest-sso-login.json" },
     "designAudit": { "verdict": "clean", "by": ["frontend-design", "polish-ui"], "at": "2026-06-04T14:22:02Z", "notes": "matched design tokens; fixed 2 spacing regressions during the audit" },
     "video":     { "status": "verified", "verifiedAt": "2026-06-04T14:22:09Z", "flagged": false, "link": "http://100.108.210.116:8099/ekoa/2026-06-04T142150/final.mp4", "runDir": ".walkthrough/runs/2026-06-04T142150" }
   },
@@ -21,6 +23,8 @@
     "status": "in_progress | passed | failed | blocked",
     "kind": "ui | automation | mixed  (drives testing strategy and walkthrough flow selection)",
     "gates.<objective>.exit": "process exit code; 0 == pass. The /goal evaluator can confirm gates from these without re-running them.",
+    "gates.codexReview.verdict": "approve | approve-with-override | needs-attention. The Codex adversarial-review loop result. 'approve' == both models agree. 'approve-with-override' == Codex still flagged but Claude rebutted each finding as a false positive (logged in overrides[] + docs/decisions.md); recorded honestly, keeps the global gate out of clean 'passed'. Run Codex calls SERIALLY — concurrent codex exec revokes the shared OAuth token.",
+    "gates.codexPwTest.result": "pass | fail  (Codex independently re-drove the running app through the acceptance with its own playwright skill — a second test pass that never saw Claude's committed test).",
     "gates.designAudit.verdict": "clean | issues  (subjective gate reduced to a written verdict + who produced it)",
     "gates.video.status": "verified | failed-but-unblocking | skipped. 'failed-but-unblocking' = walkthrough hit its retry ceiling (STUCK); log a blocker and CONTINUE, never wait for input.",
     "gates.video.flagged": "true if the run is an honest failure (the video shows it not working). An honestly-flagged run still records evidence; it does not fake success."

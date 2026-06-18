@@ -28,3 +28,14 @@ This is a solo developer machine (user: ggomes). There is no shared infrastructu
 - Direct (non-force) `git push` to `main`/`master` is expected and authorized on this solo machine — there is no PR-review workflow gating my own repos. When I say "commit and push", that includes pushing the current branch (often `main`) to its upstream without further confirmation.
 - Force-pushing to feature branches is fine. Force-pushing to `main`/`master` is not.
 - Auto-commits to the vault repo are expected.
+
+<!-- CODEGRAPH_START -->
+## CodeGraph
+
+In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the repo root), reach for it BEFORE grep/find or reading files when you need to understand or locate code:
+
+- **MCP tools** (when available): `codegraph_explore` answers most code questions in one call — the relevant symbols' verbatim source plus the call paths between them. `codegraph_node` returns one symbol's source + callers, or reads a whole file with line numbers. If the tools are listed but deferred, load them by name via tool search.
+- **Shell** (always works): `codegraph explore "<symbol names or question>"` and `codegraph node <symbol-or-file>` print the same output.
+
+If there is no `.codegraph/` directory, skip CodeGraph entirely — indexing is the user's decision.
+<!-- CODEGRAPH_END -->

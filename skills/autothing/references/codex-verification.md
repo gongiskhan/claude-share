@@ -1,0 +1,100 @@
+# Cross-model verification (Codex) — per-slice step 3
+
+A **second model** (OpenAI Codex, via the local `codex` CLI) independently checks each slice after Claude's own objective gates are green, BEFORE the design audit and the walkthrough video. Two sub-gates, run in this order:
+
+- **3A — Adversarial review loop:** Codex reviews the slice diff trying to break it; Claude fixes real findings and re-reviews; **iterate until both models agree the slice is good** (Codex returns `approve` AND Claude's objective gates are green).
+- **3B — Independent Playwright test pass:** Codex drives the *running* app through the slice acceptance with its own `playwright` skill (playwright-cli) — a fresh functional pass that never saw Claude's committed test, so it catches "the code and its test share the same wrong assumption."
+
+The point is genuine cross-model agreement: one model writes + tests, a different model adversarially reviews + re-drives. A slice is correctness-done only when **both** agree.
+
+## Why the CLI, not `/codex:adversarial-review`
+The `codex` plugin's slash commands are `disable-model-invocation: true` — a skill running autonomously **cannot** trigger them. autothing therefore drives `codex exec` directly (self-contained, no dependency on the plugin's `${CLAUDE_PLUGIN_ROOT}`). The plugin is still useful to the operator interactively; autothing just doesn't route through it.
+
+## SERIALIZE every Codex call — hard rule (empirically required)
+Codex uses one shared ChatGPT OAuth token. **Two `codex exec` processes running at the same time rotate and REVOKE that refresh token** ("your refresh token was revoked. Please log out and sign in again") — which then kills the gate for the rest of the run. So:
+- Never run 3A and 3B concurrently; never run two slices' Codex calls concurrently.
+- When slices are parallelized (agent teams / workflows), the Codex gate is **not** parallel: funnel all Codex calls through one serialized step, exactly like the shared dev-serve / bundle / `walkthrough` recorder (see the parallelism section of `build-loop.md` and the `parallel-work` skill). One Codex call in flight at a time, run-wide.
+
+## Always redirect Codex stdin from /dev/null — hard rule (empirically required)
+`codex exec` reads stdin when it is not a TTY. In any non-interactive / piped context (a skill's Bash call, a background task) it will otherwise **block forever on "Reading additional input from stdin..."**. Every invocation below ends with `</dev/null`. Capture the structured result via `--output-last-message <file>` and read that file — do NOT pipe Codex stdout into `tail`/`head` (the pipe re-triggers the stdin-read hang and can truncate the JSONL).
+
+## Preflight — once per run (do it in Phase 1, re-check on first use)
+```bash
+codex --version            # present?
+codex login status         # must print "Logged in ..."
+```
+- **Missing binary** → self-unblock per the standard rule: `npm i -g @openai/codex`, then re-check. Only a FAILED install is a blocker.
+- **Not logged in / token revoked** → this needs operator credentials (`codex login` is interactive / opens a browser); a skill cannot do it. This is a **legitimate external blocker for the cross-model gate** — and `codex login status` can falsely report "Logged in" while `codex exec` still 401s, so confirm with a trivial serial `codex exec -c model_reasoning_effort=low 'reply OK'` during preflight. If exec genuinely fails, log a blocker in `docs/decisions.md` naming the exact failed command (`codex login` / the 401), mark affected slices accordingly, and let the global gate fall to `completed-with-blockers`. **Never silently skip the cross-model gate and report a slice `passed`** — a missing second opinion is an unmet gate, not a clean pass.
+
+## 3A — Adversarial review loop (read-only)
+Capture the slice's base commit BEFORE editing the slice (`BASE=$(git rev-parse HEAD)`), so the review sees exactly the slice's changes. Each round:
+
+```bash
+codex exec -s read-only --skip-git-repo-check -C "<projectDir>" \
+  --output-schema "<autothingAssets>/codex-review.schema.json" \
+  --output-last-message "<runDir>/codex-review-<slice>-r<round>.json" \
+  "You are doing an ADVERSARIAL review of slice '<slice>'. Inspect ONLY its changes:
+   run \`git --no-pager diff <BASE>...HEAD\` and \`git --no-pager diff\` (uncommitted).
+   Slice acceptance: <acceptance>.
+   Find the strongest MATERIAL reasons this should not ship (auth/tenant isolation, data loss,
+   rollback/idempotency, races, empty/null/timeout paths, schema/version skew, observability gaps).
+   Return ONLY JSON matching the schema. verdict=approve only if you cannot support any material,
+   defensible finding from the diff; otherwise needs-attention with grounded findings." </dev/null
+```
+Then read the JSON (`verdict`, `findings[]`):
+- **`approve`** → 3A passes. Both models agree.
+- **`needs-attention`** → triage each finding:
+  - **Real & material** → fix forward, re-run the objective gates (these fixes consume the slice's 5-attempt ceiling from step 2), then run the next review round.
+  - **Demonstrably a false positive / not applicable** → write a one-line rebuttal (file:line + why it does not apply).
+- **Loop ceiling: 3 review rounds.** Re-review after each fix. If Codex still returns `needs-attention` after 3 rounds:
+  - any finding still real-and-unfixed → the slice is NOT correctness-done; treat like a failing gate (keep fixing within the slice ceiling, or `blocked` only via the genuine-external-blocker path). Do not print `approve`.
+  - all remaining findings rebutted as false positives → **appeal valve**: record the per-finding rebuttals in `docs/decisions.md` and in `gate-status.codexReview.overrides`, set verdict `approve-with-override`. This is logged and visible; it is NOT a silent override and does NOT count as a clean `approve` for the global gate (see below).
+
+## 3B — Independent Playwright test pass (functional)
+The dev server is already up from step 1 (testing skill, known port). Codex drives the live app itself:
+
+```bash
+codex exec -s workspace-write -c sandbox_workspace_write.network_access=true \
+  --skip-git-repo-check -C "<projectDir>" \
+  --output-schema "<autothingAssets>/codex-pwtest.schema.json" \
+  --output-last-message "<runDir>/codex-pwtest-<slice>.json" \
+  "Use your playwright skill (the playwright-cli wrapper) to INDEPENDENTLY test the running app
+   at <devUrl> for slice '<slice>'. Acceptance: <acceptance>.
+   Open the page, snapshot for refs, exercise the flow (click/fill/navigate), re-snapshot, and
+   ASSERT the acceptance actually held. Watch for console errors. Return ONLY JSON per schema:
+   result=pass only if every acceptance assertion held with no console error, else fail with what you saw." </dev/null
+```
+- Browser automation needs localhost network + a browser process. The flags above (workspace-write + `network_access=true`) are the principled choice on this trusted solo machine. If the browser cannot reach localhost in your environment, escalate that one call to `-s danger-full-access` (still non-interactive). Validate this at first real use.
+- Read the JSON (`result`, `failures[]`):
+  - **`pass`** → 3B passes.
+  - **`fail`** with a real defect → fix forward, re-run Claude's objective gates AND re-run 3B (consumes the slice ceiling). A flaky/env failure (not a product defect) is re-run, not counted as a fix-attempt.
+
+## What "both models agree" means
+3A `approve` (or `approve-with-override`) AND 3B `pass` AND Claude's own step-2 gates green. Only then does the slice advance to the design audit. A slice that reaches the global gate on an `approve-with-override` is recorded honestly and keeps the global gate out of clean `passed` (like a `flagged` video does) — it forces `completed-with-blockers` unless later resolved to a true `approve`.
+
+## Durable record (add to the slice's gate-status.json — schema in assets/gate-status.example.json)
+```jsonc
+"codexReview": {
+  "verdict": "approve",            // approve | approve-with-override | needs-attention
+  "rounds": 2,                     // review rounds run
+  "by": "codex/gpt-5.5",
+  "at": "<iso>",
+  "lastReport": "docs/autothing/slices/<slice>/codex-review-<slice>-r2.json",
+  "overrides": []                  // per-finding rebuttals when verdict is approve-with-override
+},
+"codexPwTest": {
+  "result": "pass",               // pass | fail
+  "by": "codex/gpt-5.5",
+  "at": "<iso>",
+  "report": "docs/autothing/slices/<slice>/codex-pwtest-<slice>.json"
+}
+```
+And in `evidence-index.json` `globalGate`, add `crossModel: { reviewAllApproved: <bool>, pwTestAllPassed: <bool> }`.
+
+## Printed lines (the transcript-only /goal evaluator can only confirm what is printed)
+Per slice, after 3A/3B, print:
+```
+GATE codex-review: <approve|approve-with-override|needs-attention(r<n>)> — <summary>
+GATE codex-pwtest: <pass|fail> — <summary>
+```
+And fold both into the global-gate line in `build-loop.md` Phase 4 (`codexReview:<approved>/<total> codexPwTest:<passed>/<total>`).

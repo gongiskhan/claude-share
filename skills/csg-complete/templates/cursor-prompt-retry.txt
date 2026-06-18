@@ -1,0 +1,30 @@
+A previous attempt at applying a pre-reviewed change set in this repository was
+incomplete. You are fixing ONLY the residual problems listed below. Do NOT
+design, improve, refactor, or invent anything.
+
+Stay on the current branch: {BRANCH} (do NOT create a new branch).
+The specification directory is: {SPEC_DIR}
+{SPEC_DIR}\files\ holds the EXACT final content of every added or modified
+file at its repository-relative path. AUTHORITATIVE.
+
+Residual problems to fix, and nothing else:
+{RESIDUAL}
+
+Instructions:
+- For every path above marked as a content mismatch or missing from the commit:
+  copy {SPEC_DIR}\files\<path> byte-for-byte to <path> in the repository.
+- For every path above marked "must be deleted": delete it from the repository.
+- Touch nothing else.
+
+Then stage exactly those paths with explicit git add <path> commands (never
+git add -A or git add .) and amend the existing commit:
+  git commit --amend --no-edit
+If the residual list says the commit message is wrong, amend it to be EXACTLY
+this single line instead:
+  git commit --amend -m "{COMMIT_MSG}"
+
+Do NOT push. Do NOT create a pull request. Do NOT modify cookies.txt or any
+*.log file.
+
+Finally print: the current branch name, the output of git log -1 --oneline,
+and the output of git status --porcelain.
