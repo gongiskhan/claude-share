@@ -181,6 +181,7 @@
     ],
     "defaultMode": "auto"
   },
+  "model": "haiku",
   "hooks": {
     "Notification": [
       {
@@ -209,6 +210,26 @@
           {
             "type": "command",
             "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=Notification' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Notification' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Notification' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
             "timeout": 5
           }
         ]
@@ -316,6 +337,26 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=PostToolUse' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=PostToolUse' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PreCompact": [
@@ -324,7 +365,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ -f \"$HOME/.claude/memory-compiler/hooks/pre-compact.py\" ] && uv run --directory \"$HOME/.claude/memory-compiler\" python hooks/pre-compact.py || true",
+            "command": "BASIC_MEMORY_VAULT_DIR=\"/Users/ggomes/ObsidianVault\" BASIC_MEMORY_MEMORY_DIR=\"Memory\" python3 \"/Users/ggomes/.claude/basic-memory/capture-session.py\"",
             "timeout": 10
           }
         ]
@@ -344,16 +385,6 @@
     ],
     "SessionEnd": [
       {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -f \"$HOME/.claude/memory-compiler/hooks/session-end.py\" ] && uv run --directory \"$HOME/.claude/memory-compiler\" python hooks/session-end.py || true",
-            "timeout": 10
-          }
-        ]
-      },
-      {
         "matcher": "*",
         "hooks": [
           {
@@ -362,16 +393,14 @@
             "timeout": 10
           }
         ]
-      }
-    ],
-    "SessionStart": [
+      },
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "[ -f \"$HOME/.claude/memory-compiler/hooks/session-start.py\" ] && uv run --directory \"$HOME/.claude/memory-compiler\" python hooks/session-start.py || true",
-            "timeout": 15
+            "command": "BASIC_MEMORY_VAULT_DIR=\"/Users/ggomes/ObsidianVault\" BASIC_MEMORY_MEMORY_DIR=\"Memory\" python3 \"/Users/ggomes/.claude/basic-memory/capture-session.py\"",
+            "timeout": 10
           }
         ]
       }
@@ -422,6 +451,26 @@
           {
             "type": "command",
             "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7081/_hook?event=Stop' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Stop' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Stop' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
             "timeout": 5
           }
         ]
@@ -527,6 +576,26 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=UserPromptSubmit' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=UserPromptSubmit' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
       }
     ]
   },
@@ -562,11 +631,11 @@
   "useAutoModeDuringPlan": true,
   "autoMode": {
     "environment": [
-      "Organization: solo developer (Gonçalo, user: ggomes). No team collaborators, no shared infrastructure, no production systems that other people depend on. Primary use: software development, infrastructure automation, and personal-assistant agent work.",
-      "Development roots: ~/dev and ~/Projects are canonical development roots. They are symlinked to each other on every machine — on some machines ~/dev points to ~/Projects, on others the reverse, so the same repository may resolve via either path. Both are equally trusted. All projects under either path are owned by the user.",
+      "Organization: solo developer (Gon\u00e7alo, user: ggomes). No team collaborators, no shared infrastructure, no production systems that other people depend on. Primary use: software development, infrastructure automation, and personal-assistant agent work.",
+      "Development roots: ~/dev and ~/Projects are canonical development roots. They are symlinked to each other on every machine \u2014 on some machines ~/dev points to ~/Projects, on others the reverse, so the same repository may resolve via either path. Both are equally trusted. All projects under either path are owned by the user.",
       "Key projects: Harmonika (~/dev/harmonika-all or ~/Projects/harmonika-all), Ekus (~/dev/ekus or ~/Projects/ekus), Ekoa OS (~/dev/ekoa-dev or ~/Projects/ekoa-dev), Next Border (~/dev/next-border or ~/Projects/next-border), Maestric (~/dev/maestric or ~/Projects/maestric).",
       "Source control: GitHub org github.com/gongiskhan and all repos under it. Force-push to feature branches is routine; force-push to main/master is not.",
-      "Claude Code configuration: ~/.claude and all subdirectories (agents, commands, skills, plugins, memory-compiler, architectus-marketplace, projects) are actively developed by the user. Edits there are routine.",
+      "Claude Code configuration: ~/.claude and all subdirectories (agents, commands, skills, plugins, basic-memory, architectus-marketplace, projects) are actively developed by the user. Edits there are routine.",
       "Canonical memory store: the Obsidian vault at ~/dev/ekus/obsidian-vault/ (or ~/Projects/ekus/obsidian-vault/) is the single source of truth for cross-session memory. It is written to frequently by automation, hooks, the memory compiler, the Harmonika orchestrator, and manual dev sessions. It has its own git via obsidian-git and auto-commits are expected. Writes to it from any working directory are expected.",
       "Orchestration pattern: the Harmonika Chat tab runs an Anthropic Agent SDK orchestrator that delegates real work to tmux Claude Code worker sessions named harmonika-orch-<taskId>. Creating, sending keys to, capturing output from, and killing these tmux sessions is expected behavior.",
       "Always-on services: Ekus runs as a long-lived personal assistant on the Mac Mini via launchctl asuser. Interacting with its launchd job is expected. Ralph-loop prompting (/ralph-loop:ralph-loop) spawns agent teams for long iterative tasks.",

@@ -68,3 +68,7 @@ __pycache__/
 *.pyc
 /.idea
 /remote/remote-server.log
+
+# Basic Memory migration artifacts (local only)
+memory-compiler-archive-*.tar.gz
+settings.json.bak-*
