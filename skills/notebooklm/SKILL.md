@@ -13,8 +13,10 @@ Complete programmatic access to Google NotebookLM—including capabilities not e
 
 **From PyPI (Recommended):**
 ```bash
-pip install notebooklm-py
+pip install "notebooklm-py[browser]"   # the [browser] extra is required for `notebooklm login`
+playwright install chromium            # the login step drives a real Chromium for Google OAuth
 ```
+> The browser-based `notebooklm login` (below) needs Playwright + Chromium. Installing plain `notebooklm-py` **without** the `[browser]` extra leaves login failing with *"Playwright not installed."* If the CLI was installed in an isolated environment (e.g. `pipx`), install the extra **into that same environment** — there is no global `pip` to fall back on (`pipx install --force "notebooklm-py[browser]"`, then `playwright install chromium` from that venv).
 
 **From GitHub (use latest release tag, NOT main branch):**
 ```bash
