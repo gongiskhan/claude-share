@@ -1,7 +1,7 @@
 ---
 name: autothing
-description: Set up and then autonomously build a web project (NEW or EXISTING) to a hard quality bar with self-verified video evidence. EXPLICIT-INVOCATION ONLY — run when the operator launches an unattended build with /effort ultracode, auto mode, and an active /goal. Idempotently bootstraps a per-project foundation (lean root CLAUDE.md + routing index, living /docs, area-skills under the project's .claude/skills/), plans slices in docs/FLOW_PLAN.md, then builds each slice through gates — vision-first exploration, Playwright + unit tests written AFTER exploring (the correctness gate), clean build/typecheck/lint, cross-model verification (an OpenAI Codex adversarial-review loop that iterates until both models agree + an independent Codex Playwright test pass), a design audit, and a self-verified walkthrough evidence video — writing durable gate-status + evidence-index files the /goal evaluator can confirm. Invoke for "set up and build this project", "autonomously implement to done with proof", or to resume such a build. Delegates research, prototype, run/verify, video, and design audit to existing skills; never fakes a gate.
-disable-model-invocation: true
+description: Set up and then autonomously build a WHOLE web project (NEW or EXISTING) end-to-end to a hard quality bar with self-verified video evidence. Use when the task is to build, scaffold, or ship an ENTIRE web app/site/dashboard from a brief — not a single feature, a bugfix, or a non-web task. Plans itself (invokes the autothing-plan skill, reproducing plan mode), idempotently bootstraps a per-project foundation (lean root CLAUDE.md + routing index, living /docs, area-skills under the project's .claude/skills/), plans slices in docs/FLOW_PLAN.md, then builds each slice through gates — vision-first exploration, Playwright + unit tests written AFTER exploring (the correctness gate), clean build/typecheck/lint, cross-model Codex verification (an adversarial-review loop until both models agree + an independent Codex Playwright pass), a design audit, and a self-verified walkthrough evidence video — writing durable gate-status + evidence-index files. Loops to completion on its own via the goal-loop Stop hook (no manual /goal needed). Best run under /effort ultracode + auto mode. Triggers on "set up and build this project", "build me a whole web app end-to-end with proof", or resuming such a build. Delegates research, prototype, run/verify, video, and design audit to existing skills; never fakes a gate.
+effort: xhigh
 ---
 
 # autothing
@@ -9,46 +9,54 @@ disable-model-invocation: true
 Orchestrates an unattended, gated build of a web project and proves each slice with a self-verified video. This skill is USER-scope; the foundation it writes is PROJECT-scope (inside the target repo). The `walkthrough` skill is SEPARATE — call it, never rebuild it.
 
 ## Operating assumptions (the operator sets these; autothing cannot set session switches)
-- Launched under **/effort ultracode + auto mode + an active /goal** whose condition is the global gate (including "a self-verified evidence video exists for every slice") plus a turn cap.
-- autothing **cannot set `/goal` itself** — no Claude Code mechanism lets a skill set a session goal — so its FIRST output is the exact `/goal` line for the operator to paste (see *On invocation* below). `/effort` and auto mode are session toggles the operator flips once.
+- Launched under **/effort ultracode + auto mode**. The goal loop is **armed automatically** by autothing's Phase 0 run sentinel + the goal-loop `Stop` hook in `settings.json` (`hooks/goal-stop.sh`) — **no manual `/goal` needed**. The completion condition is the global gate (including "a self-verified evidence video exists for every slice") plus a turn cap.
+- autothing **arms its own goal loop** (Phase 0 writes the run sentinel; the `Stop` hook keeps the session taking turns until the terminal `GLOBAL GATE:` verdict prints, then deletes the sentinel and releases the session). It STILL prints the equivalent `/goal` line as an **optional operator fallback** (the hook keys on the verdict's `videos:<n>/<n>` signature, so that quoted line never false-triggers). `/effort` and auto mode are session toggles the operator flips once; autothing cannot set them. **`effort: xhigh` is pinned in frontmatter; ultracode is the operator's choice (`/effort ultracode`) — autothing does not self-escalate to it.**
 - **Parallelism (optional, operator-set):** if `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set, prefer **agent teams** for parallel slice implementation; otherwise use **dynamic workflows**. autothing cannot enable that env var itself. See the **`parallel-work`** skill.
 - Therefore behave **fully autonomously**: never pause for approval, never ask the user, fix forward, log blockers and continue.
-- **Trade-off (noted):** no `allowed-tools` restriction — it both sets up and builds, so it may use any tool. That is why it is explicit-invocation-only and operator-gated.
+- **Trade-off (noted):** no `allowed-tools` restriction — it both sets up and builds, so it may use any tool. It is now **dual-mode** (slash- AND model-auto-invocable); the safety boundary is its own gates — its first real phase is read-only planning (`autothing-plan`) + writing the run sentinel, so auto-starting is not immediately destructive. **Optional operator hardening (documented, NOT built):** a single `UserPromptSubmit` hook that *suggests* autothing on matching prompts, if auto-trigger ever proves flaky — add it deliberately; do not rely on it by default.
 
 ## Owns vs delegates
-- **Owns:** slice planning (Phase 2), the gated build loop (including orchestration of the Codex cross-model gate), and durable evidence (gate-status + evidence-index).
-- **Delegates (do not reimplement):** foundation detect + scaffold → **`project-foundation`**; how to parallelize → **`parallel-work`**; non-UI automation slices → **`automation-testing`**; cross-model adversarial review + independent second test pass → the **`codex` CLI** (OpenAI Codex + its `playwright` skill) per `references/codex-verification.md`; research → `deep-research`; prototype/design tokens → `frontend-design`, `huashu-design`; run/verify → `/run`, `/verify`; per-slice evidence video → `walkthrough`; design audit → `frontend-design`, `polish-ui`, `huashu-design`.
+- **Owns:** arming the goal loop (Phase 0 sentinel), the gated build loop (including orchestration of the Codex cross-model gate), and durable evidence (gate-status + evidence-index).
+- **Delegates (do not reimplement):** planning / reproducing plan mode → **`autothing-plan`** (Phase 1, writes `docs/FLOW_PLAN.md`); foundation detect + scaffold → **`project-foundation`**; how to parallelize → **`parallel-work`**; non-UI automation slices → **`automation-testing`**; cross-model adversarial review + independent second test pass → the **`codex` CLI** (OpenAI Codex + its `playwright` skill) per `references/codex-verification.md`; research → `deep-research`; prototype/design tokens → `frontend-design`, `huashu-design`; run/verify → `/run`, `/verify`; per-slice evidence video → `walkthrough`; design audit → `frontend-design`, `polish-ui`, `huashu-design`.
 
 ## Workflow
 
-### On invocation — FIRST, print the operator handoff
-You cannot set `/goal` yourself, so before any work print the one line the operator pastes to run you unattended. Fill `<project>` from the repo; pick a turn cap (default **250**; scale to ≈20–30 turns × expected slices for large builds). Print exactly:
+### On invocation — Phase 0: arm the goal loop, then print the (optional) handoff
+**FIRST action — arm the goal loop (Phase 0).** Pick a turn cap (default **250**; scale to ≈20–30 turns × expected slices for large builds). Write the run sentinel so the `Stop` hook (`hooks/goal-stop.sh`, registered in `settings.json`) loops the session to completion with **no manual `/goal`**:
+- `mkdir -p ~/.autothing`; read this session's id with `SID=$(cat ~/.autothing/current-session 2>/dev/null)` (written by `hooks/goal-sessionstart.sh`; empty is fine — the Stop hook binds on first fire).
+- Write `~/.autothing/goal-sentinel.json`:
+  ```json
+  { "runId": "autothing-<project>-<YYYYMMDDHHMMSS>", "sessionId": "<SID or empty>", "project": "<project>", "turnCap": 250, "iteration": 0, "armedAt": "<iso>", "condition": "loop until a terminal GLOBAL GATE line (with videos:<n>/<n>) prints for this run" }
+  ```
+  The hook releases the session the moment the terminal `GLOBAL GATE: … videos:<n>/<n>` verdict appears in the transcript, OR at the turn cap. It then deletes the sentinel.
+
+**Then print the operator handoff (optional fallback).** The hook now drives the loop, but print the equivalent `/goal` line for transparency and as a manual fallback. Fill `<project>` from the repo. Print exactly:
 
 ```
-─── OPERATOR: to run me unattended, set /effort ultracode + auto mode, then paste this one line ───
+─── OPERATOR: I auto-loop via the goal-loop Stop hook under /effort ultracode + auto mode. (Manual fallback — paste this /goal only if the hook is disabled.) ───
 /goal autothing has printed "GLOBAL GATE: passed" for <project> with buildable-remaining 0 and every slice video verified — OR it has printed "GLOBAL GATE: completed-with-blockers" in which buildable-remaining is 0 AND every listed blocker names an external cause and the exact remediation command that failed. A completed-with-blockers verdict with any buildable slice still open, or any blocker lacking a failed-remediation command, does NOT satisfy this goal. Stop after 250 turns regardless.
 ───────────────────────────────────────────────────────────────────────────────
 ```
 
-Then continue to Phase 0 immediately — do not wait for the operator. (The `/goal` they paste keeps the session taking turns until you print the `GLOBAL GATE:` verdict; its evaluator reads only the transcript, which is why that verdict is printed, not just written to file.)
+Then continue to Phase 1 immediately — do not wait for the operator. (Both the hook and any pasted `/goal` read ONLY the transcript, which is why the `GLOBAL GATE:` verdict is PRINTED, not just written to file. The quoted target above is NOT a verdict — it lacks the `videos:<n>/<n>` signature the hook keys on.)
 
-### Phase 0 — Detect (read-only)
+### Phase 1 — Plan (invoke `autothing-plan`)
+Invoke the **`autothing-plan`** skill (via the Skill tool) to reproduce native plan mode and write the durable plan to **`docs/FLOW_PLAN.md`** — pass that path. This **replaces the operator's old manual plan-mode step**. autothing-plan explores the brief + code with read-only `Explore` subagents, designs with `Plan` subagents, resolves open questions by deciding (never asking), then writes a concise slice plan: slices with id, title, kind (`ui | automation | mixed`), route, parallel group, acceptance, status (shape: `assets/docs/FLOW_PLAN.md`). It may name area skills that Phase 3 will create. If a current `docs/FLOW_PLAN.md` already exists and is current, autothing-plan reads + refreshes it rather than starting over. autothing-plan is read-only except the plan file and **never** calls `EnterPlanMode`/`ExitPlanMode`.
+
+### Phase 2 — Detect foundation (read-only)
 Invoke the **`project-foundation`** skill's detect step. It produces a gap list (`present | missing | partial` per manifest element) + a role map for existing docs + any refresh recommendations. **Detection never edits.**
 
-### Phase 1 — Bootstrap the gaps ONLY (a HARD prerequisite for Phase 3)
-Invoke the **`project-foundation`** skill to generate ONLY what Phase 0 marked missing/partial — it owns the manifest, `git init`, the non-clobber rule, the /docs + lean `CLAUDE.md` + area-skill generation (and carries those assets). autothing layers the build-specific gates on top:
-- **Do not enter Phase 3 until the foundation manifest is satisfied or each missing item is logged in `docs/decisions.md` with a reason** — a build will be tempted to skip ahead to the app; do not.
+### Phase 3 — Bootstrap the foundation gaps ONLY (a HARD prerequisite for Phase 4)
+Invoke the **`project-foundation`** skill to generate ONLY what Phase 2 marked missing/partial — it owns the manifest, `git init`, the non-clobber rule, the /docs + lean `CLAUDE.md` + area-skill generation (and carries those assets). autothing layers the build-specific gates on top:
+- **Do not enter Phase 4 until the foundation manifest is satisfied or each missing item is logged in `docs/decisions.md` with a reason** — a build will be tempted to skip ahead to the app; do not.
 - Area skills are NOT optional: they are what parallel teammates/workers load (they don't inherit the lead's context).
 - Confirm `/run` + `/verify` resolve and the dev command/port are known; ensure `walkthrough`'s preflight passes (`brew install asciinema agg` on macOS if missing).
 - Refresh/slim recommendations go to `docs/autothing/REFRESH-RECOMMENDATIONS.md`; never rewrite an existing canonical file.
 
-### Phase 2 — Plan
-Write/update `docs/FLOW_PLAN.md` (`assets/docs/FLOW_PLAN.md`): slices with id, title, kind (`ui | automation | mixed`), route, parallel group, acceptance, status. If it exists and is current, reuse it.
-
-### Phase 3 — Build loop
+### Phase 4 — Build loop
 Per `references/build-loop.md`. **Resume from durable files first** (FLOW_PLAN + gate-status + evidence-index), then for each non-done slice: explore (vision-first) → **write a COMMITTED, re-runnable test** + run it → objective gates (tests/e2e/typecheck/lint/build exit 0) → **cross-model verification (Codex adversarial-review loop iterating until both models agree + an independent Codex Playwright pass; `references/codex-verification.md`)** → design audit → `walkthrough` evidence → write `gate-status.json` + upsert `evidence-index.json`. Bounded retry **5**, fix-forward, log-and-continue. **Parallelize by default** where slices own disjoint files — **agent teams when enabled, else dynamic workflows** — and serialize only the shared runtime (one dev-serve / bundle / recorder). Decompose at plan time to EARN parallelism; log the parallel-vs-serial choice. See the **`parallel-work`** skill. Automation slices use the **`automation-testing`** skill. **Before the first parallel batch, preflight the mechanism:** probe once that agent-team creation does NOT raise an approval prompt under auto mode (a trivial throwaway team that proceeds, or the known approval behavior); if it would block a headless run, fall back to dynamic workflows for the whole run — an approval prompt that stalls unattended is itself a silent killer of autonomy.
 
-### Phase 4 — Global gate + handover
+### Phase 5 — Global gate + handover
 Per `references/build-loop.md`. **A verdict line MAY NOT be printed while `buildable-remaining > 0`** — `buildable-remaining` = count of slices whose status is neither `passed` nor `blocked` (and `blocked` only counts when it carries the attempted-remediation evidence from the non-negotiables). If it is > 0, the run returns to the per-slice loop and builds the next buildable slice. Decide the terminal state and write `globalGate.status` to `evidence-index.json`:
 - **`passed`** only when **buildable-remaining == 0**, zero blockers, full e2e + `/verify` + build/typecheck/lint exit 0, **every slice has a clean Codex `approve` + Codex Playwright `pass`** (two-model agreement), the design audit is clean, AND **every slice's video is `verified`** (matching the `/goal` condition).
 - **`completed-with-blockers`** legitimate ONLY when **buildable-remaining == 0** AND ≥1 slice is `blocked` with a named external cause + the exact remediation command that failed. (A `failed-but-unblocking` video is recorded evidence but is NOT self-verified, so it keeps the gate out of `passed`.)
@@ -75,19 +83,23 @@ Never claim a gate passed without both its file trace and its printed line.
 - **Honest**: a failing slice is shown failing and flagged, never edited to look passed.
 - **Cross-model gate is real, serial, and never silently skipped.** Every slice gets a second opinion from Codex — an adversarial review loop that iterates until both models agree (`approve`) and an independent Codex Playwright pass — before its design audit. **Serialize all Codex calls** (one `codex exec` at a time, run-wide; concurrent calls revoke the shared OAuth token). If Codex is missing, self-unblock the install; if `codex login` genuinely fails, that is an external blocker for the gate — log it and let the global gate fall to `completed-with-blockers`, never report a slice `passed` without its second opinion. Full recipe: `references/codex-verification.md`.
 - **The correctness gate is a COMMITTED, re-runnable assertion** — a test file, or (where no runner ships, e.g. a Cortex/artifact bundle) a committed `playwright-cli` driver script that re-drives the flow and asserts. Ephemeral `.playwright-cli/` logs and the walkthrough video are EXPLORATION/EVIDENCE, never the gate. No committed re-runnable assertion ⇒ the slice is not done. (Resolves the tension with the `e2e-testing` skill: drive with playwright-cli, but COMMIT the driver + assertions so later slices catch regressions.)
-- **Foundation + git before build** — Phase 1 via `project-foundation` (lean CLAUDE.md, the docs, area skills, `git init`) is a hard prerequisite for Phase 3; a gap is filled or logged with a reason, never silently skipped.
+- **Foundation + git before build** — Phase 3 via `project-foundation` (lean CLAUDE.md, the docs, area skills, `git init`) is a hard prerequisite for Phase 4; a gap is filled or logged with a reason, never silently skipped.
 - **Workers/teammates get explicit context** — they do not inherit the lead's history; paste the relevant skill/doc + acceptance + file-ownership boundary into each spawn prompt.
 - **Record build friction as a signal — autothing never self-edits.** When you work around the skill being silent, missing a step, or wrong, append one line to `docs/autothing/friction-log.md`. autothing does NOT act on it and never edits any skill; the nightly `skill-improver` is the single mechanism that improves skills, and it reads this log as one feedback source.
 
 ## Files (autothing owns)
-- `references/build-loop.md` — the per-slice gated loop, resume, the global gate, handover. The core.
+- `references/build-loop.md` — the per-slice gated loop, resume, the global gate, handover. The core. Includes the **lead-print invariant** ("Gate lines must print in the lead context") the goal-loop hook depends on.
 - `references/codex-verification.md` — the Codex cross-model gate: preflight/auth, the serial-call rule, the adversarial-review loop, the independent Playwright pass, durable record + printed lines.
-- `assets/docs/FLOW_PLAN.md` — the Phase-2 slice-plan skeleton.
+- `references/decisions.md` — autothing's own design-decision log (e.g. the ULTRACODE-SAFE test record behind the lead-print invariant).
+- `hooks/goal-stop.sh` — the goal-loop `Stop` hook (deterministic, no model call): blocks the stop until the terminal `GLOBAL GATE: … videos:<n>/<n>` verdict prints for the armed run, then releases. Registered in `settings.json`.
+- `hooks/goal-sessionstart.sh` — `SessionStart` guard: records the session id (`~/.autothing/current-session`) and clears a stale sentinel from a different session. Registered in `settings.json`.
+- `assets/docs/FLOW_PLAN.md` — the Phase-1 slice-plan skeleton (written via `autothing-plan`).
 - `assets/gate-status.example.json` + `assets/evidence-index.example.json` — the durable-marker schemas (incl. `codexReview` / `codexPwTest` / `crossModel`).
 - `assets/codex-review.schema.json` + `assets/codex-pwtest.schema.json` — the JSON Schemas passed to `codex exec --output-schema` for the two sub-gates.
 
 ## Delegated skills (separate skills — invoke, never reimplement; each is usable on its own)
-- **`project-foundation`** — Phase 0 detect + Phase 1 scaffold: manifest/idempotency, /docs, lean CLAUDE.md, area skills, `git init`. Carries the doc/CLAUDE.md/area-skill assets.
-- **`parallel-work`** — Phase 3 parallelization: agent teams vs workflows vs serial, disjoint-file decomposition, what must serialize.
+- **`autothing-plan`** — Phase 1 planning: reproduces Claude Code plan mode (read-only `Explore` + `Plan` subagents, then a concise durable plan) WITHOUT the native `EnterPlanMode`/`ExitPlanMode` tools. Writes `docs/FLOW_PLAN.md`. Auto-invocable on its own.
+- **`project-foundation`** — Phase 2 detect + Phase 3 scaffold: manifest/idempotency, /docs, lean CLAUDE.md, area skills, `git init`. Carries the doc/CLAUDE.md/area-skill assets.
+- **`parallel-work`** — Phase 4 parallelization: agent teams vs workflows vs serial, disjoint-file decomposition, what must serialize.
 - **`automation-testing`** — validating + filming non-UI automation slices (M365 webhooks/SSO/listeners).
 - **`walkthrough`** — per-slice evidence video. **`deep-research`** / **`frontend-design`** / **`huashu-design`** / **`polish-ui`** — research, prototype, design audit. **`/run`** + **`/verify`** — drive the running app.

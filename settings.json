@@ -1,7 +1,8 @@
 {
   "cleanupPeriodDays": 365,
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_STOP_HOOK_BLOCK_CAP": "250"
   },
   "permissions": {
     "allow": [
@@ -181,7 +182,6 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "haiku",
   "hooks": {
     "Notification": [
       {
@@ -255,6 +255,17 @@
         ]
       },
       {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Notification' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "_garrison": "fitting:dev-env",
         "matcher": "",
         "hooks": [
           {
@@ -357,6 +368,17 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "_garrison": "fitting:dev-env",
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=PostToolUse' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PreCompact": [
@@ -378,6 +400,18 @@
           {
             "type": "command",
             "command": "bash '/Users/ggomes/.claude/hooks/herdr-agent-state.sh' working",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/ggomes/.claude/skills/autothing/hooks/goal-sessionstart.sh'",
             "timeout": 10
           }
         ]
@@ -406,6 +440,16 @@
       }
     ],
     "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/ggomes/.claude/skills/autothing/hooks/goal-stop.sh'",
+            "timeout": 10
+          }
+        ]
+      },
       {
         "matcher": "*",
         "hooks": [
@@ -496,6 +540,17 @@
         ]
       },
       {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=Stop' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "_garrison": "fitting:dev-env",
         "matcher": "",
         "hooks": [
           {
@@ -596,6 +651,17 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "_garrison": "fitting:dev-env",
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat 2>/dev/null); if [ -z \"$payload\" ]; then payload=\"{\\\"cwd\\\":\\\"$CLAUDE_PROJECT_DIR\\\"}\"; fi; curl -s -X POST 'http://127.0.0.1:7086/_hook?event=UserPromptSubmit' -H 'Content-Type: application/json' -d \"$payload\" > /dev/null 2>&1 || true",
+            "timeout": 5
+          }
+        ]
       }
     ]
   },
@@ -631,8 +697,8 @@
   "useAutoModeDuringPlan": true,
   "autoMode": {
     "environment": [
-      "Organization: solo developer (Gon\u00e7alo, user: ggomes). No team collaborators, no shared infrastructure, no production systems that other people depend on. Primary use: software development, infrastructure automation, and personal-assistant agent work.",
-      "Development roots: ~/dev and ~/Projects are canonical development roots. They are symlinked to each other on every machine \u2014 on some machines ~/dev points to ~/Projects, on others the reverse, so the same repository may resolve via either path. Both are equally trusted. All projects under either path are owned by the user.",
+      "Organization: solo developer (Gonçalo, user: ggomes). No team collaborators, no shared infrastructure, no production systems that other people depend on. Primary use: software development, infrastructure automation, and personal-assistant agent work.",
+      "Development roots: ~/dev and ~/Projects are canonical development roots. They are symlinked to each other on every machine — on some machines ~/dev points to ~/Projects, on others the reverse, so the same repository may resolve via either path. Both are equally trusted. All projects under either path are owned by the user.",
       "Key projects: Harmonika (~/dev/harmonika-all or ~/Projects/harmonika-all), Ekus (~/dev/ekus or ~/Projects/ekus), Ekoa OS (~/dev/ekoa-dev or ~/Projects/ekoa-dev), Next Border (~/dev/next-border or ~/Projects/next-border), Maestric (~/dev/maestric or ~/Projects/maestric).",
       "Source control: GitHub org github.com/gongiskhan and all repos under it. Force-push to feature branches is routine; force-push to main/master is not.",
       "Claude Code configuration: ~/.claude and all subdirectories (agents, commands, skills, plugins, basic-memory, architectus-marketplace, projects) are actively developed by the user. Edits there are routine.",
@@ -646,5 +712,6 @@
       "Cross-repo work is routine: Harmonika, Ekus, Ekoa OS, and the vault are edited in the same session constantly. Writes that span multiple projects under ~/dev or ~/Projects are not suspicious.",
       "Portability note: this settings file is versioned and deployed to multiple machines (Mac Mini primary, MacBook secondary). That is why both ~/dev and ~/Projects path prefixes appear throughout."
     ]
-  }
+  },
+  "model": "opus[1m]"
 }

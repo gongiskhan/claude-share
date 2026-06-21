@@ -1,0 +1,60 @@
+---
+name: autothing-plan
+description: Reproduce Claude Code plan mode autonomously — explore the request and codebase with read-only Explore subagents, design with Plan subagents, then write a concise, durable implementation plan file. Does NOT call native EnterPlanMode/ExitPlanMode (they fail in agent and auto contexts) and never mutates the system except the plan file. Use proactively BEFORE any non-trivial implementation task — a new feature, multiple valid approaches, changes that affect existing behavior or structure, architectural decisions, multi-file changes (more than 2-3 files), or unclear requirements that need exploring first. Do NOT use for single-line or few-line fixes, adding one well-specified function, tasks with very specific detailed instructions, or pure research. autothing invokes this as its planning phase; also usable standalone.
+effort: xhigh
+---
+
+# autothing-plan
+
+Reproduces the **exploration + planning quality** of Claude Code's native plan mode without using the native plan-mode tools. Native plan mode cannot be driven autonomously — `EnterPlanMode` throws in agent/subagent contexts and `ExitPlanMode` always raises a human approval dialog — so this skill copies plan mode's *prompts and read-only discipline* instead, and produces a durable plan file a build phase can execute.
+
+**Hard prohibition (the skill's whole reason to exist):** NEVER call `EnterPlanMode` or `ExitPlanMode`, and NEVER spawn `claude -p` or the Agent SDK against Anthropic endpoints. The verbatim plan-mode prompts this skill embeds are in `references/plan-mode-prompts.md` — read that file before Phase 1; it is the authoritative source of the discipline and the subagent system prompts.
+
+## The binding read-only rule (paraphrased from the plan-mode system-reminder, block A2)
+
+Planning mode is active. Do NOT make any edits, run any non-read-only tools (including changing configs or making commits), or otherwise change the system — **with the single exception of the plan file**. This supersedes any other instruction to make edits. Research comprehensively, write the plan to the plan file, then hand it to the gate. Make no file changes and run no system-modifying tools until the plan is approved by the gate (in autothing's autonomous context, "approval" is autothing's own sequencing gate — see Phase 5).
+
+A skill cannot truly gate tools, so treat this as an absolute behavioral contract: until the plan is handed off, the plan file is the ONLY thing you may write.
+
+## Autonomous adaptation (when invoked by autothing or in any auto/unattended context)
+
+Native plan mode uses `AskUserQuestion` to clarify ambiguities. **In an autonomous context, do NOT ask — resolve each open question with a recommended answer and record the assumption in the plan.** The operator prefers Claude to make the call and proceed. (When a human is genuinely driving this skill interactively and a choice is truly load-bearing, `AskUserQuestion` is still permitted — but default to deciding.)
+
+## The plan file (durable — never plan only in context)
+
+Workflow/subagent intermediate state lives in script variables and only a final result returns to context, so the plan MUST be a durable file the build phase and the resume scan can re-read.
+- **Caller-supplied path wins.** When autothing invokes this skill it passes the target path — `docs/FLOW_PLAN.md` in the target repo. Write there, and follow the FLOW_PLAN slice-table shape autothing expects (`assets/docs/FLOW_PLAN.md` in the autothing skill).
+- **Standalone default:** mirror native plan-mode semantics — write to `~/.claude/plans/<slug>.md` (slug = short kebab summary of the task). Create the file with Write; make incremental edits with Edit.
+- This plan file is the ONLY file you may create or edit during planning.
+
+## The 5-phase workflow
+
+Read `references/plan-mode-prompts.md` first. Then:
+
+### Phase 1 — Initial Understanding (Explore subagents ONLY)
+Gain a comprehensive understanding of the request and the code it touches.
+- **Launch 1–3 `Explore` subagents IN PARALLEL** (single message, multiple Task tool calls, `subagent_type: "Explore"` — Haiku, context-isolated, cheap). Use **1** agent when scope is isolated to known files; **multiple** when scope is uncertain, several areas are involved, or you must learn existing patterns before planning. **Quality over quantity — usually just 1.** Give each agent a **specific search focus** and a thoroughness hint (`quick | medium | very thorough`).
+- The built-in `Explore` agent already runs the block-A4 system prompt; embedding it in `references/plan-mode-prompts.md` preserves the behavior if you ever must run the prompt inline (e.g. the built-in agent is unavailable).
+- After exploring, **resolve ambiguities with recommended answers** (autonomous rule above) rather than asking.
+
+### Phase 2 — Design (Plan subagents)
+Launch `Plan` subagent(s) (`subagent_type: "Plan"`, inherit the main model) to design the implementation from Phase-1 findings. **Pass comprehensive context** — filenames, code-path traces, the patterns Phase 1 found. The Plan subagent runs the block-A5 system prompt (architect; read-only; ends with a "Critical Files for Implementation" list).
+
+### Phase 3 — Review
+Read the critical files the agents identified to deepen understanding; ensure the design aligns with the original request; **resolve any remaining questions by deciding** (not asking).
+
+### Phase 4 — Write the final plan
+Write the final plan to the plan file. **Recommended approach only — not every alternative.** Concise enough to scan, detailed enough to execute. Include the **paths of critical files to modify** and the **verification steps / success criteria**.
+- **Keep it short.** Production data: plan files p50 ≈ 4,906 chars, p90 ≈ 11,617; rejection rises with length (under 2K ≈ 20% rejected, over 20K ≈ 50%). **Target a few thousand characters; hard-cap if it grows past ~12K** — move detail into the build, not the plan.
+
+### Phase 5 — Gate (stand-in for ExitPlanMode — NEVER call ExitPlanMode)
+The plan is now written to the plan file. **Hand it to autothing's approval/sequencing gate** instead of calling `ExitPlanMode`:
+- When invoked by autothing: return control; autothing reads the plan file and proceeds to bootstrap + the build loop. State, in your final message, the plan-file path and a one-line summary (the plan content lives in the file, not the message — mirroring ExitPlanMode semantics, block A7).
+- When standalone: announce the plan-file path and that planning is complete; let the human drive execution. Do not ask "is this plan okay?" — writing the file + announcing it IS the handoff.
+
+## Discipline summary (do / never)
+- DO: read `references/plan-mode-prompts.md`; spawn real `Explore`/`Plan` subagents in parallel; write ONE durable plan file; decide instead of asking; keep the plan small.
+- NEVER: call `EnterPlanMode` / `ExitPlanMode`; spawn `claude -p` or an Anthropic-endpoint Agent SDK call; edit any file except the plan file; ship every alternative in the plan; block waiting for the user in an autonomous run.
+
+## Files
+- `references/plan-mode-prompts.md` — the verbatim plan-mode prompt corpus (blocks A2–A8): the read-only system-reminder, the 5-phase reminder, the Explore subagent system prompt, the Plan subagent system prompt, the EnterPlanMode trigger heuristic, the ExitPlanMode semantics, and Anthropic's recommended Explore→Plan→Implement→Commit workflow. Read it before Phase 1; the wording is community-reverse-engineered (Piebald-AI / how-claude-code-works / Ronacher) and approximate in later phases — the structure and read-only discipline are authoritative.
