@@ -1,0 +1,61 @@
+---
+name: autothing-report
+description: Send a Slack notification when an autothing run finishes — a summary of the work, a Tailscale URL to the walkthrough video gallery, and Tailscale links to the session logs + run artifacts served IN PLACE (no duplication, via a small standing Node server). autothing calls this as its final step once the global gate is decided; also usable standalone to report on a finished run. Sends via a Slack incoming webhook (AUTOTHING_SLACK_WEBHOOK_URL), falling back to the Slack MCP when interactive. NOT for mid-run progress (that is the PROGRESS line) and NOT for recording the videos (that is autothing-walkthrough).
+---
+
+# autothing-report
+
+Notifies the operator on Slack that an autothing run is done, with a work summary, the **walkthrough video gallery** (Tailscale URL), and the **session logs + run artifacts** as Tailscale links served **in place** (symlinked, never copied). The final step of an autothing run, and a standalone "report on this run" skill.
+
+## When it runs
+- **In an autothing build:** Phase 5, AFTER the handover prose and AFTER `globalGate.status` is decided, but **BEFORE** the terminal `GLOBAL GATE:` line (that line releases the goal-loop hook and ends the session, so nothing after it runs). Sending the Slack message is a side-effect, so it is safe to do before that final print.
+- **Standalone:** invoke any time against a finished run dir to (re)send the report.
+
+## Inputs
+- `<runDir>` = `docs/autothing/runs/<runId>/` (from autothing Phase 0), `<runId>`, `<project>`.
+- `globalGate.status` + per-slice video links from `<runDir>/evidence-index.json`.
+- This session id: `$CLAUDE_CODE_SESSION_ID`.
+
+## Steps
+
+### 1. Gather the summary + gallery URL
+- Read `<runDir>/evidence-index.json`: take `globalGate.status`, the per-slice `video.link` values, and the **gallery base URL** (the common `http://<tailscale-ip>:<port>/` prefix of those links — this is what the `walkthrough` skill already publishes; this skill does NOT re-serve the videos).
+- Compose a concise **summary** (slices passed/blocked, what was built, any blockers with their cause). Write it to `<runDir>/report-summary.md` so it can be passed by path.
+
+### 2. Publish the logs over Tailscale — WITHOUT duplicating them
+Build a per-run directory of **symlinks** to the real files (symlinks reference the originals — no content is copied), then start the standing server:
+```bash
+mkdir -p ~/.autothing/report/<runId>
+ln -sfn "<abs runDir>" ~/.autothing/report/<runId>/run                 # plan, gate-status, evidence-index, friction-log
+TRANSCRIPT="$(find ~/.claude/projects -name "$CLAUDE_CODE_SESSION_ID.jsonl" 2>/dev/null | head -1)"
+[ -n "$TRANSCRIPT" ] && ln -sfn "$TRANSCRIPT" ~/.autothing/report/<runId>/session-transcript.jsonl
+node ~/.claude/skills/autothing-report/scripts/serve.mjs   # prints the Tailscale base URL, e.g. http://100.x.y.z:8091/
+```
+`serve.mjs` is **idempotent + standing** (self-daemonizes, reuses an already-running instance, survives the session so the links stay live). The per-run logs URL is `<base>/<runId>/`.
+- **Default to the curated `run/` artifacts** (plan + gate-status + evidence-index + friction-log — no raw secrets). Symlinking the **raw session transcript** is optional: it is the full session log but **may contain secrets** — only include it if that is acceptable on your tailnet, or redact (`sk-*` / `ghp_*` / `xoxb-*`) first.
+
+### 3. Send the Slack notification
+```bash
+node ~/.claude/skills/autothing-report/scripts/notify.mjs \
+  --project "<project>" --status "<globalGate.status>" \
+  --summary "<runDir>/report-summary.md" \
+  --gallery-url "<gallery base URL>" \
+  --report-url "<base>/<runId>/"
+```
+- Requires a **Slack incoming webhook** in `AUTOTHING_SLACK_WEBHOOK_URL` (env) or `~/.config/autothing/.env` (`AUTOTHING_SLACK_WEBHOOK_URL=...`). This is the headless-safe path (plain HTTPS POST, no MCP, PTY-safe).
+- **Fallback when no webhook is set AND you are interactive:** `notify.mjs` prints the composed Block Kit payload and exits 0; send that same content via the Slack MCP (`mcp__claude_ai_Slack__slack_send_message`). A missing webhook never fails the run.
+
+## Setup (one-time)
+Create a Slack incoming webhook (Slack app → Incoming Webhooks → Add to a channel) and store it (secret — never commit):
+```bash
+mkdir -p ~/.config/autothing && printf 'AUTOTHING_SLACK_WEBHOOK_URL=%s\n' '<your webhook url>' >> ~/.config/autothing/.env
+```
+
+## Notes
+- **Tailscale-only exposure.** `serve.mjs` binds `0.0.0.0` and advertises the `tailscale ip -4` address; the links are reachable only on your tailnet (your own devices). If `tailscale` is absent it falls back to a LAN IP (note this in the message).
+- **No duplication.** Logs/artifacts are served via symlinks to the originals; nothing is copied. The video gallery is served by `walkthrough`, not here.
+- Honest: if the gallery URL is missing (no verified videos) or the webhook is unset, say so in the report rather than omitting silently.
+
+## Files
+- `scripts/serve.mjs` — standing, Tailscale-bound, read-only static server (self-daemonizing + idempotent) that serves the per-run symlink dir.
+- `scripts/notify.mjs` — composes the Slack Block Kit message and POSTs it to the incoming webhook (prints the payload for the MCP fallback when no webhook is set).
