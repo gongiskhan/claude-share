@@ -34,7 +34,7 @@ The set (include the first five always; add the last two when the stack warrants
 | `<proj>-planning` | break a goal into slices; write/update FLOW_PLAN; sequence + mark parallel groups | `docs/FLOW_PLAN.md` |
 | `<proj>-architecture` | decide module boundaries, data/API shape; keep architecture.md current | `docs/architecture.md` |
 | `<proj>-testing` | explore-first, write+run Playwright/unit tests, report exit codes (the exemplar) | `docs/governance.md` |
-| `<proj>-design-audit` | drive the running app and judge it against design tokens via frontend-design/polish-ui/huashu-design; record a verdict | design source of truth |
+| `<proj>-design-audit` | drive the running app and judge it against design tokens via frontend-design/huashu-design; record a verdict | design source of truth |
 | `<proj>-governance` | enforce the definition of done; write gate-status.json; gate slice/global advance | `docs/governance.md` |
 | `<proj>-mobile` *(if mobile paths exist)* | mobile-specific build/test rules | `docs/architecture.md#mobile` |
 | `<proj>-data-api` *(if a DB/API exists)* | safe data/API/schema changes, migrations, contract tests | `docs/architecture.md` |

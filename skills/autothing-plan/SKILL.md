@@ -30,9 +30,17 @@ Workflow/subagent intermediate state lives in script variables and only a final 
 
 Read `references/plan-mode-prompts.md` first. Then:
 
+### Phase 0 — Acquire the planning gate (advisory; only when coord-mcp is present)
+If the **coord-mcp** planning-gate tools are available (the Garrison coord stack is connected), call `begin_planning(repo, summary)` BEFORE exploring — coord-mcp serializes planning so only one session plans a repo at a time:
+- **GRANTED** → read the returned read-bundle (the last released plan + recent plans + in-flight intents/decisions) and fold it into your plan, so you build on other sessions' context instead of planning blind. Hold the lock through Phases 1–4; `plan_heartbeat` if planning runs long.
+- **WAIT** → another session is planning this repo. Honor the bounded wait and re-check; if you are autonomous and cannot acquire within budget, **park the task and surface it — never hang.**
+- Call `end_planning(repo)` once the plan file is written (Phase 4), so the next planner inherits your summary.
+
+If the coord tools are absent (no Garrison, or the MCP is not connected — including this kind of direct session), **skip this entirely and plan as normal; never hard-block on it.** This is what makes autothing-plan compose with coord-mcp's "one planner per repo at a time" guarantee.
+
 ### Phase 1 — Initial Understanding (Explore subagents ONLY)
 Gain a comprehensive understanding of the request and the code it touches.
-- **Launch 1–3 `Explore` subagents IN PARALLEL** (single message, multiple Task tool calls, `subagent_type: "Explore"` — Haiku, context-isolated, cheap). Use **1** agent when scope is isolated to known files; **multiple** when scope is uncertain, several areas are involved, or you must learn existing patterns before planning. **Quality over quantity — usually just 1.** Give each agent a **specific search focus** and a thoroughness hint (`quick | medium | very thorough`).
+- **Launch 1–3 `Explore` subagents IN PARALLEL** (single message, multiple Agent tool calls, `subagent_type: "Explore"` — Haiku, context-isolated, cheap). Use **1** agent when scope is isolated to known files; **multiple** when scope is uncertain, several areas are involved, or you must learn existing patterns before planning. **Quality over quantity — usually just 1.** Give each agent a **specific search focus** and a thoroughness hint (`quick | medium | very thorough`).
 - The built-in `Explore` agent already runs the block-A4 system prompt; embedding it in `references/plan-mode-prompts.md` preserves the behavior if you ever must run the prompt inline (e.g. the built-in agent is unavailable).
 - After exploring, **resolve ambiguities with recommended answers** (autonomous rule above) rather than asking.
 
@@ -50,6 +58,7 @@ Write the final plan to the plan file. **Recommended approach only — not every
 The plan is now written to the plan file. **Hand it to autothing's approval/sequencing gate** instead of calling `ExitPlanMode`:
 - When invoked by autothing: return control; autothing reads the plan file and proceeds to bootstrap + the build loop. State, in your final message, the plan-file path and a one-line summary (the plan content lives in the file, not the message — mirroring ExitPlanMode semantics, block A7).
 - When standalone: announce the plan-file path and that planning is complete; let the human drive execution. Do not ask "is this plan okay?" — writing the file + announcing it IS the handoff.
+- **If you acquired the planning gate in Phase 0, call `end_planning(repo)` now** — release the lock so the next session can plan and inherit your summary.
 
 ## Discipline summary (do / never)
 - DO: read `references/plan-mode-prompts.md`; spawn real `Explore`/`Plan` subagents in parallel; write ONE durable plan file; decide instead of asking; keep the plan small.

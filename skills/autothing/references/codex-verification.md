@@ -15,7 +15,7 @@ The `codex` plugin's slash commands are `disable-model-invocation: true` — a s
 ## SERIALIZE every Codex call — hard rule (empirically required)
 Codex uses one shared ChatGPT OAuth token. **Two `codex exec` processes running at the same time rotate and REVOKE that refresh token** ("your refresh token was revoked. Please log out and sign in again") — which then kills the gate for the rest of the run. So:
 - Never run 3A and 3B concurrently; never run two slices' Codex calls concurrently.
-- When slices are parallelized (agent teams / workflows), the Codex gate is **not** parallel: funnel all Codex calls through one serialized step, exactly like the shared dev-serve / bundle / `walkthrough` recorder (see the parallelism section of `build-loop.md` and the `parallel-work` skill). One Codex call in flight at a time, run-wide.
+- When slices are parallelized (agent teams / workflows), the Codex gate is **not** parallel: funnel all Codex calls through one serialized step, exactly like the shared dev-serve / bundle / `walkthrough` recorder (see the parallelism section of `build-loop.md` and the `autothing-parallel-work` skill). One Codex call in flight at a time, run-wide.
 
 ## Always redirect Codex stdin from /dev/null — hard rule (empirically required)
 `codex exec` reads stdin when it is not a TTY. In any non-interactive / piped context (a skill's Bash call, a background task) it will otherwise **block forever on "Reading additional input from stdin..."**. Every invocation below ends with `</dev/null`. Capture the structured result via `--output-last-message <file>` and read that file — do NOT pipe Codex stdout into `tail`/`head` (the pipe re-triggers the stdin-read hang and can truncate the JSONL).

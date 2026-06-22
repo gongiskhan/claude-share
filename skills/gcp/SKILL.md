@@ -12,7 +12,7 @@ allowed-tools:
 
 # GCP Skill
 
-Provides comprehensive Google Cloud Platform capabilities for the Golden Armada AI Agent Fleet Platform.
+Provides comprehensive Google Cloud Platform capabilities — GKE, Cloud Run, Cloud Storage, BigQuery, Pub/Sub. Examples below use placeholder names (`PROJECT_ID`, `my-cluster`, `my-service`, `my-bucket`, `my_dataset`) — substitute your own project's values.
 
 ## When to Use This Skill
 
@@ -45,29 +45,29 @@ gcloud info
 ### GKE (Google Kubernetes Engine)
 \`\`\`bash
 # Create cluster
-gcloud container clusters create golden-armada-cluster \
+gcloud container clusters create my-cluster \
   --zone us-central1-a \
   --num-nodes 3 \
   --machine-type e2-standard-4 \
   --enable-autoscaling --min-nodes 1 --max-nodes 10
 
 # Get credentials
-gcloud container clusters get-credentials golden-armada-cluster --zone us-central1-a
+gcloud container clusters get-credentials my-cluster --zone us-central1-a
 
 # List clusters
 gcloud container clusters list
 
 # Resize cluster
-gcloud container clusters resize golden-armada-cluster --num-nodes 5 --zone us-central1-a
+gcloud container clusters resize my-cluster --num-nodes 5 --zone us-central1-a
 
 # Delete cluster
-gcloud container clusters delete golden-armada-cluster --zone us-central1-a
+gcloud container clusters delete my-cluster --zone us-central1-a
 \`\`\`
 
 ### Cloud Run
 \`\`\`bash
 # Deploy service
-gcloud run deploy golden-armada-api \
+gcloud run deploy my-service \
   --image gcr.io/PROJECT_ID/agent:latest \
   --platform managed \
   --region us-central1 \
@@ -78,17 +78,17 @@ gcloud run deploy golden-armada-api \
 gcloud run services list
 
 # Get service URL
-gcloud run services describe golden-armada-api --platform managed --region us-central1 --format 'value(status.url)'
+gcloud run services describe my-service --platform managed --region us-central1 --format 'value(status.url)'
 
 # Update traffic
-gcloud run services update-traffic golden-armada-api \
+gcloud run services update-traffic my-service \
   --to-revisions REVISION=100
 \`\`\`
 
 ### Cloud Storage
 \`\`\`bash
 # Create bucket
-gsutil mb -l us-central1 gs://golden-armada-data
+gsutil mb -l us-central1 gs://my-bucket
 
 # Copy files
 gsutil cp local-file.txt gs://bucket-name/
@@ -108,10 +108,10 @@ gsutil iam ch allUsers:objectViewer gs://bucket-name
 ### BigQuery
 \`\`\`bash
 # Create dataset
-bq mk --dataset PROJECT_ID:agents_dataset
+bq mk --dataset PROJECT_ID:my_dataset
 
 # Create table
-bq mk --table agents_dataset.agent_logs schema.json
+bq mk --table my_dataset.agent_logs schema.json
 
 # Query
 bq query --use_legacy_sql=false \
@@ -119,11 +119,11 @@ bq query --use_legacy_sql=false \
 
 # Load data
 bq load --source_format=NEWLINE_DELIMITED_JSON \
-  agents_dataset.logs gs://bucket/logs/*.json
+  my_dataset.logs gs://bucket/logs/*.json
 
 # Export
 bq extract --destination_format NEWLINE_DELIMITED_JSON \
-  agents_dataset.logs gs://bucket/export/logs-*.json
+  my_dataset.logs gs://bucket/export/logs-*.json
 \`\`\`
 
 ### Pub/Sub
@@ -150,7 +150,7 @@ from google.cloud import storage, bigquery, pubsub_v1
 
 # Cloud Storage
 storage_client = storage.Client()
-bucket = storage_client.bucket('golden-armada-data')
+bucket = storage_client.bucket('my-bucket')
 
 # Upload
 blob = bucket.blob('agents/config.json')
@@ -174,7 +174,7 @@ for row in results:
     print(f"{row.agent_id}: {row.task_count}")
 
 # Insert rows
-table_ref = bq_client.dataset('agents_dataset').table('logs')
+table_ref = bq_client.dataset('my_dataset').table('logs')
 errors = bq_client.insert_rows_json(table_ref, rows)
 
 # Pub/Sub Publisher
@@ -209,7 +209,7 @@ provider "google" {
 
 # GKE Cluster
 resource "google_container_cluster" "primary" {
-  name     = "golden-armada-cluster"
+  name     = "my-cluster"
   location = var.zone
 
   remove_default_node_pool = true
@@ -240,7 +240,7 @@ resource "google_container_node_pool" "primary_nodes" {
 
 # Cloud Run Service
 resource "google_cloud_run_service" "agent_api" {
-  name     = "golden-armada-api"
+  name     = "my-service"
   location = var.region
 
   template {
@@ -263,7 +263,7 @@ resource "google_cloud_run_service" "agent_api" {
 
 # Cloud Storage Bucket
 resource "google_storage_bucket" "data" {
-  name     = "golden-armada-data"
+  name     = "my-bucket"
   location = var.region
 
   uniform_bucket_level_access = true

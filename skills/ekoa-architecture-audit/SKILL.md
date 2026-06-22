@@ -24,7 +24,7 @@ Do not skip this. Forming opinions before understanding the system produces bad 
 
 1. Identify which repo you are in:
    - **ekoa-mono** (`ekoa-core/`, `ekoa-platform/`, `ekoa-data/`): the platform. Apply Phase 2A and 2B.
-   - **agent-garrison**: agnostic agent infrastructure. Apply Phase 2B plus invariant G in 2A.
+   - **agent-garrison**: agnostic agent infrastructure. Apply Phase 2B plus invariant F in 2A.
    - Anything else: apply Phase 2B and whatever invariants from 2A the code touches.
 2. Read `CLAUDE.md`, the README, package manifests, and any architecture docs or ADRs. Treat them as claimed invariants to verify, not as truth.
 3. Map the directory structure and identify the major modules and layers.
@@ -48,7 +48,7 @@ These are the platform's structural rules. Violations start at **High** severity
 
 **E. Migration completeness (build-to-final-form).** Half-migrated parallel implementations (JsonStore beside Firestore, old bespoke Git code beside Cortex paths), temporary scaffolding, bridges marked "for now", feature flags that became permanent. A migration that is 90% done is debt at the 10%, not progress at the 90%.
 
-**G. Garrison rule (agent-garrison only).** Apply the Garrison Honesty Test: any component justifiable only on Ekoa grounds fails the test and is a finding. It belongs in Ekoa, not Garrison.
+**F. Garrison rule (agent-garrison only).** Apply the Garrison Honesty Test: any component justifiable only on Ekoa grounds fails the test and is a finding. It belongs in Ekoa, not Garrison.
 
 ## Phase 2B: Structural dimensions
 
@@ -99,7 +99,7 @@ Run per package, in parallel where possible: `npm audit`, `npx knip` (dead expor
 
 ## Large repo: subagents
 
-If the repo is >50k LOC or has 3+ top-level packages (ekoa-mono qualifies), dispatch subagents in parallel, one per package (`ekoa-core`, `ekoa-platform`, `ekoa-data`), each scoped to Phase 2B with the citation requirement and a 200-finding cap. Keep Phase 2A in the main agent: invariants live at the boundaries between packages and need the cross-package view. The main agent merges, dedupes, and ranks.
+If the repo is >50k LOC or has 3+ top-level packages (ekoa-mono qualifies), dispatch subagents in parallel, one per package (`ekoa-core`, `ekoa-platform`, `ekoa-data`), each scoped to Phase 2B with the citation requirement and a 200-finding cap. Keep Phase 2A in the main agent: invariants live at the boundaries between packages and need the cross-package view. The main agent merges, dedupes, and ranks. This fan-out is **read-only** (no file edits), so no cross-session file leases are needed; if the Garrison coord stack is present and other sessions may be active, `declare_intent` that an audit is running so it shows in their digest — purely advisory, never a blocker.
 
 ## Repeat-run mode
 

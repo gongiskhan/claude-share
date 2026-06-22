@@ -14,7 +14,7 @@
     "e2e":       { "cmd": "npx playwright test e2e/sso-login.spec.ts",     "exit": 0, "at": "2026-06-04T14:21:55Z", "summary": "3 passed, 0 console errors" },
     "codexReview": { "verdict": "approve", "rounds": 2, "by": "codex/gpt-5.5", "at": "2026-06-04T14:21:30Z", "lastReport": "docs/autothing/slices/sso-login/codex-review-sso-login-r2.json", "overrides": [] },
     "codexPwTest": { "result": "pass", "by": "codex/gpt-5.5", "at": "2026-06-04T14:21:45Z", "report": "docs/autothing/slices/sso-login/codex-pwtest-sso-login.json" },
-    "designAudit": { "verdict": "clean", "by": ["frontend-design", "polish-ui"], "at": "2026-06-04T14:22:02Z", "notes": "matched design tokens; fixed 2 spacing regressions during the audit" },
+    "designAudit": { "verdict": "clean", "by": ["frontend-design", "huashu-design"], "at": "2026-06-04T14:22:02Z", "notes": "matched design tokens; fixed 2 spacing regressions during the audit" },
     "video":     { "status": "verified", "verifiedAt": "2026-06-04T14:22:09Z", "flagged": false, "link": "http://100.108.210.116:8099/ekoa/2026-06-04T142150/final.mp4", "runDir": ".walkthrough/runs/2026-06-04T142150" }
   },
   "blockers": [],

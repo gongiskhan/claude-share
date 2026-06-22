@@ -284,9 +284,9 @@ When user wants full automation (generate and download when ready):
 1. Create notebook and add sources as usual
 2. Wait for sources to be ready (use `source wait` or check `source list --json`)
 3. Run `notebooklm generate audio "..." --json` → parse `artifact_id` from output
-4. **Spawn a background agent** using Task tool:
+4. **Spawn a background agent** using Agent tool:
    ```
-   Task(
+   Agent(
      prompt="Wait for artifact {artifact_id} in notebook {notebook_id} to complete, then download.
              Use: notebooklm artifact wait {artifact_id} -n {notebook_id} --timeout 600
              Then: notebooklm download audio ./podcast.mp3 -a {artifact_id} -n {notebook_id}",
@@ -337,7 +337,7 @@ When adding multiple sources and needing to wait for processing before chat/gene
    ```
 2. **Spawn a background agent** to wait for all sources:
    ```
-   Task(
+   Agent(
      prompt="Wait for sources {source_ids} in notebook {notebook_id} to be ready.
              For each: notebooklm source wait {id} -n {notebook_id} --timeout 120
              Report when all ready or if any fail.",
@@ -361,7 +361,7 @@ Deep research finds and analyzes web sources on a topic:
    ```
 3. **Spawn a background agent** to wait and import:
    ```
-   Task(
+   Agent(
      prompt="Wait for research in notebook {notebook_id} to complete and import sources.
              Use: notebooklm research wait -n {notebook_id} --import-all --timeout 300
              Report how many sources were imported.",

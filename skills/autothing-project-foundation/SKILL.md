@@ -1,9 +1,9 @@
 ---
-name: project-foundation
+name: autothing-project-foundation
 description: Idempotently audit and scaffold a project's Claude-Code foundation — a lean root CLAUDE.md with a routing index, living /docs (product-overview, architecture, conventions, governance, decisions), per-area skills under .claude/skills/, and git init. Read-only DETECT pass produces a gap list; GENERATE creates only the missing/partial pieces and NEVER rewrites an existing canonical file. Use to set up a new or existing repo for agent-driven work, or to audit what foundation a repo is missing — without running a full build. autothing calls this as its Phase 0/1; usable directly. Do NOT use to plan build slices (that is the planning/FLOW_PLAN step) or to implement features.
 ---
 
-# project-foundation
+# autothing-project-foundation
 
 Sets up (or audits) the per-project foundation that lets agents work a repo coherently: a lean root `CLAUDE.md` that routes to area skills, a small set of living `/docs`, the warranted area skills inside the project's `.claude/skills/`, and a git repo. **USER-scope skill; everything it writes is PROJECT-scope** (inside the target repo).
 

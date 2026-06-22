@@ -1,6 +1,6 @@
 ---
 name: autothing-design-audit
-description: Subjective design and UX audit of the current UI change — judge the running app against the project's design tokens and conventions for visual hierarchy, spacing, consistency, responsiveness, and polish, using the design skills (frontend-design, polish-ui, huashu-design). In an autothing build, real issues send the slice back to autothing-implement to fix; standalone, report the verdict and issues. Use for "design audit", "review the UI/UX of this", "is this polished enough", or as the design gate of a build. Skip for non-UI changes. NOT a correctness test (use autothing-test) and NOT a code review (use autothing-review).
+description: Subjective design and UX audit of the current UI change — judge the running app against the project's design tokens and conventions for visual hierarchy, spacing, consistency, responsiveness, and polish, using the design skills (frontend-design, huashu-design). In an autothing build, real issues send the slice back to autothing-implement to fix; standalone, report the verdict and issues. Use for "design audit", "review the UI/UX of this", "is this polished enough", or as the design gate of a build. Skip for non-UI changes. NOT a correctness test (use autothing-test) and NOT a code review (use autothing-review).
 ---
 
 # autothing-design-audit
@@ -9,7 +9,7 @@ The subjective design/UX gate — judges the running UI against the project's de
 
 ## What it runs
 Drive the running app (`/run` + `/verify` + playwright-cli for screenshots) and audit the change using the design skills:
-- **`frontend-design`** / **`polish-ui`** / **`huashu-design`** — apply their rubric: visual hierarchy, spacing/rhythm, type scale, color/contrast, consistency with existing components, responsive behavior, empty/loading/error states, motion, and overall polish.
+- **`frontend-design`** / **`huashu-design`** — apply their rubric: visual hierarchy, spacing/rhythm, type scale, color/contrast, consistency with existing components, responsive behavior, empty/loading/error states, motion, and overall polish.
 - Compare against the project's **design tokens + existing screens**; flag regressions and off-system choices, each with a concrete fix.
 
 ## Scope

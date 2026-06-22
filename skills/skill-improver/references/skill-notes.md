@@ -14,7 +14,7 @@ The improver is the SINGLE mechanism that improves skills, so skill-specific kno
 - **Prose-fixable:** flow-selection guidance (SKILL.md step 4), caption rules, what-to-show/avoid, `.walkthrough/notes.md` conventions.
 - **Code → FLAG (do not auto-edit):** anything in `scripts/` — highlight coordinates / cursor / recording pipeline (`scripts/lib/browser.mjs`, `scripts/record.mjs`). Verifying these needs recording against a live app.
 
-## frontend-design / huashu-design / polish-ui  (design skills)
+## frontend-design / huashu-design  (design skills)
 - **Dominant false positive:** "make it blue / move the button" is about the OUTPUT → drop. Keep only feedback about how the skill audits/generates (its process, its tokens handling, what it checks).
 
 ## skill-creator, update-config, etc. (meta skills)

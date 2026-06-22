@@ -1,6 +1,6 @@
 ---
 name: csg-complete
-description: Complete a pnmui-monorepo ticket via the corporate machine — cursor-agent (the sanctioned tool) headlessly recreates the Mac change set on corporate, branches, commits and is byte-verified; push + Azure DevOps PR happen only after the user explicitly confirms. Use when the user says "complete the ticket", "csg complete", "make the PR for this", "land this change", or "finish ticket <number>".
+description: Complete a pnmui-monorepo ticket via the corporate machine — cursor-agent (the sanctioned tool) headlessly recreates the Mac change set on corporate, branches, commits and is byte-verified; push + Azure DevOps PR happen only after the user explicitly confirms. Use when the user says "complete the ticket", "csg complete", "make the PR for this", "land this change", or "finish ticket 1202066".
 ---
 
 # csg-complete
