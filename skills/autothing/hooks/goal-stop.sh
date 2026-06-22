@@ -35,6 +35,7 @@ STOP_ACTIVE="$(printf '%s' "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/
 RUN_ID="$(jq -r '.runId // "unknown"' "$SENTINEL" 2>/dev/null)"
 TURN_CAP="$(jq -r '.turnCap // 250' "$SENTINEL" 2>/dev/null)"
 ITER="$(jq -r '.iteration // 0' "$SENTINEL" 2>/dev/null)"
+PROBE="$(jq -r '.probe // false' "$SENTINEL" 2>/dev/null)"
 
 # DONE: the terminal GLOBAL GATE verdict is in this session's transcript.
 # Match the real verdict by its metric signature `videos:<n>/<n>` so the QUOTED
@@ -59,6 +60,11 @@ tmp="$(mktemp)" && jq --argjson n "$NEXT" '.iteration=$n' "$SENTINEL" >"$tmp" 2>
 
 # stop_hook_active is logged only — NOT a terminator (a /goal-style loop legitimately
 # stays in forced-continuation for many turns; the terminators above end it).
-reason="autothing run ${RUN_ID} has not printed its terminal GLOBAL GATE line (iteration ${NEXT}/${TURN_CAP}, stop_hook_active=${STOP_ACTIVE}); buildable work may remain — resume the per-slice loop from this run's FLOW_PLAN + gate-status + evidence-index files and continue to the next buildable slice."
+if [ "$PROBE" = "true" ]; then
+  # Liveness-probe sentinel: the fact this block is honored proves the hook is live.
+  reason="GOAL-LOOP LIVENESS PROBE — the Stop hook fired and is auto-continuing this session (iteration ${NEXT}/${TURN_CAP}). The hook is LIVE. Confirm + clear with: bash ~/.claude/skills/autothing/hooks/probe.sh check"
+else
+  reason="autothing run ${RUN_ID} has not printed its terminal GLOBAL GATE line (iteration ${NEXT}/${TURN_CAP}, stop_hook_active=${STOP_ACTIVE}); buildable work may remain — resume the per-slice loop from this run's FLOW_PLAN + gate-status + evidence-index files and continue to the next buildable slice."
+fi
 jq -cn --arg r "$reason" '{decision:"block", reason:$r}'
 exit 0
