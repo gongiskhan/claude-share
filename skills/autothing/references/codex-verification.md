@@ -20,6 +20,9 @@ Codex uses one shared ChatGPT OAuth token. **Two `codex exec` processes running 
 ## Always redirect Codex stdin from /dev/null — hard rule (empirically required)
 `codex exec` reads stdin when it is not a TTY. In any non-interactive / piped context (a skill's Bash call, a background task) it will otherwise **block forever on "Reading additional input from stdin..."**. Every invocation below ends with `</dev/null`. Capture the structured result via `--output-last-message <file>` and read that file — do NOT pipe Codex stdout into `tail`/`head` (the pipe re-triggers the stdin-read hang and can truncate the JSONL).
 
+## Keep each Codex call FOCUSED — hard rule (empirically required)
+Scope every prompt to the slice's own diff and acceptance. Do NOT paste broad multi-file or whole-directory context (e.g. a `src/lib` dump) into a Codex prompt: an unfocused review listing many files empirically spun `codex exec` into a runaway — 50+ live processes, 14+ minutes, zero output — and had to be killed, while a focused single-concern prompt over just the diff completes reliably in ~30s. The 3A/3B recipes below already scope to `git diff <BASE>...HEAD` and one slice's acceptance; keep them that way. If a review genuinely needs more than the diff, add the few specific files by path — never a directory tree.
+
 ## Preflight — once per run (do it in Phase 1, re-check on first use)
 ```bash
 codex --version            # present?
@@ -44,6 +47,7 @@ codex exec -s read-only --skip-git-repo-check -C "<projectDir>" \
    defensible finding from the diff; otherwise needs-attention with grounded findings." </dev/null
 ```
 Then read the JSON (`verdict`, `findings[]`):
+- **Environment-blocked (not a product finding)** → if the report shows Codex could not READ the diff/files (e.g. a "finding" like *"cannot read files under read-only sandbox"*) rather than a defect in the code, treat it as a transient flake, NOT a `needs-attention`: retry the identical call ONCE. An immediate identical retry has been seen to read fine. Only if it recurs do you treat the output as a genuine result (and if it is a real permissions issue, fix the invocation — `-s read-only` must still allow reading the workspace). An env flake must never be counted as a finding or as an `approve`. (Same principle as 3B's flaky/env re-run.)
 - **`approve`** → 3A passes. Both models agree.
 - **`needs-attention`** → triage each finding:
   - **Real & material** → fix forward, re-run the objective gates (these fixes consume the slice's 5-attempt ceiling from step 2), then run the next review round.
