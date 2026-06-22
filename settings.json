@@ -415,6 +415,28 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "_garrison": "fitting:coord-beads",
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x /Users/ggomes/.garrison/bin/coord-beads-prime.sh ] && /Users/ggomes/.garrison/bin/coord-beads-prime.sh || true",
+            "timeout": 8
+          }
+        ]
+      },
+      {
+        "_garrison": "fitting:coord-mcp",
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -f /Users/ggomes/dev/garrison/fittings/seed/coord-mcp/scripts/coord-hook.mjs ] && /Users/ggomes/.nvm/versions/node/v20.19.4/bin/node /Users/ggomes/dev/garrison/fittings/seed/coord-mcp/scripts/coord-hook.mjs || true",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionEnd": [
@@ -662,6 +684,17 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "_garrison": "fitting:coord-mcp",
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -f /Users/ggomes/dev/garrison/fittings/seed/coord-mcp/scripts/coord-hook.mjs ] && /Users/ggomes/.nvm/versions/node/v20.19.4/bin/node /Users/ggomes/dev/garrison/fittings/seed/coord-mcp/scripts/coord-hook.mjs || true",
+            "timeout": 10
+          }
+        ]
       }
     ]
   },
@@ -681,6 +714,8 @@
     }
   },
   "effortLevel": "xhigh",
+  "ultracode": true,
+  "useAutoModeDuringPlan": true,
   "promptSuggestionEnabled": false,
   "showClearContextOnPlanAccept": true,
   "autoMemoryEnabled": true,
@@ -694,7 +729,6 @@
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": true,
   "autoMode": {
     "environment": [
       "Organization: solo developer (Gonçalo, user: ggomes). No team collaborators, no shared infrastructure, no production systems that other people depend on. Primary use: software development, infrastructure automation, and personal-assistant agent work.",

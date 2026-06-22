@@ -11,16 +11,18 @@
 #   2. git pull --rebase --autostash to ingest other machines below our commit.
 #   3. On rebase conflict: abort (restores pre-rebase state) and log; never reset.
 #   4. git push.
-# Status is written to ~/.garrison/vault-sync-status.json; full log to
+# Status is written to ~/.garrison/obsidian-vault-sync-status.json; full log to
 # ~/Library/Logs/obsidian-vault-sync.log.
+# NOTE: the status/lock filenames are obsidian-* prefixed to avoid colliding with
+# Garrison's separate rsync `vault-sync` fitting (which owns vault-sync-status.json).
 
 set -uo pipefail
 
 VAULT="${OBSIDIAN_VAULT:-$HOME/ObsidianVault}"
 LOG="$HOME/Library/Logs/obsidian-vault-sync.log"
 STATUS_DIR="$HOME/.garrison"
-STATUS="$STATUS_DIR/vault-sync-status.json"
-LOCK="$STATUS_DIR/vault-sync.lock"
+STATUS="$STATUS_DIR/obsidian-vault-sync-status.json"
+LOCK="$STATUS_DIR/obsidian-vault-sync.lock"
 
 mkdir -p "$STATUS_DIR" "$(dirname "$LOG")"
 
