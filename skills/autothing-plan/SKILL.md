@@ -1,7 +1,6 @@
 ---
 name: autothing-plan
 description: Reproduce Claude Code plan mode autonomously — explore the request and codebase with read-only Explore subagents, design with Plan subagents, then write a concise, durable implementation plan file. Does NOT call native EnterPlanMode/ExitPlanMode (they fail in agent and auto contexts) and never mutates the system except the plan file. Use proactively BEFORE any non-trivial implementation task — a new feature, multiple valid approaches, changes that affect existing behavior or structure, architectural decisions, multi-file changes (more than 2-3 files), or unclear requirements that need exploring first. Do NOT use for single-line or few-line fixes, adding one well-specified function, tasks with very specific detailed instructions, or pure research. autothing invokes this as its planning phase; also usable standalone.
-effort: xhigh
 ---
 
 # autothing-plan
@@ -22,9 +21,9 @@ Native plan mode uses `AskUserQuestion` to clarify ambiguities. **In an autonomo
 
 ## The plan file (durable — never plan only in context)
 
-Workflow/subagent intermediate state lives in script variables and only a final result returns to context, so the plan MUST be a durable file the build phase and the resume scan can re-read.
-- **Caller-supplied path wins.** When autothing invokes this skill it passes the target path — `docs/FLOW_PLAN.md` in the target repo. Write there, and follow the FLOW_PLAN slice-table shape autothing expects (`assets/docs/FLOW_PLAN.md` in the autothing skill).
-- **Standalone default:** mirror native plan-mode semantics — write to `~/.claude/plans/<slug>.md` (slug = short kebab summary of the task). Create the file with Write; make incremental edits with Edit.
+Workflow/subagent intermediate state lives in script variables and only a final result returns to context, so the plan MUST be a durable file the build phase and the resume scan can re-read. **Never a shared, fixed path** — concurrent plan/build runs in other sessions must not clobber each other.
+- **Caller-supplied path wins.** When autothing invokes this skill it passes a **per-run** path — `docs/autothing/runs/<runId>/FLOW_PLAN.md` in the target repo. Write exactly there (never a shared `docs/FLOW_PLAN.md`), following the FLOW_PLAN slice-table shape autothing expects (`assets/docs/FLOW_PLAN.md` in the autothing skill).
+- **Standalone default:** mirror native plan-mode semantics but make the path **unique** — write to `~/.claude/plans/<slug>-<YYYYMMDD-HHMMSS>.md` (slug = short kebab summary; the timestamp keeps concurrent standalone plans from colliding). Create with Write; make incremental edits with Edit.
 - This plan file is the ONLY file you may create or edit during planning.
 
 ## The 5-phase workflow

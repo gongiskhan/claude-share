@@ -1,6 +1,8 @@
-# Cross-model verification (Codex) — per-slice step 3
+# Cross-model verification (Codex) — the cross-model gates
 
-A **second model** (OpenAI Codex, via the local `codex` CLI) independently checks each slice after Claude's own objective gates are green, BEFORE the design audit and the walkthrough video. Two sub-gates, run in this order:
+> These two sub-gates are each a STANDALONE skill that autothing orchestrates and that also runs on its own: **3A → `autothing-adversarial-review`**, **3B → `autothing-adversarial-test`**. This file is the shared operational reference both carry; keep the hard rules (serial calls, `</dev/null`, preflight/auth) here so they live in one place.
+
+A **second model** (OpenAI Codex, via the local `codex` CLI) independently checks each slice after Claude's own correctness gate (`autothing-test`) and same-model review (`autothing-review`) are green, BEFORE the design audit and the walkthrough video. Two sub-gates, run in this order:
 
 - **3A — Adversarial review loop:** Codex reviews the slice diff trying to break it; Claude fixes real findings and re-reviews; **iterate until both models agree the slice is good** (Codex returns `approve` AND Claude's objective gates are green).
 - **3B — Independent Playwright test pass:** Codex drives the *running* app through the slice acceptance with its own `playwright` skill (playwright-cli) — a fresh functional pass that never saw Claude's committed test, so it catches "the code and its test share the same wrong assumption."
@@ -79,14 +81,14 @@ codex exec -s workspace-write -c sandbox_workspace_write.network_access=true \
   "rounds": 2,                     // review rounds run
   "by": "codex/gpt-5.5",
   "at": "<iso>",
-  "lastReport": "docs/autothing/slices/<slice>/codex-review-<slice>-r2.json",
+  "lastReport": "<runDir>/slices/<slice>/codex-review-<slice>-r2.json",
   "overrides": []                  // per-finding rebuttals when verdict is approve-with-override
 },
 "codexPwTest": {
   "result": "pass",               // pass | fail
   "by": "codex/gpt-5.5",
   "at": "<iso>",
-  "report": "docs/autothing/slices/<slice>/codex-pwtest-<slice>.json"
+  "report": "<runDir>/slices/<slice>/codex-pwtest-<slice>.json"
 }
 ```
 And in `evidence-index.json` `globalGate`, add `crossModel: { reviewAllApproved: <bool>, pwTestAllPassed: <bool> }`.

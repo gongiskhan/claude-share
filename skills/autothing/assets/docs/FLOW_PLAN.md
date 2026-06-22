@@ -1,15 +1,15 @@
 # Flow Plan
 
-<!-- The build plan. autothing writes/updates this in Phase 2 and updates each slice's Status as it builds (durable resume — on re-invocation, progress is re-read from here + gate-status files, never from memory). Keep the table current. -->
+<!-- The build plan for ONE run. autothing writes/updates this in Phase 1 (via autothing-plan) at docs/autothing/runs/<runId>/FLOW_PLAN.md — a per-run path, never a shared docs/FLOW_PLAN.md — and updates each slice's Status as it builds (durable resume — progress is re-read from here + gate-status files, never from memory). Keep the table current. -->
 
 ## Slices
-<!-- A slice = one user-facing flow or one automation, small enough for a 60-90s walkthrough. Order by dependency; mark which can run in parallel. -->
+<!-- A slice = one user-facing flow or feature, small enough for a 60-90s walkthrough. Order by dependency; mark which can run in parallel. Kind: ui | mixed (most testing is e2e through the UI). -->
 
-| # | Slice ID | Title | Kind | Routes to (area skill / doc) | Parallel group | Status |
-|---|----------|-------|------|------------------------------|----------------|--------|
-| 1 | {{slug}} | {{title}} | ui | testing + {{area}} | A | pending |
-| 2 | {{slug}} | {{title}} | automation | testing + {{area}} | A | pending |
-| 3 | {{slug}} | {{title}} | mixed | testing + {{area}} | B (after A) | pending |
+| # | Slice ID | Title | Kind | Routes to (area skill) | Parallel group | Status |
+|---|----------|-------|------|------------------------|----------------|--------|
+| 1 | {{slug}} | {{title}} | ui | {{area}} | A | pending |
+| 2 | {{slug}} | {{title}} | ui | {{area}} | A | pending |
+| 3 | {{slug}} | {{title}} | mixed | {{area}} | B (after A) | pending |
 
 <!-- Status: pending | in_progress | passed | blocked. Mirror of each slice's gate-status.json status. -->
 
@@ -22,4 +22,4 @@
 - Group B depends on A → starts after A's slices reach `passed`.
 
 ## Global acceptance
-See `governance.md`. Tracked in `docs/autothing/evidence-index.json → globalGate`.
+See `governance.md`. Tracked in `<runDir>/evidence-index.json → globalGate` (`<runDir>` = `docs/autothing/runs/<runId>/`).
