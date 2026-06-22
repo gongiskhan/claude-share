@@ -5,7 +5,7 @@
       "repo": "anthropics/claude-plugins-official"
     },
     "installLocation": "/Users/ggomes/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2026-06-22T00:37:30.735Z"
+    "lastUpdated": "2026-06-22T10:01:36.504Z"
   },
   "dev-browser-marketplace": {
     "source": {
@@ -21,7 +21,7 @@
       "url": "https://github.com/anthropics/skills.git"
     },
     "installLocation": "/Users/ggomes/.claude/plugins/marketplaces/anthropic-agent-skills",
-    "lastUpdated": "2026-06-22T00:37:30.621Z"
+    "lastUpdated": "2026-06-22T02:32:08.770Z"
   },
   "ui-ux-pro-max-skill": {
     "source": {
