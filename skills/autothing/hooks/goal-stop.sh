@@ -37,13 +37,16 @@ TURN_CAP="$(jq -r '.turnCap // 250' "$SENTINEL" 2>/dev/null)"
 ITER="$(jq -r '.iteration // 0' "$SENTINEL" 2>/dev/null)"
 PROBE="$(jq -r '.probe // false' "$SENTINEL" 2>/dev/null)"
 
-# DONE: the terminal GLOBAL GATE verdict is in this session's transcript.
-# Match the real verdict by its metric signature `videos:<n>/<n>` so the QUOTED
-# `"GLOBAL GATE: passed"` target in autothing's /goal handoff (no videos:N/N) can
-# never be mistaken for it. See build-loop.md "Gate lines must print in the lead
-# context (ultracode-safe)".
-if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] \
-   && grep -Eq 'GLOBAL GATE:.*videos:[0-9]+/[0-9]+' "$TRANSCRIPT" 2>/dev/null; then
+# DONE: THIS run's terminal GLOBAL GATE verdict is in the transcript.
+# Bound to the run's unique runId AND the videos:<n>/<n> metric signature, so NONE of
+# these can falsely release the loop: the QUOTED "GLOBAL GATE: passed" /goal target
+# (no videos:N/N); a stray/example/quoted verdict line; a verdict from a DIFFERENT or
+# prior run (different runId); or a dev session discussing the format. A liveness probe
+# (probe:true) has no real verdict, so it skips this check entirely.
+# See build-loop.md "Gate lines must print in the lead context (ultracode-safe)".
+if [ "$PROBE" != "true" ] && [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] \
+   && [ -n "$RUN_ID" ] && [ "$RUN_ID" != "unknown" ] \
+   && grep -Eq "GLOBAL GATE:.*${RUN_ID}.*videos:[0-9]+/[0-9]+" "$TRANSCRIPT" 2>/dev/null; then
   rm -f "$SENTINEL" 2>/dev/null
   exit 0
 fi
