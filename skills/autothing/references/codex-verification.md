@@ -23,19 +23,44 @@ Codex uses one shared ChatGPT OAuth token. **Two `codex exec` processes running 
 ## Keep each Codex call FOCUSED — hard rule (empirically required)
 Scope every prompt to the slice's own diff and acceptance. Do NOT paste broad multi-file or whole-directory context (e.g. a `src/lib` dump) into a Codex prompt: an unfocused review listing many files empirically spun `codex exec` into a runaway — 50+ live processes, 14+ minutes, zero output — and had to be killed, while a focused single-concern prompt over just the diff completes reliably in ~30s. The 3A/3B recipes below already scope to `git diff <BASE>...HEAD` and one slice's acceptance; keep them that way. If a review genuinely needs more than the diff, add the few specific files by path — never a directory tree.
 
+## Pin model + reasoning effort on EVERY call — hard rule (cost-aware, escalate on risk)
+An **unpinned** `codex exec` inherits the account/CLI default model + reasoning effort, which can silently run a heavy model at xhigh — empirically the dominant token-burn multiplier (a focused diff review at default effort observed ~765k tokens/turn). So pin `-m` and `-c model_reasoning_effort=` on every real 3A/3B call; defaults are deliberately cheap, escalate only on the triggers below, and only for the call(s) that need it.
+
+- **3A review — default `-m gpt-5.4 -c model_reasoning_effort=low`.** Escalate that round (and the slice's subsequent rounds) to `-c model_reasoning_effort=medium` if ANY of:
+  - the low pass surfaced a **plausible material** finding (re-run the round at medium to confirm/deepen before acting on it);
+  - the slice touches **auth / tenant-isolation / data / security / payments / migrations** (escalate from round 1);
+  - the first review output was **low-confidence** or failed schema validation / came back unparseable.
+  Never escalate the *model* for 3A — `gpt-5.4` is sufficient for diff review; the cross-model value is model *diversity*, not horsepower.
+- **3B test — default `-m gpt-5.4 -c model_reasoning_effort=medium`.** Escalate to `-m gpt-5.5 -c model_reasoning_effort=xhigh` ONLY if the test **repeatedly fails for unclear reasons** (env/flaky already excluded — ≥2 unclear fails on the same slice) or the slice is **high-risk** (the same risk list). Browser drives are the most expensive gate; never run them at xhigh by default.
+
+Record the model + effort actually used in the slice gate-status (`codexReview.by`/`.effort`, `codexPwTest.by`/`.effort`) so cost is auditable per slice.
+
+### Required pre-call log line (print in the lead context, BEFORE each codex call)
+Surfaces what each call will cost — model, effort, gate, round, diff size — at a glance:
+```bash
+DIFFSTAT="$(git --no-pager diff <BASE>...HEAD --shortstat 2>/dev/null | sed 's/^[[:space:]]*//')"
+echo "CODEX CALL: gate=<3A-review|3B-pwtest> model=<gpt-5.4|gpt-5.5> effort=<low|medium|xhigh> round=<n> diff=[${DIFFSTAT:-no committed diff}]"
+```
+This line is informational (NOT a gate verdict — the `GATE …` verdict lines below are unchanged), and like every gate line it MUST print in the lead context, never from inside a workflow agent.
+
 ## Preflight — once per run (do it in Phase 1, re-check on first use)
 ```bash
 codex --version            # present?
 codex login status         # must print "Logged in ..."
 ```
 - **Missing binary** → self-unblock per the standard rule: `npm i -g @openai/codex`, then re-check. Only a FAILED install is a blocker.
-- **Not logged in / token revoked** → this needs operator credentials (`codex login` is interactive / opens a browser); a skill cannot do it. This is a **legitimate external blocker for the cross-model gate** — and `codex login status` can falsely report "Logged in" while `codex exec` still 401s, so confirm with a trivial serial `codex exec -c model_reasoning_effort=low 'reply OK'` during preflight. If exec genuinely fails, log a blocker in `docs/decisions.md` naming the exact failed command (`codex login` / the 401), mark affected slices accordingly, and let the global gate fall to `completed-with-blockers`. **Never silently skip the cross-model gate and report a slice `passed`** — a missing second opinion is an unmet gate, not a clean pass.
+- **Not logged in / token revoked** → this needs operator credentials (`codex login` is interactive / opens a browser); a skill cannot do it. This is a **legitimate external blocker for the cross-model gate** — and `codex login status` can falsely report "Logged in" while `codex exec` still 401s, so confirm with a trivial serial `codex exec -m gpt-5.4 -c model_reasoning_effort=low 'reply OK'` during preflight (also confirms the pinned default model is reachable on this account). If exec genuinely fails, log a blocker in `docs/decisions.md` naming the exact failed command (`codex login` / the 401), mark affected slices accordingly, and let the global gate fall to `completed-with-blockers`. **Never silently skip the cross-model gate and report a slice `passed`** — a missing second opinion is an unmet gate, not a clean pass.
 
 ## 3A — Adversarial review loop (read-only)
 Capture the slice's base commit BEFORE editing the slice (`BASE=$(git rev-parse HEAD)`), so the review sees exactly the slice's changes. Each round:
 
 ```bash
-codex exec -s read-only --skip-git-repo-check -C "<projectDir>" \
+# Effort per the policy above: low default; medium if a material finding / high-risk slice / low-confidence first pass.
+EFFORT=low   # -> medium on escalation (keep the model gpt-5.4 for 3A)
+DIFFSTAT="$(git --no-pager diff <BASE>...HEAD --shortstat 2>/dev/null | sed 's/^[[:space:]]*//')"
+echo "CODEX CALL: gate=3A-review model=gpt-5.4 effort=${EFFORT} round=<round> diff=[${DIFFSTAT:-no committed diff}]"
+codex exec -s read-only -m gpt-5.4 -c model_reasoning_effort="${EFFORT}" \
+  --skip-git-repo-check -C "<projectDir>" \
   --output-schema "<autothingAssets>/codex-review.schema.json" \
   --output-last-message "<runDir>/codex-review-<slice>-r<round>.json" \
   "You are doing an ADVERSARIAL review of slice '<slice>'. Inspect ONLY its changes:
@@ -60,7 +85,12 @@ Then read the JSON (`verdict`, `findings[]`):
 The dev server is already up from step 1 (testing skill, known port). Codex drives the live app itself:
 
 ```bash
+# Default gpt-5.4 / medium; escalate to gpt-5.5 / xhigh ONLY on repeated unclear fails or a high-risk slice (policy above).
+MODEL=gpt-5.4 ; EFFORT=medium   # -> MODEL=gpt-5.5 EFFORT=xhigh on escalation
+DIFFSTAT="$(git --no-pager diff <BASE>...HEAD --shortstat 2>/dev/null | sed 's/^[[:space:]]*//')"
+echo "CODEX CALL: gate=3B-pwtest model=${MODEL} effort=${EFFORT} round=<attempt> diff=[${DIFFSTAT:-no committed diff}]"
 codex exec -s workspace-write -c sandbox_workspace_write.network_access=true \
+  -m "${MODEL}" -c model_reasoning_effort="${EFFORT}" \
   --skip-git-repo-check -C "<projectDir>" \
   --output-schema "<autothingAssets>/codex-pwtest.schema.json" \
   --output-last-message "<runDir>/codex-pwtest-<slice>.json" \
@@ -83,14 +113,16 @@ codex exec -s workspace-write -c sandbox_workspace_write.network_access=true \
 "codexReview": {
   "verdict": "approve",            // approve | approve-with-override | needs-attention
   "rounds": 2,                     // review rounds run
-  "by": "codex/gpt-5.5",
+  "by": "codex/gpt-5.4",          // actual model used (gpt-5.5 only if escalated)
+  "effort": "low",                // low default; "medium" if escalated
   "at": "<iso>",
   "lastReport": "<runDir>/slices/<slice>/codex-review-<slice>-r2.json",
   "overrides": []                  // per-finding rebuttals when verdict is approve-with-override
 },
 "codexPwTest": {
   "result": "pass",               // pass | fail
-  "by": "codex/gpt-5.5",
+  "by": "codex/gpt-5.4",          // actual model used (gpt-5.5 only if escalated)
+  "effort": "medium",             // medium default; "xhigh" if escalated
   "at": "<iso>",
   "report": "<runDir>/slices/<slice>/codex-pwtest-<slice>.json"
 }
@@ -98,7 +130,7 @@ codex exec -s workspace-write -c sandbox_workspace_write.network_access=true \
 And in `evidence-index.json` `globalGate`, add `crossModel: { reviewAllApproved: <bool>, pwTestAllPassed: <bool> }`.
 
 ## Printed lines (the transcript-only /goal evaluator can only confirm what is printed)
-Per slice, after 3A/3B, print:
+BEFORE each Codex call, print the `CODEX CALL: gate=… model=… effort=… round=… diff=[…]` line (see "Required pre-call log line" above). Then, per slice, after 3A/3B, print the verdicts:
 ```
 GATE codex-review: <approve|approve-with-override|needs-attention(r<n>)> — <summary>
 GATE codex-pwtest: <pass|fail> — <summary>

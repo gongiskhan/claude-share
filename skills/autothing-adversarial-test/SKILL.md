@@ -11,10 +11,15 @@ Cross-model functional test — a SECOND model (OpenAI Codex, via the `codex` CL
 - **Serialize every `codex exec`** — one at a time, run-wide. Concurrent calls revoke the shared OAuth token.
 - **Redirect stdin from `/dev/null`**; read the result from `--output-last-message`, never via a pipe.
 - The dev server must be up (from `autothing-test` / `/run`, known port).
+- **Pin model + effort (cost-aware):** default `-m gpt-5.4 -c model_reasoning_effort=medium` (an unpinned call inherits the account default, which can silently run xhigh — browser drives are the most expensive gate). Escalate to `-m gpt-5.5 -c model_reasoning_effort=xhigh` ONLY when the test repeatedly fails for unclear reasons (env/flaky excluded — ≥2 unclear fails on the same change) or the change is high-risk (**auth/tenant/data/security/payments/migrations**). Full policy: `~/.claude/skills/autothing/references/codex-verification.md`.
 
 ## The independent pass
 ```bash
+MODEL=gpt-5.4 ; EFFORT=medium   # -> MODEL=gpt-5.5 EFFORT=xhigh on escalation
+DIFFSTAT="$(git --no-pager diff <BASE>...HEAD --shortstat 2>/dev/null | sed 's/^[[:space:]]*//')"
+echo "CODEX CALL: gate=3B-pwtest model=${MODEL} effort=${EFFORT} round=<attempt> diff=[${DIFFSTAT:-no committed diff}]"
 codex exec -s workspace-write -c sandbox_workspace_write.network_access=true \
+  -m "${MODEL}" -c model_reasoning_effort="${EFFORT}" \
   --skip-git-repo-check -C "<projectDir>" \
   --output-schema "$HOME/.claude/skills/autothing/assets/codex-pwtest.schema.json" \
   --output-last-message "<runDir>/codex-pwtest.json" \
@@ -26,4 +31,4 @@ Browser automation needs localhost network + a browser process; the flags above 
 - **In an autothing build:** `fail` with a real defect **sends the slice back to `autothing-implement`** (consumes the slice retry ceiling); re-run after each fix. A flaky/env failure (not a product defect) is re-run, not counted as a fix-attempt. Record `codexPwTest` in the slice gate-status.
 - **Standalone:** run the pass and report `pass|fail` + what Codex saw.
 
-Print in the lead context: `GATE codex-pwtest: <pass|fail> — <summary>`.
+Print in the lead context, BEFORE the call the `CODEX CALL: gate=3B-pwtest model=… effort=… round=… diff=[…]` line, and after it the verdict: `GATE codex-pwtest: <pass|fail> — <summary>`.
